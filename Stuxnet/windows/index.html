@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nuclear Process HMI</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            background: #101820;
+            color: white;
+        }
+
+        .header {
+            background: #1b2733;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 3px solid #00aaff;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 30px;
+        }
+
+        .header p {
+            margin: 8px 0 0;
+            color: #aaa;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .card {
+            background: #1b2733;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #00aaff;
+            font-size: 20px;
+        }
+
+        .value {
+            font-size: 38px;
+            font-weight: bold;
+            margin: 20px 0;
+        }
+
+        .unit {
+            color: #aaa;
+            font-size: 18px;
+        }
+
+        .status {
+            color: #00ff88;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .authorized {
+            color: #00ff88;
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            color: #777;
+        }
+
+        .connection {
+            text-align: center;
+            padding: 10px;
+            background: #16232d;
+        }
+
+        @media (max-width: 800px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>NUCLEAR PROCESS HMI</h1>
+        <p>Industrial Control & Monitoring Dashboard</p>
+    </div>
+
+    <div class="connection">
+        PLC Connection:
+        <span id="connectionStatus">Connecting...</span>
+    </div>
+
+    <div class="dashboard">
+
+        <!-- RPM -->
+        <div class="card">
+            <h2>ROTATION SPEED</h2>
+
+            <div class="value" id="rpm">
+                ---
+            </div>
+
+            <div class="unit">
+                RPM
+            </div>
+        </div>
+
+        <!-- Temperature -->
+        <div class="card">
+            <h2>TEMPERATURE</h2>
+
+            <div class="value" id="temperature">
+                ---
+            </div>
+
+            <div class="unit">
+                °C
+            </div>
+        </div>
+
+        <!-- Pressure -->
+        <div class="card">
+            <h2>PRESSURE</h2>
+
+            <div class="value" id="pressure">
+                ---
+            </div>
+
+            <div class="unit">
+                bar
+            </div>
+        </div>
+
+        <!-- PLC Status -->
+        <div class="card">
+            <h2>PLC STATUS</h2>
+
+            <div class="status" id="plcStatus">
+                ---
+            </div>
+        </div>
+
+        <!-- Authorization -->
+        <div class="card">
+            <h2>AUTHORIZATION</h2>
+
+            <div class="authorized" id="authorization">
+                ---
+            </div>
+        </div>
+
+        <!-- System -->
+        <div class="card">
+            <h2>SYSTEM</h2>
+
+            <div class="value" id="systemStatus">
+                ---
+            </div>
+        </div>
+
+    </div>
+
+    <div class="footer">
+        Simulated Industrial Control System | Educational Project
+    </div>
+
+
+    <script>
+
+        // ==========================================
+        // UBUNTU PLC API ADDRESS
+        // ==========================================
+
+        const PLC_API =
+            "http://192.168.63.143:5000/plc/data";
+
+
+        // ==========================================
+        // GET DATA FROM PLC
+        // ==========================================
+
+        async function getPLCData() {
+
+            try {
+
+                const response = await fetch(PLC_API);
+
+                if (!response.ok) {
+                    throw new Error("PLC API error");
+                }
+
+                const data = await response.json();
+
+
+                // Update RPM
+                document.getElementById("rpm").textContent =
+                    data.rpm;
+
+
+                // Update Temperature
+                document.getElementById("temperature").textContent =
+                    data.temperature;
+
+
+                // Update Pressure
+                document.getElementById("pressure").textContent =
+                    data.pressure;
+
+
+                // Update PLC Status
+                document.getElementById("plcStatus").textContent =
+                    data.plc_status;
+
+
+                // Update Authorization
+                document.getElementById("authorization").textContent =
+                    data.authorization;
+
+
+                // System status
+                document.getElementById("systemStatus").textContent =
+                    "ACTIVE";
+
+
+                // Connection status
+                document.getElementById("connectionStatus").textContent =
+                    "CONNECTED";
+
+                document.getElementById("connectionStatus").style.color =
+                    "#00ff88";
+
+            }
+
+            catch (error) {
+
+                console.log(error);
+
+                document.getElementById("connectionStatus").textContent =
+                    "DISCONNECTED";
+
+                document.getElementById("connectionStatus").style.color =
+                    "red";
+
+                document.getElementById("plcStatus").textContent =
+                    "OFFLINE";
+
+                document.getElementById("systemStatus").textContent =
+                    "OFFLINE";
+            }
+        }
+
+
+        // ==========================================
+        // UPDATE EVERY 1 SECOND
+        // ==========================================
+
+        getPLCData();
+
+        setInterval(getPLCData, 1000);
+
+    </script>
+
+</body>
+</html>

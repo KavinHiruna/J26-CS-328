@@ -1,0 +1,162 @@
+                    WIND TURBINE
+                         │
+       ┌─────────────────┼──────────────────┐
+       │                 │                  │
+       ▼                 ▼                  ▼
+ Wind Sensors       Mechanical          Electrical
+       │              Sensors              Sensors
+       │                 │                  │
+ ┌─────┴─────┐     ┌─────┴─────┐      ┌────┴─────┐
+ │Anemometer │     │Vibration  │      │ Voltage  │
+ │Wind Vane  │     │Accelerom. │      │ Current  │
+ │Wind Temp  │     │RPM/Speed  │      │ Power    │
+ └───────────┘     │Temperature│      │Frequency │
+                   │Gearbox    │      └──────────┘
+                   └───────────┘
+                         │
+                         ▼
+                       PLC
+                         │
+                       Modbus
+                         │
+                         ▼
+                     SCADA/HMI
+                         │
+                         ▼
+                Network / IDS / SOC
+
+
+
+=======================================================================================
+Sensors
+   ↓
+PLC
+   ↓
+Modbus
+   ↓
+SCADA/HMI
+   ↓
+Network Traffic
+   ↓
+ML IDS
+   ↓
+XAI
+   ↓
+SOC
+
+
+==================================================================================ambient_temp_c    = 29.4
+gearbox_temp_c    = 67.2
+generator_temp_c  = 72.1
+bearing_temp_c    = 54.3
+oil_temp_c        = 61.5
+
+==================================================================================
+voltage_v       = 690
+current_a       = 420
+active_power_kw = 285
+frequency_hz    = 50.02
+power_factor    = 0.96
+
+==================================================================================
+
+PLC/SCADA data
+
+Sensors → PLC → Modbus → SCADA
+plc_id
+plc_register
+plc_command
+plc_response
+modbus_function
+modbus_address
+register_value
+scada_tag
+
+==================================================================================
+
+
+Network features — VERY important for Student 1
+
+
+Group A — Physical/industrial features
+
+wind_speed
+wind_direction
+rotor_speed
+generator_speed
+vibration
+temperature
+voltage
+current
+power
+pitch
+yaw
+
+
+Group B — Network/IIoT features
+
+source_ip
+destination_ip
+source_port
+destination_port
+protocol
+packet_length
+packet_count
+flow_duration
+tcp_flags
+modbus_function
+modbus_address
+request_count
+response_count
+
+==============================================================================
+
+Example dataset row
+
+timestamp,turbine_id,wind_speed_mps,wind_direction_deg,
+rotor_speed_rpm,generator_speed_rpm,vibration_rms,
+gearbox_temp_c,voltage_v,current_a,active_power_kw,
+frequency_hz,overspeed_alarm,modbus_function,
+packet_length,flow_duration,attack_type
+
+normal:
+2026-08-25 10:00:01,
+WT01,
+11.8,
+245,
+15.2,
+1520,
+0.21,
+63.4,
+690,
+410,
+275,
+50.01,
+0,
+3,
+128,
+0.15,
+Normal
+
+suspicious:
+2026-08-25 10:05:21,
+WT01,
+12.1,
+246,
+24.8,
+2480,
+0.31,
+68.2,
+690,
+430,
+290,
+50.02,
+1,
+6,
+512,
+0.02,
+Modbus_Manipulation
+
+
+
+

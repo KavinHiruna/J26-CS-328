@@ -1,0 +1,5 @@
+Model,Target,Rows,Feature count,Test size,Random state,Accuracy (%),Macro precision (%),Macro recall (%),Macro F1 (%),Weighted F1 (%),Training time (s),Prediction time (s)
+Logistic Regression,Attack_type,157800,36,0.2,42,68.4569,64.5378,66.1383,62.641,65.5698,15.379,0.0194
+Decision Tree,Attack_type,157800,36,0.2,42,93.9924,90.998,92.8434,90.9683,94.2054,1.0914,0.0189
+Random Forest,Attack_type,not recorded,36,0.2,not recorded,94.3473,88.9273,93.4439,90.0757,94.6089,15.5619,0.5268
+HistGradientBoosting,Attack_type,157800,36,0.2,42,93.7041,87.4785,92.8864,88.4464,94.1694,3.2354,0.1005

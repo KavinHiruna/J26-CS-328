@@ -1,0 +1,18 @@
+{
+    "model": "RandomForestClassifier",
+    "target": "Attack_type",
+    "dataset_rows": 157800,
+    "training_rows": 126240,
+    "testing_rows": 31560,
+    "feature_count": 36,
+    "class_count": 15,
+    "random_seed": 42,
+    "test_size": 0.2,
+    "accuracy": 0.9434727503168567,
+    "macro_precision": 0.8892733781588288,
+    "macro_recall": 0.9344393109044252,
+    "macro_f1": 0.9007565722177403,
+    "weighted_f1": 0.9460891490608717,
+    "training_seconds": 15.561909299925901,
+    "prediction_seconds": 0.5267948999535292
+}

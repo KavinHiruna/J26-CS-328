@@ -1,0 +1,15 @@
+{
+  "experiment": "Random Forest without tcp.srcport",
+  "dataset_rows": 157800,
+  "training_rows": 126240,
+  "testing_rows": 31560,
+  "feature_count": 35,
+  "removed_feature": "tcp.srcport",
+  "accuracy": 0.919106463878327,
+  "macro_precision": 0.8899451267066034,
+  "macro_recall": 0.9043022264545807,
+  "macro_f1": 0.8870817422416405,
+  "weighted_f1": 0.9209895926635707,
+  "training_seconds": 2.104974600020796,
+  "prediction_seconds": 0.15183129999786615
+}

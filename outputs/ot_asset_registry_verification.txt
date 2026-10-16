@@ -1,0 +1,5 @@
+OT asset registry structural validation: PASSED
+Asset count: 5
+Unique asset IDs: 5
+Scenario count: 2
+Criticality values are provisional scenario assumptions.

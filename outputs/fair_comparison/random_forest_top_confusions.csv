@@ -1,0 +1,11 @@
+actual_class,predicted_attack_type,count
+DDoS_HTTP,SQL_injection,159
+SQL_injection,DDoS_HTTP,150
+Uploading,XSS,150
+Password,SQL_injection,143
+Ransomware,MITM,129
+Password,DDoS_HTTP,117
+Ransomware,Port_Scanning,103
+XSS,MITM,92
+XSS,Uploading,82
+Port_Scanning,MITM,79

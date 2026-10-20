@@ -1,0 +1,83 @@
+┌────────────────────────────────────────────────────┐
+│                 SOLAR PROCESS DATA                  │
+├────────────────────────────────────────────────────┤
+│ Irradiance                                         │
+│ Ambient Temperature                                │
+│ Module Temperature                                 │
+│ Wind Speed                                         │
+│ Wind Direction                                     │
+│ Humidity                                           │
+│ DC Voltage                                         │
+│ DC Current                                         │
+│ DC Power                                           │
+│ AC Voltage                                         │
+│ AC Current                                         │
+│ Frequency                                          │
+│ Active Power                                       │
+│ Reactive Power                                     │
+│ Inverter Temperature                               │
+│ Grid Voltage                                       │
+│ Grid Frequency                                     │
+│ Transformer Temperature                            │
+│ Breaker Status                                     │
+│ Safety Alarms                                      │
+└──────────────────────┬─────────────────────────────┘
+                       │
+                       ▼
+┌────────────────────────────────────────────────────┐
+│                 NETWORK FEATURES                   │
+├────────────────────────────────────────────────────┤
+│ Source IP                                          │
+│ Destination IP                                     │
+│ Source Port                                        │
+│ Destination Port                                   │
+│ Protocol                                           │
+│ Packet Size                                        │
+│ Flow Duration                                      │
+│ TCP Flags                                          │
+│ Packet Count                                       │
+│ Modbus Function                                    │
+│ Modbus Register                                    │
+└──────────────────────┬─────────────────────────────┘
+                       │
+                       ▼
+                ┌──────────────┐
+                │ ML-Based IDS  │
+                └──────┬───────┘
+                       │
+                       ▼
+                  Attack Label
+==================================================================================
+
+
+
+
+Attacker
+   │
+   │ Malicious Modbus request
+   ▼
+PLC
+   │
+   │ Modified register
+   ▼
+Inverter
+   │
+   │ Abnormal setpoint
+   ▼
+AC/DC measurements change
+   │
+   ▼
+ML IDS
+   │
+   ▼
+Attack detected
+   │
+   ▼
+SHAP/LIME
+   │
+   └── "Why?"
+       ├── Modbus function code
+       ├── Destination port
+       ├── Packet size
+       ├── Connection frequency
+       └── Abnormal power measurement

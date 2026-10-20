@@ -1,0 +1,190 @@
+                 KALI LINUX
+                     │
+                Attack Traffic
+                     │
+                     ▼
+        ┌─────────────────────────┐
+        │   SUBSTATION NETWORK    │
+        │                         │
+        │  Electrical Sensors     │
+        │  ├─ CT                  │
+        │  ├─ VT/PT               │
+        │  ├─ Voltage             │
+        │  └─ Current             │
+        │                         │
+        │  Environmental Sensors  │
+        │  ├─ Temperature         │
+        │  ├─ Humidity            │
+        │  ├─ SF6                 │
+        │  └─ Gas/Dust            │
+        │                         │
+        │  Physical Sensors       │
+        │  ├─ Vibration           │
+        │  ├─ Seismic             │
+        │  ├─ Intrusion           │
+        │  └─ Acoustic            │
+        │                         │
+        └───────────┬─────────────┘
+                    │
+                    ▼
+                  PLC
+                    │
+              Modbus TCP
+                    │
+                    ▼
+                 SCADA/HMI
+                    │
+                    ▼
+          ┌──────────────────┐
+          │ Dataset Collector│
+          └────────┬─────────┘
+                   │
+                   ▼
+          ┌──────────────────┐
+          │ Preprocessing    │
+          │ Feature Engineer │
+          └────────┬─────────┘
+                   │
+                   ▼
+             ML-Based IDS
+                   │
+                   ▼
+                  XAI
+             SHAP / LIME
+                   │
+                   ▼
+              SOC / Alert
+                   │
+                   ▼
+             Forensics
+
+
+timestamp
+asset_id
+sensor_id
+
+phase_a_voltage_v
+phase_b_voltage_v
+phase_c_voltage_v
+phase_a_current_a
+phase_b_current_a
+phase_c_current_a
+frequency_hz
+active_power_kw
+reactive_power_kvar
+power_factor
+voltage_unbalance_pct
+current_unbalance_pct
+partial_discharge_level
+
+ambient_temperature_c
+transformer_temperature_c
+winding_temperature_c
+hotspot_temperature_c
+fiber_temperature_c
+humidity_pct
+sf6_pressure_kpa
+sf6_density
+oxygen_level_pct
+pm2_5
+pm10
+
+transformer_vibration
+seismic_level
+acoustic_level_db
+intrusion_status
+door_status
+motion_detected
+wildlife_detected
+fire_alarm_status
+
+plc_id
+modbus_function_code
+modbus_register
+modbus_value
+scada_tag
+control_command
+alarm_status
+
+src_ip
+dst_ip
+src_port
+dst_port
+protocol
+packet_length
+flow_duration
+packets_sent
+packets_received
+bytes_sent
+bytes_received
+
+traffic_status
+attack_type
+severity
+label
+
+
+========================================================================
+Dataset Structure I Recommend
+
+Timestamp
+   │
+   ├── Electrical Measurements
+   │
+   ├── Environmental Measurements
+   │
+   ├── Physical/Safety Measurements
+   │
+   ├── Equipment Status
+   │
+   ├── PLC/SCADA Information
+   │
+   ├── Network Features
+   │
+   └── Attack Label
+========================================================================
+
+Electrical Measurement Columns
+
+TR-01
+TR-02
+TR-03
+
+========================================================================
+Physical & Safety Sensor Columns
+0 = Normal
+1 = Abnormal
+
+========================================================================
+
+PLC / SCADA Columns
+Sensors
+   ↓
+PLC
+   ↓
+Modbus
+   ↓
+SCADA/HMI
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

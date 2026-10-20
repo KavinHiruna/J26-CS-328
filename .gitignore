@@ -1,0 +1,14 @@
+.venv/
+venv/
+__pycache__/
+*.pyc
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+data/raw/*
+!data/raw/.gitkeep
+*.csv.zip
+models/*.joblib
+*.pkl
+outputs/live_scored.jsonl
+.DS_Store

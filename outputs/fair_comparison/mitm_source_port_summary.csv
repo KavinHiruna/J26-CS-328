@@ -1,0 +1,3 @@
+group,rows,missing_count,missing_percent,unique_non_missing_values
+MITM,1214,367,30.230642504118617,1
+OTHER,156586,0,0.0,32182

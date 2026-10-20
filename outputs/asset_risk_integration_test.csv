@@ -1,0 +1,2 @@
+alert_id,asset_id,attack_type,attack_severity,detection_confidence,attack_frequency,asset_name,scenario,asset_criticality,risk_score,priority,input_status
+TEST-001,OT-001,Ransomware,5,0.9,4,Industrial Controller,Water Treatment,5,95.07,Critical,Illustrative test values

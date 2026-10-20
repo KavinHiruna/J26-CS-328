@@ -1,0 +1,7 @@
+
+asset_id,asset_name,scenario,asset_role,criticality,criticality_reason,data_source
+OT-001,Industrial Controller,Water Treatment,Process control,5,Prototype assumption: directly controls a critical process,Scenario-based assumption
+OT-002,Monitoring Gateway,Water Treatment,Monitoring and communication,3,Prototype assumption: supports monitoring and communication,Scenario-based assumption
+OT-003,Engineering Workstation,Water Treatment,Engineering access,4,Prototype assumption: privileged engineering access,Scenario-based assumption
+OT-004,Renewable Energy Controller,Solar Farm,Power generation control,5,Prototype assumption: directly controls power generation,Scenario-based assumption
+OT-005,Monitoring Server,Solar Farm,Monitoring and reporting,3,Prototype assumption: supports monitoring and reporting,Scenario-based assumption

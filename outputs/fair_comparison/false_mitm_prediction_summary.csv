@@ -1,0 +1,11 @@
+actual_attack_type,predicted_as_MITM_count
+Ransomware,129
+XSS,92
+Port_Scanning,79
+Backdoor,29
+Fingerprinting,19
+Normal,10
+Password,4
+SQL_injection,3
+Uploading,2
+Vulnerability_scanner,2

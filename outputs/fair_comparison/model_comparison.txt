@@ -1,0 +1,16 @@
+FAIR MODEL COMPARISON — SHARED TEST SPLIT
+============================================
+
+               Model  Accuracy (%)  Macro precision (%)  Macro recall (%)  Macro F1 (%)  Weighted F1 (%)  Training time (s)  Prediction time (s)
+ Logistic Regression         68.46                64.54             66.14         62.64            65.57              15.38               0.0178
+       Decision Tree         93.99                91.00             92.84         90.97            94.21               1.07               0.0162
+       Random Forest         94.52                91.59             93.41         91.54            94.74               2.01               0.1254
+HistGradientBoosting         93.70                87.48             92.89         88.45            94.17               2.99               0.0963
+
+Dataset rows: 157800; features: 36; classes: 15
+Training rows: 126240; testing rows: 31560
+Split: stratified 80/20, random_state=42
+Class weighting: none for all four models in this controlled experiment
+
+Caution: row-level split does not rule out near-duplicate leakage or prove performance on unseen sessions/environments.
+These models classify Attack_type, not final Critical/High/Medium/Low SOC priority.

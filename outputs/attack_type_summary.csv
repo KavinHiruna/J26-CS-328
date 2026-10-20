@@ -1,0 +1,15 @@
+Attack_type,record_count
+DDoS_UDP,14498
+DDoS_ICMP,14090
+Ransomware,10925
+DDoS_HTTP,10561
+SQL_injection,10311
+Uploading,10269
+DDoS_TCP,10247
+Backdoor,10195
+Vulnerability_scanner,10076
+Port_Scanning,10071
+XSS,10052
+Password,9989
+MITM,1214
+Fingerprinting,1001

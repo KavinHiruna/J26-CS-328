@@ -1,0 +1,8 @@
+total_records: 157800
+training_records: 126240
+testing_records: 31560
+duplicate_feature_rows_full_dataset: 5476
+unique_feature_hashes_training: 122008
+unique_feature_hashes_testing: 30686
+overlapping_feature_hashes_train_test: 370
+feature_vectors_with_conflicting_labels: 3

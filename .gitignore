@@ -216,3 +216,23 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Component 3 local files and generated models
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Keep the original dataset out of Git
+data/*
+!data/ot_asset_registry.csv
+
+# Trained models
+models/
+*.joblib
+*.pkl

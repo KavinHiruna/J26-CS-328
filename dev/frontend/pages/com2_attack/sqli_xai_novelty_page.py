@@ -147,7 +147,7 @@ if st.session_state.get("engine_sig") != signature:
 engine: X.SQLiXAIEngine = st.session_state["engine"]
 
 # ---------------------------------------------------------------- incident selection
-st.title("🛡️ SQL Injection - Evidence-Grounded Hybrid XAI")
+st.title("SQL Injection - Evidence-Grounded Hybrid XAI")
 st.caption(f"Dataset `{data_name}` · {len(df):,} rows · model classes: {', '.join(classes)} · "
            f"explaining class **{engine.attack_class}**")
 

@@ -988,6 +988,11 @@ st.markdown(
 # INCIDENT DATA
 # ============================================================
 
+# Define sidebar defaults before loading the dataset. If the CSV is missing,
+# the rest of the page can still render without NameError exceptions.
+selected_attack = st.session_state.get("detection_type", "All")
+selected_source = st.session_state.get("traffic_source", "Dataset")
+
 DATASET_PATH = (
     Path(__file__).resolve().parent
     / "data"
@@ -997,10 +1002,27 @@ DATASET_PATH = (
 
 try:
 
-    incident_data = pd.read_csv(
-        DATASET_PATH,
-        low_memory=False
-    )
+    if DATASET_PATH.exists():
+        incident_data = pd.read_csv(
+            DATASET_PATH,
+            low_memory=False
+        )
+    else:
+        st.warning(
+            f"Dataset file not found at: {DATASET_PATH}. "
+            "Upload the CSV below, or place it in the project's data folder."
+        )
+        uploaded_dataset_fallback = st.file_uploader(
+            "Upload EdgeIIoT_train_80.csv",
+            type=["csv"],
+            key="dataset_fallback_upload"
+        )
+        if uploaded_dataset_fallback is None:
+            raise FileNotFoundError(DATASET_PATH)
+        incident_data = pd.read_csv(
+            uploaded_dataset_fallback,
+            low_memory=False
+        )
 
 
     # ========================================================
@@ -1256,15 +1278,9 @@ except Exception as e:
 
 if not incident_data.empty:
 
-    selected_attack = st.session_state.get(
-        "detection_type",
-        "All"
-    )
-
-    selected_source = st.session_state.get(
-        "traffic_source",
-        "Dataset"
-    )
+    # Keep the defaults in sync with the current sidebar controls.
+    selected_attack = st.session_state.get("detection_type", selected_attack)
+    selected_source = st.session_state.get("traffic_source", selected_source)
 
 
     # --------------------------------------------------------

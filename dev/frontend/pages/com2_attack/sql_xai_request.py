@@ -26,14 +26,14 @@ st.set_page_config(
 
 PROJECT_ROOT = Path(r"D:\4Y1S\research\xai_iiot_prototype")
 DATASET_PATH = PROJECT_ROOT / "data" / "EdgeIIoT_train_80_with_incident_id.csv"
-ID_COLUMNS = ["Incident ID", "incident_id"]
+ID_COLUMNS = ["Incident ID", "Incident_ID", "incident_id", "incident id"]
 TEXT_COLUMNS = [
     "http.request.uri.query", "http.request.full_uri", "http.request.uri",
     "http.referer", "http.file_data", "http.request.method",
     "http.host", "url", "query", "payload", "raw_http_request", "http.request",
 ]
 DISPLAY_COLUMNS = [
-    "Incident ID", "frame.time", "ip.src_host", "ip.dst_host",
+    "Incident ID", "Incident_ID", "frame.time", "ip.src_host", "ip.dst_host",
     "http.request.method", "http.host", "http.request.uri",
     "http.request.uri.query", "http.request.full_uri", "http.file_data",
     "Attack_label",
@@ -133,13 +133,51 @@ if not id_col:
 
 st.caption(f"Dataset: `{dataset_name}` · {len(df):,} rows · {len(df.columns):,} columns · Incident ID column: `{id_col}`")
 
-# Calculate candidate indicators over request-related text columns only.
+# Fast vectorized scan: only inspect existing HTTP/request text columns.
+# Avoid DataFrame.apply(axis=1), which is slow for large packet datasets.
+df = df.copy()
+df["_source_row"] = range(len(df))
+
+existing_text_cols = []
+for name in TEXT_COLUMNS:
+    col = find_col(df, [name])
+    if col and col not in existing_text_cols:
+        existing_text_cols.append(col)
+
+if not existing_text_cols:
+    st.error("No supported HTTP/request text columns were found.")
+    st.write("Available columns:", list(df.columns))
+    st.stop()
+
 with st.spinner("Scanning HTTP/request fields for SQL-like indicators..."):
-    df = df.copy()
-    df["_source_row"] = range(len(df))
-    df["_indicator_text"] = df.apply(lambda row: row_text(row, df), axis=1)
-    df["_indicators"] = df["_indicator_text"].map(get_indicators)
-    df["_sql_candidate"] = df["_indicators"].map(bool)
+    # Build one searchable string per row from only the relevant text fields.
+    # Vectorized column operations are much faster than row-wise Python callbacks.
+    text_series = []
+    for col in existing_text_cols:
+        values = df[col].astype("string").fillna("")
+        text_series.append(values)
+    combined = text_series[0]
+    for values in text_series[1:]:
+        combined = combined.str.cat(values, sep=" ")
+    df["_indicator_text"] = combined.str.replace(r"%27", "'", regex=True).str.replace(r"%22", '"', regex=True)
+    df["_indicator_text"] = df["_indicator_text"].str.replace(r"\\+", " ", regex=True)
+
+    indicator_masks = {}
+    for indicator_name, pattern in PATTERNS.items():
+        indicator_masks[indicator_name] = df["_indicator_text"].str.contains(
+            pattern, na=False, regex=True
+        )
+
+    # Each row gets the names of the patterns matched. Apply only to the small
+    # set of boolean indicator columns, rather than repeatedly parsing raw rows.
+    indicator_names = list(indicator_masks.keys())
+    mask_frame = pd.DataFrame(indicator_masks, index=df.index)
+    any_match = mask_frame.any(axis=1)
+    df["_indicators"] = [
+        [name for name in indicator_names if bool(mask_frame.iloc[pos][name])]
+        for pos in range(len(mask_frame))
+    ]
+    df["_sql_candidate"] = any_match.to_numpy()
 
 # The binary Attack_label is a generic attack/benign label, not a SQLi-specific class.
 attack_col = find_col(df, ["Attack_label", "attack_label", "label"])

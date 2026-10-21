@@ -349,9 +349,42 @@ st.markdown(
     .lime-bar { height: 100%; border-radius: 3px; }
     .lime-value { text-align: right; color: #dce7f3; font-variant-numeric: tabular-nums; }
     .lime-note { color: #9fb2c7; font-size: 10px; margin-top: 10px; line-height: 1.4; }
+    .incident-header {
+        background: linear-gradient(120deg, #0d1a28, #101b28);
+        border: 1px solid #26384c;
+        border-radius: 12px;
+        padding: 22px 22px 18px;
+        margin: 0 0 12px;
+    }
+    .incident-heading {
+        display: flex; align-items: center; gap: 12px;
+        color: #e7eef7; font-size: 23px; font-weight: 800;
+        margin-bottom: 6px;
+    }
+    .incident-subtitle { color: #9fb2c7; font-size: 12px; margin-bottom: 18px; }
+    .incident-meta { display: flex; flex-wrap: wrap; gap: 26px; }
+    .incident-meta-item { display: grid; gap: 5px; min-width: 100px; }
+    .incident-meta-label { color: #93a8bd; font-size: 11px; }
+    .incident-meta-value { color: #e7eef7; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+    .status-open { color: #ff626b; }
+    .summary-grid {
+        display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px; margin-bottom: 12px;
+    }
+    .summary-card {
+        background: #101b28; border: 1px solid #26384c;
+        border-radius: 10px; padding: 16px; min-height: 100px; box-sizing: border-box;
+    }
+    .summary-label { color: #93a8bd; font-size: 11px; margin-bottom: 12px; }
+    .summary-value { color: #e7eef7; font-size: 18px; font-weight: 800; margin-bottom: 5px; }
+    .summary-detail { color: #c0cede; font-size: 11px; line-height: 1.4; }
     .notice {
         color: #aebed0; background: #111d2a; border: 1px solid #293b4e;
         border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px;
+    }
+    @media (max-width: 950px) {
+        .summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .incident-heading { font-size: 20px; }
     }
     @media (max-width: 760px) {
         .request-grid { grid-template-columns: 1fr; }
@@ -429,6 +462,45 @@ else:
         f'{html.escape(selection_reason.capitalize())}. Missing raw HTTP fields are not fabricated.</div>',
         unsafe_allow_html=True,
     )
+
+# SQL-injection incident overview — placed above HTTP Request Details.
+incident_id = "SQLI-000042"
+incident_status = "Open"
+incident_time = request.get("timestamp", UNAVAILABLE)
+incident_source = request.get("source_ip", UNAVAILABLE)
+
+incident_header_html = (
+    '<section class="incident-header">'
+    '<div class="incident-heading"><span>🛡️</span>SQL Injection Incident Analysis (XAI)</div>'
+    '<div class="incident-subtitle">Explainable analysis of a potentially malicious SQL request</div>'
+    '<div class="incident-meta">'
+    f'<div class="incident-meta-item"><div class="incident-meta-label">Incident ID</div><div class="incident-meta-value">{html.escape(incident_id)}</div></div>'
+    f'<div class="incident-meta-item"><div class="incident-meta-label">Status</div><div class="incident-meta-value status-open">● {html.escape(incident_status)}</div></div>'
+    f'<div class="incident-meta-item"><div class="incident-meta-label">Date &amp; Time</div><div class="incident-meta-value">{html.escape(incident_time)}</div></div>'
+    f'<div class="incident-meta-item"><div class="incident-meta-label">Source IP</div><div class="incident-meta-value">{html.escape(incident_source)}</div></div>'
+    '</div></section>'
+)
+st.markdown(incident_header_html, unsafe_allow_html=True)
+
+# Summary cards tailored to SQL injection.
+# Confidence is not fabricated when no trained model is loaded.
+summary_cards = [
+    ("Predicted Activity", "SQL Injection", "Nested query and Boolean-condition indicators"),
+    ("Model Confidence", "Not connected", "No trained model loaded"),
+    ("Severity", "High", "Investigate and validate before response"),
+    ("Attack Type", "SQL Injection", "Oracle-style XMLType / nested SELECT pattern"),
+]
+summary_html = ['<section class="summary-grid">']
+for label, value, detail in summary_cards:
+    summary_html.append(
+        '<div class="summary-card">'
+        f'<div class="summary-label">{html.escape(label)}</div>'
+        f'<div class="summary-value">{html.escape(value)}</div>'
+        f'<div class="summary-detail">{html.escape(detail)}</div>'
+        '</div>'
+    )
+summary_html.append('</section>')
+st.markdown("".join(summary_html), unsafe_allow_html=True)
 
 # Render each panel as one HTML block inside Streamlit columns.
 left_col, right_col = st.columns([1, 1.05], gap="small")

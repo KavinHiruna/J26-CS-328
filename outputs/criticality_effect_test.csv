@@ -1,0 +1,6 @@
+test_case,asset_criticality,attack_severity,detection_confidence,attack_frequency,risk_score,priority
+CRIT-1,1,5,0.9,4,49.53,Medium
+CRIT-2,2,5,0.9,4,60.91,High
+CRIT-3,3,5,0.9,4,72.3,High
+CRIT-4,4,5,0.9,4,83.68,Critical
+CRIT-5,5,5,0.9,4,95.07,Critical

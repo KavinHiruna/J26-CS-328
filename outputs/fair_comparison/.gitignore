@@ -1,0 +1,27 @@
+
+# Python environment
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Original datasets
+data/*
+!data/ot_asset_registry.csv
+
+# Trained models
+models/
+
+# Temporary files
+*.tmp
+*.log
+.DS_Store
+Thumbs.db
+

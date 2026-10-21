@@ -321,6 +321,22 @@ st.markdown(
     .evidence-name { color: #e7eef7; font-size: 12px; font-weight: 700; margin-bottom: 3px; }
     .evidence-desc { color: #aebed0; font-size: 11px; line-height: 1.45; }
     .evidence-severity { border-radius: 6px; padding: 4px 7px; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .shap-panel { margin-top: 12px; }
+    .shap-subtitle { color: #9fb2c7; font-size: 11px; margin: -2px 0 10px; }
+    .shap-chart { display: grid; gap: 9px; }
+    .shap-row {
+        display: grid; grid-template-columns: 142px minmax(100px, 1fr) 48px;
+        gap: 8px; align-items: center; font-size: 11px; color: #cbd8e6;
+    }
+    .shap-feature { text-align: right; overflow-wrap: anywhere; }
+    .shap-track {
+        position: relative; height: 15px; background: #0a111b;
+        border-radius: 3px; overflow: hidden;
+        background-image: linear-gradient(to right, transparent 49.5%, #526174 49.5%, #526174 50.5%, transparent 50.5%);
+    }
+    .shap-bar { position: absolute; top: 2px; height: 11px; border-radius: 2px; }
+    .shap-value { color: #dce7f3; font-variant-numeric: tabular-nums; }
+    .shap-note { color: #9fb2c7; font-size: 10px; margin-top: 10px; line-height: 1.4; }
     .notice {
         color: #aebed0; background: #111d2a; border: 1px solid #293b4e;
         border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px;
@@ -502,3 +518,42 @@ with right_col:
         '</div></section>'
     )
     st.markdown(payload_panel_html, unsafe_allow_html=True)
+
+
+    # Model Explanation (SHAP) — values below are illustrative until connected to
+    # the trained model's actual SHAP output.
+    shap_values = [
+        ("nested_query_pattern", 0.31),
+        ("quote_pattern", 0.18),
+        ("boolean_condition", 0.12),
+        ("and_operator", 0.09),
+        ("parameter_entropy", -0.06),
+        ("normal_query_structure", -0.08),
+    ]
+    max_abs = max(abs(value) for _, value in shap_values) or 1.0
+    shap_rows = []
+    for feature, value in shap_values:
+        # Map values to a centred track; positive bars extend right, negative left.
+        width_pct = abs(value) / max_abs * 46
+        if value >= 0:
+            bar_style = f"left:50%;width:{width_pct}%;background:#f08a36;"
+        else:
+            bar_style = f"right:50%;width:{width_pct}%;background:#25a7f0;"
+        shap_rows.append(
+            '<div class="shap-row">'
+            f'<div class="shap-feature">{html.escape(feature)}</div>'
+            f'<div class="shap-track"><span class="shap-bar" style="{bar_style}"></span></div>'
+            f'<div class="shap-value">{value:+.2f}</div>'
+            '</div>'
+        )
+
+    shap_panel_html = (
+        '<section class="xai-panel shap-panel">'
+        '<div class="panel-title"><span class="panel-icon">▥</span>Model Explanation (SHAP)</div>'
+        '<div class="shap-subtitle">Feature contribution to the model output</div>'
+        f'<div class="shap-chart">{"".join(shap_rows)}</div>'
+        '<div class="shap-note">Illustrative SHAP values for layout preview. Replace these values with '
+        'SHAP values calculated from your trained classifier before using this as a research result.</div>'
+        '</section>'
+    )
+    st.markdown(shap_panel_html, unsafe_allow_html=True)

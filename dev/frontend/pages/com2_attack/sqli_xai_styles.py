@@ -75,6 +75,17 @@ h1, h2, h3, h4 {{color:{c["navy"]};font-weight:800}}
   border:1px dashed rgba(255,255,255,.35)}}
 [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button span {{color:{c["navy"]} !important}}
 
+/* incident lookup widgets */
+.st-key-incident_id_search label, .st-key-incident_id_search input,
+.st-key-incident_selector label, .st-key-incident_selector [data-baseweb="select"] * {{
+  color:#000 !important
+}}
+/* incident lookup widgets */
+.st-key-incident_id_search label, .st-key-incident_id_search input,
+.st-key-incident_selector label, .st-key-incident_selector [data-baseweb="select"] * {{
+  color:#000 !important
+}}
+
 /* buttons */
 .stButton>button, .stDownloadButton>button {{background:{c["blue"]};color:#fff;border:0;border-radius:8px;font-weight:600}}
 .stButton>button:hover, .stDownloadButton>button:hover {{background:{c["blue_hover"]};color:#fff}}
@@ -84,6 +95,7 @@ h1, h2, h3, h4 {{color:{c["navy"]};font-weight:800}}
   padding:12px 16px;box-shadow:0 2px 10px rgba(15,43,82,.05)}}
 [data-testid="stMetricLabel"] p {{color:{c["muted"]};font-weight:600}}
 [data-testid="stMetricValue"] {{color:{c["navy"]}}}
+[data-testid="stMetricDelta"], [data-testid="stMetricDelta"] * {{color:#000 !important}}
 
 /* page parts */
 .page-title {{font-size:{f["size_heading"]};font-weight:800;color:{c["navy"]};margin:0 0 2px}}

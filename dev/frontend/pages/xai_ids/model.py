@@ -21,8 +21,8 @@ from sklearn.model_selection import train_test_split
 import config
 
 
-def feature_columns(df, label_col, id_col):
-    skip = set(config.NON_FEATURE_COLUMNS) | {label_col, id_col, config.BINARY_LABEL_COLUMN}
+def feature_columns(df, label_col, id_col, extra_skip=()):
+    skip = set(config.NON_FEATURE_COLUMNS) | {label_col, id_col, config.BINARY_LABEL_COLUMN} | set(extra_skip)
     feats = []
     for c in df.columns:
         if c in skip or c.startswith("_"):
@@ -71,7 +71,7 @@ class Detector:
     def _train(self):
         ds = self.ds
         df = ds.df
-        self.features = feature_columns(df, ds.label_col, ds.id_col)
+        self.features = feature_columns(df, ds.label_col, ds.id_col, ds.exclude_cols)
         n = min(config.TRAIN_SAMPLE_SIZE, len(df))
         y_all = df[ds.label_col]
         if n < len(df):

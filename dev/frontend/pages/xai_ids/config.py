@@ -27,6 +27,13 @@ DATASETS = {
 # ---------------------------------------------------------------------------
 LABEL_COLUMN = "Attack_type"          # multi-class label (Normal, DDoS_UDP, ...)
 BINARY_LABEL_COLUMN = "Attack_label"  # 0 = normal, 1 = attack
+# Other names tried if LABEL_COLUMN isn't in the file (case, spaces and _ ignored)
+LABEL_CANDIDATES = ["Attack_type", "attack_cat", "attack", "label_name", "class", "category",
+                    "label", "type", "target", "y"]
+BINARY_LABEL_CANDIDATES = ["Attack_label", "is_attack", "binary_label", "label_binary"]
+# If the attack type is label-encoded as numbers, map them to names here, e.g.
+# LABEL_NAMES = {"0": "Backdoor", "1": "DDoS_HTTP", ..., "7": "Normal", ...}
+LABEL_NAMES = {}
 INCIDENT_ID_CANDIDATES = ["incident_id", "Incident_ID", "IncidentID", "incident ID", "Incident Id"]
 TIME_CANDIDATES = ["frame.time", "timestamp", "Timestamp", "time", "datetime"]
 SRC_IP_CANDIDATES = ["ip.src_host", "src_ip", "Src IP", "source_ip"]

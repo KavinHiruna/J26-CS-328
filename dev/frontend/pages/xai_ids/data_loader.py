@@ -10,13 +10,20 @@ import pandas as pd
 import config
 
 
+def _norm(name):
+    """'Attack Type', 'attack_type', ' Attack-Type ' -> 'attacktype'."""
+    return "".join(ch for ch in str(name).lower() if ch.isalnum())
+
+
 def _find(columns, candidates):
-    lower = {c.lower(): c for c in columns}
+    by_norm = {}
+    for c in columns:
+        by_norm.setdefault(_norm(c), c)
     for cand in candidates:
         if cand in columns:
             return cand
-        if cand.lower() in lower:
-            return lower[cand.lower()]
+        if _norm(cand) in by_norm:
+            return by_norm[_norm(cand)]
     return None
 
 
@@ -75,10 +82,28 @@ class IncidentDataset:
         df = pd.read_csv(self.path, low_memory=False)
         print(f"[data] {len(df):,} rows x {df.shape[1]} columns", flush=True)
 
+        # Clean header names (stray spaces, Excel's UTF-8 BOM)
+        df.columns = [str(c).replace("\ufeff", "").strip() for c in df.columns]
         cols = list(df.columns)
-        self.label_col = _find(cols, [config.LABEL_COLUMN, "Attack_type", "label", "Label"])
+        print(f"[data] columns: {cols}", flush=True)
+
+        self.label_col = _find(cols, [config.LABEL_COLUMN] + config.LABEL_CANDIDATES)
+        self.binary_col = _find(cols, [config.BINARY_LABEL_COLUMN] + config.BINARY_LABEL_CANDIDATES)
+        if self.label_col is None and self.binary_col is not None:
+            # Only a 0/1 label: show traffic as Normal vs Attack
+            print(f"[data] no multi-class label column; using '{self.binary_col}' as Normal/Attack",
+                  flush=True)
+            b = pd.to_numeric(df[self.binary_col], errors="coerce").fillna(0)
+            df["Attack_type"] = np.where(b > 0, "Attack", "Normal")
+            self.label_col = "Attack_type"
         if self.label_col is None:
-            raise ValueError(f"No label column found (expected '{config.LABEL_COLUMN}').")
+            raise ValueError(
+                "No label column found. Set LABEL_COLUMN in config.py to the name of the column "
+                f"that holds the attack type. Columns in this file: {cols}")
+        if config.LABEL_NAMES:
+            # label-encoded classes (0, 1, 2 ...) -> names
+            df[self.label_col] = df[self.label_col].map(
+                lambda v: config.LABEL_NAMES.get(str(v).strip().split(".")[0], v))
         self.id_col = _find(cols, config.INCIDENT_ID_CANDIDATES) or next(
             (c for c in cols if "incident" in c.lower()), None)
         self.time_col = _find(cols, config.TIME_CANDIDATES)
@@ -86,6 +111,11 @@ class IncidentDataset:
         self.dst_col = _find(cols, config.DST_IP_CANDIDATES)
 
         df[self.label_col] = df[self.label_col].astype(str).str.strip()
+        # Normalise the benign class name so Normal-specific logic works ("normal", "BENIGN", "0")
+        benign = {"normal", "benign", "normal/benign"}
+        df[self.label_col] = df[self.label_col].where(
+            ~df[self.label_col].str.lower().isin(benign), "Normal")
+        self.exclude_cols = {self.label_col, self.binary_col} - {None}
 
         # Incident IDs
         if self.id_col is None:

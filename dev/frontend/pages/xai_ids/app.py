@@ -13,7 +13,7 @@ import config
 from data_loader import IncidentDataset
 from model import Detector
 
-app = Flask(__name__)
+app = Flask(__name__, template_folder="xai_ids_templates", static_folder="xai_ids_static")
 
 _state = {"datasets": {}, "detectors": {}, "errors": {}}
 _lock = threading.Lock()

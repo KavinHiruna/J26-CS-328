@@ -84,7 +84,7 @@ class Detector:
             sample = df
         self.medians = _matrix(sample, self.features).median()
         X = _matrix(sample, self.features, self.medians)
-        y = sample[ds.label_col].values
+        y = np.asarray(sample[ds.label_col])
         strat = y if pd.Series(y).value_counts().min() >= 2 else None
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42, stratify=strat)
         print(f"[model] training RandomForest on {len(Xtr):,} rows, {len(self.features)} features ...",

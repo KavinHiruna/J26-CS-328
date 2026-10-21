@@ -1,2228 +1,437 @@
-import streamlit as st
-import pandas as pd
-from datetime import date, time, datetime
-from zoneinfo import ZoneInfo
-from pathlib import Path
-import re
 import html
+import re
+from pathlib import Path
+from urllib.parse import urlsplit, unquote_plus
+import pandas as pd
+import streamlit as st
 
 
 # ============================================================
-# STREAMLIT PAGE CONFIGURATION
+# SQL INJECTION XAI — REQUEST & PAYLOAD ONLY
+# Expected dataset: D:\4Y1S\research\xai_iiot_prototype\data\EdgeIIoT_train_80.csv
 # ============================================================
 
 st.set_page_config(
-    page_title="Network Intrusion Detection System (IDS)",
-    page_icon="🔍",
+    page_title="SQL Injection XAI — Request & Payload",
+    page_icon="🔎",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
+)
+
+PROJECT_ROOT = Path(r"D:\4Y1S\research\xai_iiot_prototype")
+DATASET_PATH = PROJECT_ROOT / "data" / "EdgeIIoT_train_80.csv"
+UNAVAILABLE = "Not available in dataset"
+
+# Exact SQL-injection example supplied for the highlighted-payload panel.
+# URL decoding is done only for display; the encoded source remains unchanged here.
+SAMPLE_SQLI_PAYLOAD = (
+    "id=2&Submit=Submitid%3D53%27%20AND%202161%3D%28SELECT%20UPPER%28XMLType%28CHR%2860%29%7C%7CCHR%2858%29%7C%7CCHR%28113%29%7C%7CCHR%28113%29%7C%7CCHR%28112%29%7C%7CCHR%28122%29%7C%7CCHR%28113%29%7C%7C%28SELECT%20%28CASE%20WHEN%20%282161%3D2161%29%20THEN%201%20ELSE%200%20END%29%20FROM%20DUAL%29%7C%7CCHR%28113%29%7C%7CCHR%28118%29%7C%7CCHR%28106%29%7C%7CCHR%28118%29%7C%7CCHR%28113%29%7C%7CCHR%2862%29%29%29%20FROM%20DUAL%29%20AND%20%27cBFZ%27%3D%27cBFZ"
 )
 
 
-# ============================================================
-# CURRENT DATE & TIME
-# ============================================================
-
-@st.fragment(run_every="30s")
-def display_current_datetime():
-
-    # Sri Lanka Time
-    sri_lanka_time = datetime.now(
-        ZoneInfo("Asia/Colombo")
-    )
-
-    current_date = sri_lanka_time.strftime("%b %d, %Y")
-    current_time = sri_lanka_time.strftime("%H:%M:%S")
-
-    st.markdown(
-        f"""
-        <div style="
-            position: fixed;
-            top: 12px;
-            right: 30px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 15px;
-            color: #cbd5e1;
-            font-weight: 500;
-            z-index: 999999;
-            background: #0e1117;
-            padding: 6px 12px;
-            border-radius: 8px;
-        ">
-            <span style="font-size: 20px;">🗓️</span>
-            <span>{current_date}</span>
-            <span>{current_time}</span>
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-display_current_datetime()
-
-
-# ============================================================
-# SIDEBAR → MAIN DASHBOARD ATTACK TYPE MAPPING
-# ============================================================
-
-ATTACK_TYPE_MAPPING = {
-
-    "SQL Injection": [
-        "sql_injection",
-        "sql injection",
-        "sqlinjection"
-    ],
-
-    "Port Scanning": [
-        "port_scanning",
-        "port scanning",
-        "port_scan",
-        "port scan"
-    ],
-
-    "MITM": [
-        "mitm",
-        "man_in_the_middle",
-        "man in the middle",
-        "mitm_attack"
-    ],
-
-    "DDoS HTTP Flood": [
-        "ddos_http",
-        "ddos http",
-        "ddos_http_flood",
-        "ddos http flood",
-        "ddos_http_flooding",
-        "ddos http flooding"
-    ],
-
-    "OS Fingerprinting": [
-        "os_fingerprinting",
-        "os fingerprinting",
-        "osfingerprinting"
-    ],
-
-    "XSS": [
-        "xss",
-        "cross_site_scripting",
-        "cross site scripting"
-    ],
-
-    "Uploading": [
-        "uploading",
-        "upload"
-    ],
-
-    "Vulnerability Scanner": [
-        "vulnerability_scanner",
-        "vulnerability scanner",
-        "vulnerabilityscanner"
-    ],
-
-    "Backdoor": [
-        "backdoor"
-    ],
-
-    "Ransomware": [
-        "ransomware"
-    ],
-
-    "Normal/Benign": [
-        "normal",
-        "normal/benign",
-        "normal_benign",
-        "benign"
-    ]
-}
-
-
-# ============================================================
-# HELPER FUNCTION
-# NORMALIZE ATTACK TYPE VALUES
-# ============================================================
-
-def normalize_attack_type(value):
-
-    return re.sub(
-        r"[^a-z0-9]+",
-        "",
-        str(value).strip().lower()
-    )
-
-
-# ============================================================
-# CREATE NORMALIZED ATTACK TYPE MAPPING
-# ============================================================
-
-NORMALIZED_ATTACK_TYPE_MAPPING = {
-    key: {
-        normalize_attack_type(value)
-        for value in values
-    }
-    for key, values in ATTACK_TYPE_MAPPING.items()
-}
-
-
-# ============================================================
-# DETECTION MODULE SIDEBAR
-# ============================================================
-
-with st.sidebar:
-
-    # --------------------------------------------------------
-    # Back button
-    # --------------------------------------------------------
-
-    if st.button(
-        "‹‹",
-        key="back_btn",
-        use_container_width=False
-    ):
-        st.session_state["detection_page"] = False
-
-    st.markdown("## DETECTION MODULE")
-
-    st.markdown("---")
-
-
-    # --------------------------------------------------------
-    # Attack / Traffic Type
-    # --------------------------------------------------------
-
-    st.markdown("**Attack / Traffic Type**")
-
-    detection_type = st.selectbox(
-        "Attack / Traffic Type",
-        [
-            "All",
-            "SQL Injection",
-            "Port Scanning",
-            "MITM",
-            "DDoS HTTP Flood",
-            "OS Fingerprinting",
-            "XSS",
-            "Uploading",
-            "Vulnerability Scanner",
-            "Backdoor",
-            "Ransomware",
-            "Normal/Benign"
-        ],
-        index=0,
-        label_visibility="collapsed",
-        key="detection_type"
-    )
-
-
-    # --------------------------------------------------------
-    # Traffic Source
-    # --------------------------------------------------------
-
-    st.markdown("**Traffic Source**")
-
-    traffic_source = st.selectbox(
-        "Traffic Source",
-        [
-            "Dataset",
-            "Uploaded CSV",
-            "Live Traffic"
-        ],
-        index=0,
-        label_visibility="collapsed",
-        key="traffic_source"
-    )
-
-
-    # --------------------------------------------------------
-    # Dataset
-    # --------------------------------------------------------
-
-    if traffic_source == "Dataset":
-
-        st.markdown("**Dataset**")
-
-        dataset = st.selectbox(
-            "Dataset",
-            [
-                "IDS Test Dataset",
-                "IDS Validation Dataset"
-            ],
-            index=0,
-            label_visibility="collapsed",
-            key="dataset_select"
-        )
-
-
-    elif traffic_source == "Uploaded CSV":
-
-        st.markdown("**Upload Dataset**")
-
-        uploaded_file = st.file_uploader(
-            "Upload CSV",
-            type=["csv"],
-            label_visibility="collapsed",
-            key="uploaded_csv"
-        )
-
-
-    # --------------------------------------------------------
-    # Traffic Record
-    # --------------------------------------------------------
-
-    st.markdown("**Traffic Record**")
-
-    if "traffic_record" not in st.session_state:
-        st.session_state["traffic_record"] = 0
-
-    total_records = 10000
-
-    col1, col2, col3 = st.columns([1, 3, 1])
-
-
-    with col1:
-
-        if st.button(
-            "−",
-            key="previous_record",
-            use_container_width=True
-        ):
-
-            if st.session_state["traffic_record"] > 0:
-
-                st.session_state["traffic_record"] -= 1
-
-
-    with col2:
-
-        record_number = st.session_state["traffic_record"] + 1
-
-        st.markdown(
-            f"""
-            <div style="
-             text-align:center;
-             padding-top:8px;
-            ">
-             <b>Record {record_number:03d}</b>
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-    with col3:
-
-        if st.button(
-            "+",
-            key="next_record",
-            use_container_width=True
-        ):
-
-            if (
-                st.session_state["traffic_record"]
-                < total_records - 1
-            ):
-
-                st.session_state["traffic_record"] += 1
-
-
-    # --------------------------------------------------------
-    # Record counter
-    # --------------------------------------------------------
-
-    st.markdown(
-        f"""
-        <div style="
-            text-align:center;
-            color:#888;
-            margin-top:5px;
-        ">
-            {
-                st.session_state["traffic_record"] + 1
-            :,} / {total_records:,}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-
-    # --------------------------------------------------------
-    # Analyze Traffic
-    # --------------------------------------------------------
-
-    analyze_clicked = st.button(
-        "🔍  Analyze Traffic",
-        use_container_width=True,
-        type="primary",
-        key="analyze_traffic"
-    )
-
-
-    # --------------------------------------------------------
-    # Explain Prediction
-    # --------------------------------------------------------
-
-    explain_clicked = st.button(
-        "✨  Explain Prediction",
-        use_container_width=True,
-        key="explain_prediction"
-    )
-
-
-    st.markdown("---")
-
-
-    # --------------------------------------------------------
-    # Analysis Status
-    # --------------------------------------------------------
-
-    st.markdown("**Analysis Status**")
-
-    if "analysis_status" not in st.session_state:
-
-        st.session_state["analysis_status"] = "Ready"
-
-
-    status = st.session_state["analysis_status"]
-
-
-    if status == "Ready":
-
-        st.markdown("🟢 **Ready**")
-
-
-    elif status == "Analyzing":
-
-        st.markdown("🔵 **Analyzing**")
-
-
-    elif status == "Complete":
-
-        st.markdown("🟢 **Analysis Complete**")
-
-
-    elif status == "Explanation Pending":
-
-        st.markdown("🟠 **Explanation Pending**")
-
-
-    elif status == "Error":
-
-        st.markdown("🔴 **Error**")
-
-
-    # --------------------------------------------------------
-    # Prediction
-    # --------------------------------------------------------
-
-    st.markdown("**Prediction**")
-
-    prediction = st.session_state.get(
-        "prediction",
-        "—"
-    )
-
-    st.markdown(
-        f"""
-        <div style="
-            font-size:18px;
-            font-weight:600;
-        ">
-            {prediction}
-        </div>
-        """,
-        unsafe_allow_html=True
-    )
-
-
-    # --------------------------------------------------------
-    # Confidence
-    # --------------------------------------------------------
-
-    st.markdown("**Confidence**")
-
-    confidence = st.session_state.get(
-        "confidence",
-        None
-    )
-
-
-    if confidence is None:
-
-        st.markdown("—")
-
-    else:
-
-        st.markdown(
-            f"""
-            <div style="
-                font-size:18px;
-                font-weight:600;
-            ">
-                {confidence:.1f}%
-            </div>
-            """,
-            unsafe_allow_html=True
-        )
-
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-
-    # --------------------------------------------------------
-    # Reset
-    # --------------------------------------------------------
-
-    reset_clicked = st.button(
-        "↻  Reset Analysis",
-        use_container_width=True,
-        key="reset_analysis"
-    )
-
-
-# ============================================================
-# SIDEBAR ACTIONS
-# ============================================================
-
-if analyze_clicked:
-
-    st.session_state["analysis_status"] = "Analyzing"
-
-    st.session_state["prediction"] = "—"
-
-    st.session_state["confidence"] = None
-
-    st.rerun()
-
-
-if explain_clicked:
-
-    if st.session_state.get(
-        "prediction"
-    ) in [None, "—"]:
-
-        st.warning(
-            "Please analyze the traffic record "
-            "before requesting an explanation."
-        )
-
-    else:
-
-        st.session_state[
-            "analysis_status"
-        ] = "Explanation Pending"
-
-        st.rerun()
-
-
-if reset_clicked:
-
-    st.session_state["traffic_record"] = 0
-
-    st.session_state[
-        "analysis_status"
-    ] = "Ready"
-
-    st.session_state["prediction"] = "—"
-
-    st.session_state["confidence"] = None
-
-    st.session_state.pop(
-        "shap_values",
-        None
-    )
-
-    st.session_state.pop(
-        "lime_explanation",
-        None
-    )
-
-    st.session_state.pop(
-        "current_record",
-        None
-    )
-
-    st.session_state["incident_selected"] = False
-    st.session_state.pop(
-        "selected_incident_data",
-        None
-    )
-
-    st.rerun()
-
-
-
-# ============================================================
-# SQL INJECTION XAI → REQUEST / PAYLOAD HELPERS
-# ============================================================
-
-def get_first_value(row, column_names, default="—"):
-    """Return the first usable value from a row using candidate column names."""
-    for column in column_names:
-        if column in row.index:
-            value = row[column]
-            if pd.notna(value) and str(value).strip() not in {"", "nan", "None"}:
-                return str(value).strip()
+def normalise_name(value):
+    """Normalise column names for case/space/punctuation-insensitive matching."""
+    return re.sub(r"[^a-z0-9]", "", str(value).strip().lower())
+
+
+def get_value(row, candidates, default=UNAVAILABLE):
+    """Return a real value from the selected CSV row, if a matching field exists."""
+    normalised_columns = {normalise_name(col): col for col in row.index}
+    for candidate in candidates:
+        actual = normalised_columns.get(normalise_name(candidate))
+        if actual is None:
+            continue
+        value = row[actual]
+        if pd.isna(value):
+            continue
+        text = str(value).strip()
+        if text and text.lower() not in {"nan", "none", "null"}:
+            return text
     return default
 
 
-def build_request_details(row):
-    """Read HTTP request metadata only from fields present in the selected dataset row.
+def extract_query(value):
+    if not value or value == UNAVAILABLE:
+        return ""
+    parsed = urlsplit(value)
+    if parsed.query:
+        return parsed.query
+    if "?" in value:
+        return value.split("?", 1)[1].split("#", 1)[0]
+    return ""
 
-    Missing packet-level fields are labelled as unavailable instead of being
-    filled with fabricated demo values.
-    """
-    unavailable = "Not available in dataset"
 
-    method = get_first_value(
+def build_request(row):
+    method = get_value(
         row,
-        [
-            "http.request.method", "http.request_method",
-            "request.method", "Method", "method"
-        ],
-        unavailable
-    )
-
-    full_uri = get_first_value(
-        row,
-        [
-            "http.request.full_uri", "http.request_full_uri",
-            "http.full_uri", "Full URI", "full_uri", "url", "URL"
-        ],
-        ""
-    )
-    host = get_first_value(
-        row,
-        ["http.host", "http.host.header", "http_host", "Host", "host"],
-        ""
-    )
-    uri = get_first_value(
-        row,
-        [
-            "http.request.uri", "http.request_uri", "request.uri",
-            "URI", "uri", "http.uri"
-        ],
-        ""
-    )
-    query = get_first_value(
-        row,
-        [
-            "http.request.uri.query", "http.request_uri_query",
-            "http.query", "query", "Query String", "query_string"
-        ],
-        ""
+        ["http.request.method", "http.request_method", "request.method", "method"],
     )
 
-    if full_uri:
-        url = full_uri
+    full_url = get_value(
+        row,
+        [
+            "http.request.full_uri", "http.request_full_uri", "http.full_uri",
+            "full_uri", "url", "URL",
+        ],
+        default="",
+    )
+    host = get_value(row, ["http.host", "http.host.header", "http_host", "host"], default="")
+    uri = get_value(
+        row,
+        ["http.request.uri", "http.request_uri", "request.uri", "http.uri", "uri"],
+        default="",
+    )
+
+    if full_url:
+        url = full_url
     elif host and uri:
         url = f"http://{host}{uri}"
     elif uri:
-        # A URI/path is shown as-is if the dataset has no host/scheme.
         url = uri
-    elif host:
-        url = host
     else:
-        url = unavailable
+        url = UNAVAILABLE
 
-    if not query and full_uri and "?" in full_uri:
-        query = extract_query_from_url(full_uri)
-    elif not query and uri and "?" in uri:
-        query = extract_query_from_url(uri)
+    query = get_value(
+        row,
+        [
+            "http.request.uri.query", "http.request_uri_query", "http.query",
+            "query_string", "query", "Query String",
+        ],
+        default="",
+    )
+    if not query:
+        query = extract_query(full_url) or extract_query(uri) or UNAVAILABLE
 
-    source_ip = get_first_value(
+    source_ip = get_value(
         row,
         ["ip.src_host", "ip.src", "ip.src_host.ip", "Source IP", "source_ip"],
-        unavailable
     )
-    user_agent = get_first_value(
+    user_agent = get_value(
         row,
         [
             "http.user_agent", "http.user_agent.header", "http_user_agent",
-            "User-Agent", "user_agent", "http.user-agent"
+            "user_agent", "User-Agent", "http.user-agent",
         ],
-        unavailable
     )
-    timestamp = get_first_value(
+    timestamp = get_value(
         row,
-        ["frame.time", "DateTime", "Timestamp", "timestamp"],
-        unavailable
+        ["frame.time", "DateTime", "Timestamp", "timestamp", "time"],
     )
-
-    if timestamp != unavailable:
+    if timestamp != UNAVAILABLE:
         try:
-            timestamp = pd.to_datetime(timestamp).strftime("%Y-%m-%d %H:%M:%S")
-        except (TypeError, ValueError):
+            timestamp = pd.to_datetime(timestamp, errors="raise").strftime("%Y-%m-%d %H:%M:%S")
+        except (TypeError, ValueError, OverflowError):
             pass
 
     return {
         "method": method,
         "url": url,
-        "query": query if query else unavailable,
+        "query": query,
         "source_ip": source_ip,
         "user_agent": user_agent,
         "timestamp": timestamp,
     }
 
 
-def extract_query_from_url(url):
-    """Extract a query string from a URL/URI, if one exists."""
-    if not url or "?" not in str(url):
-        return ""
-    return str(url).split("?", 1)[1]
-
-
-def build_payload(row, request_details):
-    """Use only the selected dataset row's raw query/payload fields."""
-    query = request_details.get("query", "")
-    if query and query != "Not available in dataset":
+def build_payload(row, request):
+    # Prefer the actual query string captured in the dataset.
+    query = request.get("query", "")
+    if query and query != UNAVAILABLE:
         return query
 
-    for column in [
-        "http.request.uri.query", "http.request_uri_query", "http.query",
-        "query", "Query String", "query_string", "payload", "Payload",
-        "http.request", "raw_http_request", "Raw HTTP Request"
-    ]:
-        if column in row.index:
-            value = row[column]
-            if pd.notna(value) and str(value).strip() not in {"", "nan", "None"}:
-                return str(value).strip()
+    raw_request = get_value(
+        row,
+        [
+            "http.request", "raw_http_request", "Raw HTTP Request",
+            "payload", "Payload", "http.request.line",
+        ],
+        default="",
+    )
+    if raw_request:
+        return raw_request
 
     return "Raw HTTP query/payload is not available in this dataset record."
 
 
-def highlight_sql_payload(payload):
-    """
-    Highlight SQL-Injection indicators with category-specific colors.
-    The HTML is escaped first so payload text cannot inject dashboard HTML.
-    """
-    text = html.escape(str(payload), quote=False)
-
-    token_pattern = re.compile(
+def highlight_payload(payload):
+    """Decode URL-encoded payloads and safely highlight SQLi indicators."""
+    decoded = unquote_plus(str(payload))
+    text = html.escape(decoded, quote=False)
+    pattern = re.compile(
+        r"(?P<quote>'[^']*')|"
         r"(?P<delay>\b(?:PG_SLEEP|SLEEP|BENCHMARK)\s*\([^)]*\)|"
         r"\bWAITFOR\s+DELAY\b(?:\s+'[^']*')?)|"
-        r"(?P<select>\bSELECT\b)|"
+        r"(?P<select>\bSELECT\b|\bXMLType\b|\bUPPER\b)|"
         r"(?P<operator>\b(?:AND|OR|UNION)\b)|"
-        r"(?P<boolean>\b(?:\d+\s*=\s*\d+|[A-Za-z0-9_]+\s*=\s*'[A-Za-z0-9_]+'\s*))|"
-        r"(?P<quote>'[^']*')",
-        re.IGNORECASE
+        r"(?P<boolean>\b\d+\s*=\s*\d+\b|\bCASE\s+WHEN\b)|"
+        r"(?P<chr>\bCHR\s*\(\s*\d+\s*\)|\|\|)",
+        re.IGNORECASE,
     )
-
-    styles = {
-        "quote": ("#ff4d4d", "Quote / String termination"),
+    colors = {
+        "quote": ("#ff4d4d", "Quote / string"),
         "operator": ("#f6a23a", "Logical operator"),
-        "select": ("#25a7f0", "Nested query (SELECT)"),
+        "select": ("#25a7f0", "SELECT / nested query"),
         "delay": ("#35d07f", "Time-delay function"),
         "boolean": ("#a85cf5", "Boolean condition"),
+        "chr": ("#35d7a0", "CHR() / string construction"),
     }
 
-    output = []
-    last = 0
-
-    for match in token_pattern.finditer(text):
-        output.append(text[last:match.start()])
+    result, last = [], 0
+    for match in pattern.finditer(text):
+        result.append(text[last:match.start()])
         kind = match.lastgroup
-        value = match.group(0)
-        color, title = styles[kind]
-
-        output.append(
-            f'<span class="sql-token sql-{kind}" title="{title}" '
-            f'style="background:{color}22;border-color:{color};color:{color};">'
-            f'{value}</span>'
+        color, label = colors[kind]
+        token = match.group(0)
+        result.append(
+            f'<span class="sql-token" title="{label}" '
+            f'style="background:{color}22;border-color:{color};color:{color}">'
+            f'{token}</span>'
         )
         last = match.end()
+    result.append(text[last:])
+    return "".join(result)
 
-    output.append(text[last:])
-    return "".join(output)
 
+def choose_sqli_record(data):
+    """Prefer rows labelled SQL injection; otherwise use a row with SQL-like request text."""
+    label_column = None
+    label_candidates = {
+        normalise_name(name)
+        for name in ["Attack_type", "Attack Type", "attack_type", "label", "class"]
+    }
+    for column in data.columns:
+        if normalise_name(column) in label_candidates:
+            label_column = column
+            break
 
-def render_request_payload_section(row):
-    """Render the first Request & Payload section of the SQL-Injection XAI page."""
-    request = build_request_details(row)
-    payload = build_payload(row, request)
+    if label_column:
+        labels = data[label_column].astype(str)
+        mask = labels.str.contains(r"sql[\s_-]*injection|sqli", case=False, na=False)
+        matches = data.loc[mask]
+        if not matches.empty:
+            return matches.iloc[0], len(matches), "labelled SQL-injection records"
 
-    st.markdown(
-        """
-        <style>
-        .xai-request-card {
-            background: #0e1722;
-            border: 1px solid #26384c;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-top: 8px;
-        }
-
-        .xai-request-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.05fr;
-            gap: 12px;
-        }
-
-        .xai-panel {
-            background: #101b28;
-            border: 1px solid #26384c;
-            border-radius: 10px;
-            padding: 16px 18px;
-        }
-
-        .xai-panel-title {
-            color: #dce8f5;
-            font-size: 15px;
-            font-weight: 700;
-            margin-bottom: 12px;
-        }
-
-        .xai-panel-title .icon {
-            color: #53bdf7;
-            margin-right: 7px;
-        }
-
-        .xai-detail-row {
-            display: grid;
-            grid-template-columns: 125px 1fr;
-            gap: 12px;
-            padding: 7px 0;
-            border-bottom: 1px solid #1d2b3b;
-        }
-
-        .xai-detail-row:last-child {
-            border-bottom: 0;
-        }
-
-        .xai-detail-label {
-            color: #93a8bd;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .xai-detail-value {
-            color: #e7eef7;
-            font-size: 13px;
-            word-break: break-word;
-        }
-
-        .xai-method {
-            display: inline-block;
-            background: #4b2530;
-            color: #ff6870;
-            border: 1px solid #79333d;
-            border-radius: 5px;
-            padding: 2px 9px;
-            font-weight: 700;
-            font-size: 12px;
-        }
-
-        .xai-payload-box {
-            background: #0a111b;
-            border: 1px solid #385069;
-            border-radius: 9px;
-            padding: 17px 15px;
-            min-height: 58px;
-            display: flex;
-            align-items: center;
-            overflow-x: auto;
-        }
-
-        .xai-payload-text {
-            color: #e9f1f9;
-            font-family: Consolas, "Courier New", monospace;
-            font-size: 14px;
-            line-height: 1.65;
-            white-space: nowrap;
-        }
-
-        .sql-token {
-            display: inline-block;
-            padding: 1px 5px;
-            margin: 0 1px;
-            border: 1px solid;
-            border-radius: 4px;
-            font-weight: 700;
-        }
-
-        .xai-legend {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 9px 15px;
-            margin-top: 12px;
-        }
-
-        .xai-legend-item {
-            color: #9fb0c1;
-            font-size: 11px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .xai-legend-dot {
-            width: 9px;
-            height: 9px;
-            border-radius: 2px;
-            display: inline-block;
-        }
-
-        @media (max-width: 900px) {
-            .xai-request-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
-
-    st.markdown(
-        '<div class="xai-request-grid">',
-        unsafe_allow_html=True
-    )
-
-    # ---------------- HTTP Request Details ----------------
-    st.markdown(
-        '<div class="xai-panel">'
-        '<div class="xai-panel-title"><span class="icon">▣</span>'
-        'HTTP Request Details</div>',
-        unsafe_allow_html=True
-    )
-
-    rows = [
-        ("Method", f'<span class="xai-method">{html.escape(request["method"])}</span>'),
-        ("URL", html.escape(request["url"])),
-        ("Query String", html.escape(request["query"])),
-        ("Source IP", html.escape(request["source_ip"])),
-        ("User-Agent", html.escape(request["user_agent"])),
-        ("Timestamp", html.escape(request["timestamp"])),
+    # If there is no usable SQL-injection label, look for a captured HTTP query/payload
+    # containing SQL indicators. This is only a fallback, not a model classification.
+    candidate_columns = [
+        col for col in data.columns
+        if any(term in normalise_name(col) for term in ["query", "payload", "fulluri", "requesturi", "httprequest"])
     ]
+    for _, row in data.iterrows():
+        sample = " ".join(str(row[col]) for col in candidate_columns if pd.notna(row[col]))
+        if re.search(r"\b(select|union|sleep|pg_sleep|benchmark)\b|('|%27)\s*(and|or)\b", sample, re.I):
+            return row, 1, "records with SQL-like request indicators"
 
-    for label, value in rows:
-        st.markdown(
-            f'<div class="xai-detail-row">'
-            f'<div class="xai-detail-label">{label}</div>'
-            f'<div class="xai-detail-value">{value}</div>'
-            f'</div>',
-            unsafe_allow_html=True
-        )
-
-    st.markdown("</div>", unsafe_allow_html=True)
-
-    # ---------------- Highlighted Payload ----------------
-    st.markdown(
-        '<div class="xai-panel">'
-        '<div class="xai-panel-title"><span class="icon">⌘</span>'
-        'Payload with Highlighted Indicators</div>'
-        f'<div class="xai-payload-box">'
-        f'<div class="xai-payload-text">{highlight_sql_payload(payload)}</div>'
-        f'</div>'
-        '<div class="xai-legend">'
-        '<div class="xai-legend-item"><span class="xai-legend-dot" style="background:#ff4d4d"></span>Quote / String termination</div>'
-        '<div class="xai-legend-item"><span class="xai-legend-dot" style="background:#f6a23a"></span>Logical operator</div>'
-        '<div class="xai-legend-item"><span class="xai-legend-dot" style="background:#25a7f0"></span>Nested query (SELECT)</div>'
-        '<div class="xai-legend-item"><span class="xai-legend-dot" style="background:#35d07f"></span>Time-delay function</div>'
-        '<div class="xai-legend-item"><span class="xai-legend-dot" style="background:#a85cf5"></span>Boolean condition</div>'
-        '</div>'
-        '</div>',
-        unsafe_allow_html=True
-    )
-
-    st.markdown("</div>", unsafe_allow_html=True)
+    return data.iloc[0], 0, "dataset records (no SQL-injection label or raw SQL payload found)"
 
 
-
-# ============================================================
-# MAIN DASHBOARD
-# ============================================================
-
-
-# ============================================================
-# INCIDENT SEARCH MODULE CSS
-# ============================================================
-
+# Dark theme and two-panel layout only — no extra dashboard widgets.
 st.markdown(
     """
     <style>
-
-    .incident-search-box {
-        background-color: #ffffff;
-        border: 1px solid #d9e2ec;
-        border-radius: 12px;
-        padding: 24px 26px 22px 26px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    .stApp { background: #0b1119; color: #e7eef7; }
+    [data-testid="stHeader"] { background: rgba(0,0,0,0); }
+    .block-container { max-width: 1500px; padding: 1rem 1rem 1.5rem; }
+    .request-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+        gap: 12px;
+        align-items: stretch;
     }
-
-    .incident-title {
-        font-size: 25px;
-        font-weight: 700;
-        color: #123f73;
-        margin-bottom: 2px;
+    .xai-panel {
+        min-width: 0;
+        background: #101b28;
+        border: 1px solid #26384c;
+        border-radius: 10px;
+        padding: 16px 18px;
+        box-sizing: border-box;
     }
-
-    .incident-subtitle {
-        font-size: 16px;
-        color: #718096;
-        margin-bottom: 25px;
-    }
-
-    .section-label {
+    .panel-title {
+        color: #e7eef7;
         font-size: 16px;
         font-weight: 700;
-        color: #163d6b;
-        margin-top: 5px;
-        margin-bottom: 8px;
+        padding-bottom: 13px;
+        margin-bottom: 9px;
+        border-bottom: 1px solid #2b3e52;
     }
-
-    .search-divider {
-        border-top: 1px solid #dfe7ef;
-        margin: 20px 0;
+    .panel-icon { color: #53bdf7; margin-right: 8px; }
+    .detail-row {
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        gap: 10px;
+        padding: 7px 0;
+        border-bottom: 1px solid #1d2b3b;
     }
-
+    .detail-row:last-child { border-bottom: 0; }
+    .detail-label { color: #93a8bd; font-size: 13px; }
+    .detail-value {
+        color: #e7eef7;
+        font-size: 13px;
+        overflow-wrap: anywhere;
+        line-height: 1.45;
+    }
+    .method {
+        display: inline-block;
+        background: #4b2530;
+        color: #ff6870;
+        border: 1px solid #79333d;
+        border-radius: 5px;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .payload-box {
+        background: #0a111b;
+        border: 1px solid #385069;
+        border-radius: 9px;
+        padding: 16px 14px;
+        min-height: 76px;
+        overflow-x: auto;
+    }
+    .payload-text {
+        color: #e9f1f9;
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 14px;
+        line-height: 1.8;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+    .sql-token {
+        display: inline-block;
+        padding: 1px 5px;
+        margin: 0 1px;
+        border: 1px solid;
+        border-radius: 5px;
+        font-weight: 700;
+    }
+    .legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 14px; }
+    .legend-item { color: #c4d0dd; font-size: 11px; display: flex; align-items: center; gap: 6px; }
+    .legend-dot { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+    .notice {
+        color: #aebed0; background: #111d2a; border: 1px solid #293b4e;
+        border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px;
+    }
+    @media (max-width: 760px) {
+        .request-grid { grid-template-columns: 1fr; }
+        .detail-row { grid-template-columns: 100px minmax(0, 1fr); }
+    }
     </style>
     """,
-    unsafe_allow_html=True
+    unsafe_allow_html=True,
 )
 
-
-# ============================================================
-# INCIDENT DATA
-# ============================================================
-
-# Define sidebar defaults before loading the dataset. If the CSV is missing,
-# the rest of the page can still render without NameError exceptions.
-selected_attack = st.session_state.get("detection_type", "All")
-selected_source = st.session_state.get("traffic_source", "Dataset")
-
-DATASET_PATH = (
-    Path(__file__).resolve().parent
-    / "data"
-    / "EdgeIIoT_train_80.csv"
-)
-
-
-try:
-
-    if DATASET_PATH.exists():
-        incident_data = pd.read_csv(
-            DATASET_PATH,
-            low_memory=False
-        )
-    else:
-        st.warning(
-            f"Dataset file not found at: {DATASET_PATH}. "
-            "Upload the CSV below, or place it in the project's data folder."
-        )
-        uploaded_dataset_fallback = st.file_uploader(
-            "Upload EdgeIIoT_train_80.csv",
-            type=["csv"],
-            key="dataset_fallback_upload"
-        )
-        if uploaded_dataset_fallback is None:
-            raise FileNotFoundError(DATASET_PATH)
-        incident_data = pd.read_csv(
-            uploaded_dataset_fallback,
-            low_memory=False
-        )
-
-
-    # ========================================================
-    # GENERATE INCIDENT IDs
-    # ========================================================
-
-    if "Incident ID" not in incident_data.columns:
-
-        incident_data.insert(
-            0,
-            "Incident ID",
-            [
-                f"ALR-{i:06d}"
-                for i in range(
-                    1,
-                    len(incident_data) + 1
-                )
-            ]
-        )
-
-
-    # ========================================================
-    # CONVERT frame.time TO DATETIME
-    # ========================================================
-
-    if "frame.time" in incident_data.columns:
-
-        incident_data["DateTime"] = pd.to_datetime(
-            incident_data["frame.time"]
-            .astype(str)
-            .str.strip(),
-            errors="coerce"
-        )
-
-    else:
-
-        st.error(
-            "The dataset does not contain the required "
-            "'frame.time' column."
-        )
-
-        incident_data["DateTime"] = pd.NaT
-
-
-    # ========================================================
-    # CREATE DATE AND TIME
-    # ========================================================
-
-    incident_data["Date"] = (
-        incident_data["DateTime"].dt.date
-    )
-
-    incident_data["Time"] = (
-        incident_data["DateTime"].dt.time
-    )
-
-
-    # ========================================================
-    # CREATE SOURCE IP
-    # ========================================================
-
-    if "ip.src_host" in incident_data.columns:
-
-        incident_data["Source IP"] = (
-            incident_data["ip.src_host"]
-            .astype(str)
-            .str.strip()
-        )
-
-    else:
-
-        incident_data["Source IP"] = "Unknown"
-
-
-    # ========================================================
-    # CREATE TRAFFIC TYPE
-    # Normal / Attack
-    # ========================================================
-
-    if "Attack_label" in incident_data.columns:
-
-        incident_data["Type"] = (
-            incident_data["Attack_label"]
-            .apply(
-                lambda x:
-                "Normal"
-                if str(x).strip()
-                in ["0", "0.0"]
-                else "Attack"
-            )
-        )
-
-    else:
-
-        # If Attack_label does not exist,
-        # determine Type from Attack_type.
-
-        if "Attack_type" in incident_data.columns:
-
-            incident_data["Type"] = (
-                incident_data["Attack_type"]
-                .apply(
-                    lambda x:
-                    "Normal"
-                    if normalize_attack_type(x)
-                    in NORMALIZED_ATTACK_TYPE_MAPPING[
-                        "Normal/Benign"
-                    ]
-                    else "Attack"
-                )
-            )
-
-        else:
-
-            incident_data["Type"] = "Unknown"
-
-
-    # ========================================================
-    # CREATE ATTACK TYPE
-    # ========================================================
-
-    # Find the attack type column regardless of capitalization
-    # or small naming differences.
-
-    attack_type_column = None
-
-    possible_attack_columns = [
-        "Attack_type",
-        "Attack Type",
-        "attack_type",
-        "attack type",
-        "AttackType",
-        "attacktype"
+# Resolve the CSV from common project locations first. If it is not there,
+# let the user select the dataset in the app instead of crashing.
+def find_dataset_path():
+    script_dir = Path(__file__).resolve().parent
+    candidates = [
+        PROJECT_ROOT / "data" / "SQL_injection_train_80.csv",
+        script_dir / "data" / "SQL_injection_train_80.csv",
+        script_dir / "SQL_injection_train_80.csv",
+        script_dir.parent / "data" / "SQL_injection_train_80.csv",
+        script_dir.parent / "SQL_injection_train_80.csv",
+        Path.cwd() / "data" / "SQL_injection_train_80.csv",
+        Path.cwd() / "SQL_injection_train_80.csv",
     ]
+    for candidate in candidates:
+        if candidate.is_file():
+            return candidate
+    return DATASET_PATH if DATASET_PATH.is_file() else None
 
 
-    for column in incident_data.columns:
+resolved_dataset_path = find_dataset_path()
 
-        normalized_column = (
-            str(column)
-            .strip()
-            .lower()
-            .replace(" ", "_")
-        )
-
-        if normalized_column in [
-            "attack_type",
-            "attacktype"
-        ]:
-
-            attack_type_column = column
-            break
-
-
-    if attack_type_column is not None:
-
-        incident_data["Attack Type"] = (
-            incident_data[attack_type_column]
-            .astype(str)
-            .str.strip()
-        )
-
-    else:
-
-        incident_data["Attack Type"] = (
-            incident_data["Type"]
-            .apply(
-                lambda x:
-                "Normal"
-                if x == "Normal"
-                else "Unknown"
-            )
-        )
-
-
-    # ========================================================
-    # CREATE SEVERITY
-    # ========================================================
-
-    incident_data["Severity"] = (
-        incident_data["Type"]
-        .apply(
-            lambda x:
-            "Low"
-            if x == "Normal"
-            else "High"
-        )
-    )
-
-
-    # ========================================================
-    # CREATE STATUS
-    # ========================================================
-
-    incident_data["Status"] = (
-        incident_data["Type"]
-        .apply(
-            lambda x:
-            "Normal"
-            if x == "Normal"
-            else "Open"
-        )
-    )
-
-
-    # ========================================================
-    # REMOVE INVALID TIMESTAMPS
-    # ========================================================
-
-    incident_data = (
-        incident_data
-        .dropna(
-            subset=["DateTime"]
-        )
-        .reset_index(drop=True)
-    )
-
-
-    # ========================================================
-    # SUCCESS MESSAGE
-    # ========================================================
-
-    st.success(
-        f"Loaded {len(incident_data):,} "
-        f"incident records successfully."
-    )
-
-
-except FileNotFoundError:
-
-    st.error(
-        f"Dataset not found at:\n"
-        f"{DATASET_PATH}\n\n"
-        f"Make sure EdgeIIoT_train_80.csv "
-        f"is inside the data folder."
-    )
-
-    incident_data = pd.DataFrame()
-
-
-except Exception as e:
-
-    st.error(
-        f"Error loading incident dataset:\n{e}"
-    )
-
-    incident_data = pd.DataFrame()
-
-
-# ============================================================
-# APPLY SIDEBAR ATTACK TYPE FILTER
-# ============================================================
-
-if not incident_data.empty:
-
-    # Keep the defaults in sync with the current sidebar controls.
-    selected_attack = st.session_state.get("detection_type", selected_attack)
-    selected_source = st.session_state.get("traffic_source", selected_source)
-
-
-    # --------------------------------------------------------
-    # DATASET SOURCE
-    # --------------------------------------------------------
-
-    if selected_source == "Dataset":
-
-        # ----------------------------------------------------
-        # ALL ATTACK TYPES
-        # ----------------------------------------------------
-
-        if selected_attack == "All":
-
-            sidebar_filtered_data = (
-                incident_data.copy()
-            )
-
-
-        # ----------------------------------------------------
-        # SPECIFIC ATTACK TYPE
-        # ----------------------------------------------------
-
-        else:
-
-            allowed_attack_types = (
-                NORMALIZED_ATTACK_TYPE_MAPPING.get(
-                    selected_attack,
-                    set()
-                )
-            )
-
-
-            sidebar_filtered_data = (
-                incident_data[
-                    incident_data["Attack Type"]
-                    .apply(normalize_attack_type)
-                    .isin(allowed_attack_types)
-                ]
-                .copy()
-            )
-
-
-    # --------------------------------------------------------
-    # UPLOADED CSV
-    # --------------------------------------------------------
-
-    elif selected_source == "Uploaded CSV":
-
-        uploaded_file = st.session_state.get(
-            "uploaded_csv",
-            None
-        )
-
-        if uploaded_file is not None:
-
-            try:
-
-                uploaded_data = pd.read_csv(
-                    uploaded_file,
-                    low_memory=False
-                )
-
-                sidebar_filtered_data = (
-                    uploaded_data.copy()
-                )
-
-            except Exception:
-
-                sidebar_filtered_data = (
-                    incident_data.copy()
-                )
-
-        else:
-
-            sidebar_filtered_data = (
-                incident_data.copy()
-            )
-
-
-    # --------------------------------------------------------
-    # LIVE TRAFFIC
-    # --------------------------------------------------------
-
-    else:
-
-        sidebar_filtered_data = (
-            incident_data.copy()
-        )
-
+if resolved_dataset_path is not None:
+    try:
+        dataset = pd.read_csv(resolved_dataset_path, low_memory=False)
+        st.caption(f"Dataset: `{resolved_dataset_path}`")
+    except Exception as exc:
+        st.error(f"Could not read the dataset at `{resolved_dataset_path}`: {exc}")
+        st.stop()
 else:
-
-    sidebar_filtered_data = pd.DataFrame()
-
-
-# ============================================================
-# STORE CURRENT SIDEBAR FILTER
-# ============================================================
-
-current_sidebar_signature = (
-    selected_source
-    if "selected_source" in locals()
-    else "Dataset",
-
-    selected_attack
-    if "selected_attack" in locals()
-    else "All"
-)
-
-
-previous_sidebar_signature = (
-    st.session_state.get(
-        "previous_sidebar_signature"
+    st.warning(
+        "EdgeIIoT_train_80.csv was not found automatically. "
+        "Choose the CSV file below, or place it in a `data` folder next to this script."
     )
-)
+    uploaded_dataset = st.file_uploader(
+        "Select EdgeIIoT_train_80.csv",
+        type=["csv"],
+        key="edgeiiot_dataset_upload",
+    )
+    if uploaded_dataset is None:
+        st.stop()
+    try:
+        dataset = pd.read_csv(uploaded_dataset, low_memory=False)
+        st.caption(f"Dataset loaded from upload: `{uploaded_dataset.name}`")
+    except Exception as exc:
+        st.error(f"Could not read the uploaded CSV: {exc}")
+        st.stop()
 
+if dataset.empty:
+    st.error("The dataset is empty.")
+    st.stop()
 
-# ============================================================
-# DETECT SIDEBAR FILTER CHANGE
-# ============================================================
+selected_row, sqli_count, selection_reason = choose_sqli_record(dataset)
+request = build_request(selected_row)
+payload = SAMPLE_SQLI_PAYLOAD  # display the exact payload supplied for this UI example
 
-if (
-    previous_sidebar_signature
-    != current_sidebar_signature
-):
-
-    st.session_state[
-        "previous_sidebar_signature"
-    ] = current_sidebar_signature
-
-    # Reset previous search results so the
-    # newly selected sidebar attack immediately
-    # controls the main dashboard.
-
-    st.session_state[
-        "incident_search_performed"
-    ] = False
-
-    st.session_state[
-        "incident_results"
-    ] = sidebar_filtered_data.copy()
-
-    st.session_state[
-        "incident_id_error"
-    ] = ""
-
-    st.session_state[
-        "incident_id_found"
-    ] = False
-
-
-# ============================================================
-# INCIDENT SEARCH UI
-# ============================================================
-
+if sqli_count:
     st.markdown(
-        """
-       
-        <div class="incident-title">
-                🔎 INCIDENT SEARCH
-        </div>
-        
-        """,
-        unsafe_allow_html=True
+        f'<div class="notice">Showing one of {sqli_count:,} {html.escape(selection_reason)} '
+        f'from <code>EdgeIIoT_train_80.csv</code>.</div>',
+        unsafe_allow_html=True,
     )
-
-
-# ============================================================
-# SHOW ACTIVE SIDEBAR FILTER
-# ============================================================
-
-if selected_source == "Dataset":
-
-    if selected_attack == "All":
-
-        st.info(
-            "📊 Showing incidents from the complete dataset."
-        )
-
-    else:
-
-        st.info(
-            f"🎯 Showing incidents filtered by sidebar: "
-            f"**{selected_attack}**"
-        )
-
-
-# ============================================================
-# INCIDENT ID SEARCH
-# ============================================================
-
-st.markdown("**Incident ID**")
-
-
-id_col1, id_col2 = st.columns([4, 1])
-
-
-with id_col1:
-
-    incident_id = st.text_input(
-        "Incident ID",
-        placeholder="Search incident ID...",
-        label_visibility="collapsed",
-        key="incident_id_search"
-    )
-
-
-# ============================================================
-# SEARCH INCIDENT BY ID
-# ============================================================
-
-def search_incident_by_id():
-
-    query = (
-        st.session_state
-        .get(
-            "incident_id_search",
-            ""
-        )
-        .strip()
-    )
-
-
-    if not query:
-
-        st.session_state[
-            "incident_id_error"
-        ] = "Please enter an Incident ID."
-
-        st.session_state[
-            "incident_id_found"
-        ] = False
-
-        return
-
-
-    # Search inside the currently selected sidebar dataset
-    search_data = sidebar_filtered_data
-
-
-    if search_data.empty:
-
-        st.session_state[
-            "incident_id_error"
-        ] = (
-            "No incidents are available "
-            "for the selected attack type."
-        )
-
-        st.session_state[
-            "incident_id_found"
-        ] = False
-
-        return
-
-
-    # Exact Incident ID match
-
-    matches = search_data[
-        search_data["Incident ID"]
-        .astype(str)
-        .str.strip()
-        .str.upper()
-        == query.upper()
-    ]
-
-
-    if matches.empty:
-
-        st.session_state[
-            "incident_id_error"
-        ] = (
-            f"Incident ID '{query}' "
-            f"was not found in the selected data."
-        )
-
-        st.session_state[
-            "incident_id_found"
-        ] = False
-
-        return
-
-
-    selected = matches.iloc[0]
-
-    incident_datetime = pd.to_datetime(
-        selected["DateTime"]
-    )
-
-
-    # Automatically update time range
-
-    st.session_state[
-        "from_date"
-    ] = incident_datetime.date()
-
-    st.session_state[
-        "from_time"
-    ] = incident_datetime.time().replace(
-        microsecond=0
-    )
-
-    st.session_state[
-        "to_date"
-    ] = incident_datetime.date()
-
-    st.session_state[
-        "to_time"
-    ] = incident_datetime.time().replace(
-        microsecond=0
-    )
-
-
-    # Save result
-
-    st.session_state[
-        "incident_results"
-    ] = matches.copy()
-
-    st.session_state[
-        "incident_search_performed"
-    ] = True
-
-    st.session_state[
-        "incident_id_found"
-    ] = True
-
-    st.session_state[
-        "incident_id_error"
-    ] = ""
-
-    st.session_state[
-        "selected_incident_data"
-    ] = selected.to_dict()
-
-
-with id_col2:
-
-    st.button(
-        "🔍  Search",
-        use_container_width=True,
-        key="incident_id_button",
-        on_click=search_incident_by_id
-    )
-
-
-# ============================================================
-# DIVIDER
-# ============================================================
-
-st.markdown(
-    '<div class="search-divider"></div>',
-    unsafe_allow_html=True
-)
-
-
-# ============================================================
-# TIME RANGE
-# ============================================================
-
-st.markdown(
-    '<div class="section-label">Time Range</div>',
-    unsafe_allow_html=True
-)
-
-
-col1, col2, col3, col4 = st.columns(4)
-
-
-# ------------------------------------------------------------
-# From Date
-# ------------------------------------------------------------
-
-with col1:
-
-    from_date = st.date_input(
-        "From Date",
-        value=datetime.now(
-            ZoneInfo("Asia/Colombo")
-        ).date(),
-        key="from_date"
-    )
-
-
-# ------------------------------------------------------------
-# From Time
-# ------------------------------------------------------------
-
-with col2:
-
-    from_time = st.time_input(
-        "From Time",
-        value=time(8, 0),
-        key="from_time"
-    )
-
-
-# ------------------------------------------------------------
-# To Date
-# ------------------------------------------------------------
-
-with col3:
-
-    to_date = st.date_input(
-        "To Date",
-        value=datetime.now(
-            ZoneInfo("Asia/Colombo")
-        ).date(),
-        key="to_date"
-    )
-
-
-# ------------------------------------------------------------
-# To Time
-# ------------------------------------------------------------
-
-with col4:
-
-    to_time = st.time_input(
-        "To Time",
-        value=time(12, 0),
-        key="to_time"
-    )
-
-
-# ============================================================
-# FILTERS
-# ============================================================
-
-filter_col1, filter_col2, filter_col3, button_col = (
-    st.columns(
-        [1, 1, 1, 1.15]
-    )
-)
-
-
-# ------------------------------------------------------------
-# Traffic Type
-# ------------------------------------------------------------
-
-with filter_col1:
-
-    traffic_type = st.selectbox(
-        "Traffic Type",
-        [
-            "All",
-            "Normal",
-            "Attack"
-        ],
-        key="traffic_type_filter"
-    )
-
-
-# ------------------------------------------------------------
-# Severity
-# ------------------------------------------------------------
-
-with filter_col2:
-
-    severity = st.selectbox(
-        "Severity",
-        [
-            "All",
-            "Critical",
-            "High",
-            "Medium",
-            "Low"
-        ],
-        key="severity_filter"
-    )
-
-
-# ------------------------------------------------------------
-# Status
-# ------------------------------------------------------------
-
-with filter_col3:
-
-    status = st.selectbox(
-        "Status",
-        [
-            "All",
-            "Open",
-            "Investigating",
-            "Resolved",
-            "Normal"
-        ],
-        key="status_filter"
-    )
-
-
-# ============================================================
-# SEARCH BUTTON
-# ============================================================
-
-with button_col:
-
+else:
     st.markdown(
-        "<br>",
-        unsafe_allow_html=True
+        f'<div class="notice">Showing a dataset record from <code>EdgeIIoT_train_80.csv</code>. '
+        f'{html.escape(selection_reason.capitalize())}. Missing raw HTTP fields are not fabricated.</div>',
+        unsafe_allow_html=True,
     )
 
-    search_clicked = st.button(
-        "🔍  Search Incidents",
-        type="primary",
-        use_container_width=True,
-        key="search_incidents"
-    )
+# Render each panel as one HTML block inside Streamlit columns.
+left_col, right_col = st.columns([1, 1.05], gap="small")
 
-
-# ============================================================
-# ID SEARCH FEEDBACK
-# ============================================================
-
-if st.session_state.get(
-    "incident_id_error"
-):
-
-    st.error(
-        f"⚠️ "
-        f"{st.session_state['incident_id_error']}"
-    )
-
-
-elif st.session_state.get(
-    "incident_id_found"
-):
-
-    found_data = st.session_state.get(
-        "incident_results",
-        pd.DataFrame()
-    )
-
-
-    if not found_data.empty:
-
-        found_row = found_data.iloc[0]
-
-        st.success(
-            f"Incident "
-            f"{found_row['Incident ID']} found. "
-            f"Time Range updated to "
-            f"{found_row['Date']} "
-            f"{found_row['Time']}."
+# Panel 1: HTTP request details
+with left_col:
+    detail_rows = []
+    for label, value, is_method in [
+        ("Method", request["method"], True),
+        ("URL", request["url"], False),
+        ("Query String", request["query"], False),
+        ("Source IP", request["source_ip"], False),
+        ("User-Agent", request["user_agent"], False),
+        ("Timestamp", request["timestamp"], False),
+    ]:
+        shown = (
+            f'<span class="method">{html.escape(value)}</span>'
+            if is_method else html.escape(value)
+        )
+        detail_rows.append(
+            f'<div class="detail-row"><div class="detail-label">{label}</div>'
+            f'<div class="detail-value">{shown}</div></div>'
         )
 
-
-# ============================================================
-# SEARCH LOGIC
-# ============================================================
-
-if search_clicked:
-
-    # --------------------------------------------------------
-    # Create datetime range
-    # --------------------------------------------------------
-
-    start_datetime = datetime.combine(
-        from_date,
-        from_time
+    request_panel_html = (
+        '<section class="xai-panel">'
+        '<div class="panel-title"><span class="panel-icon">▤</span>HTTP Request Details</div>'
+        + "".join(detail_rows)
+        + '</section>'
     )
+    st.markdown(request_panel_html, unsafe_allow_html=True)
 
-    end_datetime = datetime.combine(
-        to_date,
-        to_time
+# Panel 2: highlighted SQL payload
+with right_col:
+    payload_panel_html = (
+        '<section class="xai-panel">'
+        '<div class="panel-title"><span class="panel-icon">&lt;/&gt;</span>'
+        'Payload with Highlighted Indicators</div>'
+        f'<div class="payload-box"><div class="payload-text">{highlight_payload(payload)}</div></div>'
+        '<div class="legend">'
+        '<div class="legend-item"><span class="legend-dot" style="background:#ff4d4d"></span>Quote / string</div>'
+        '<div class="legend-item"><span class="legend-dot" style="background:#f6a23a"></span>Logical operator</div>'
+        '<div class="legend-item"><span class="legend-dot" style="background:#25a7f0"></span>SELECT / nested query</div>'
+        '<div class="legend-item"><span class="legend-dot" style="background:#35d07f"></span>CHR() / string construction</div>'
+        '<div class="legend-item"><span class="legend-dot" style="background:#a85cf5"></span>Boolean condition</div>'
+        '</div></section>'
     )
-
-
-    # --------------------------------------------------------
-    # Validate date/time
-    # --------------------------------------------------------
-
-    if start_datetime > end_datetime:
-
-        st.error(
-            "⚠️ From date/time cannot be later "
-            "than To date/time."
-        )
-
-    else:
-
-        # IMPORTANT:
-        # Start from sidebar-filtered data.
-        #
-        # This is what connects the sidebar
-        # to the main dashboard.
-
-        filtered_data = (
-            sidebar_filtered_data.copy()
-        )
-
-
-        # ----------------------------------------------------
-        # Incident ID filter
-        # ----------------------------------------------------
-
-        if incident_id.strip():
-
-            filtered_data = filtered_data[
-                filtered_data["Incident ID"]
-                .astype(str)
-                .str.contains(
-                    incident_id.strip(),
-                    case=False,
-                    na=False
-                )
-            ]
-
-
-        # ----------------------------------------------------
-        # Date/time filter
-        # ----------------------------------------------------
-
-        filtered_data = filtered_data[
-            (
-                filtered_data["DateTime"]
-                >= start_datetime
-            )
-            &
-            (
-                filtered_data["DateTime"]
-                <= end_datetime
-            )
-        ]
-
-
-        # ----------------------------------------------------
-        # Traffic Type filter
-        # ----------------------------------------------------
-
-        if traffic_type != "All":
-
-            filtered_data = filtered_data[
-                filtered_data["Type"]
-                == traffic_type
-            ]
-
-
-        # ----------------------------------------------------
-        # Severity filter
-        # ----------------------------------------------------
-
-        if severity != "All":
-
-            filtered_data = filtered_data[
-                filtered_data["Severity"]
-                == severity
-            ]
-
-
-        # ----------------------------------------------------
-        # Status filter
-        # ----------------------------------------------------
-
-        if status != "All":
-
-            filtered_data = filtered_data[
-                filtered_data["Status"]
-                == status
-            ]
-
-
-        # ----------------------------------------------------
-        # Save results
-        # ----------------------------------------------------
-
-        st.session_state[
-            "incident_results"
-        ] = filtered_data
-
-        st.session_state[
-            "incident_search_performed"
-        ] = True
-
-
-# ============================================================
-# INCIDENT RESULTS
-# ============================================================
-
-# If the user has NOT pressed Search Incidents,
-# automatically show the sidebar-filtered incidents.
-#
-# This is the main connection:
-#
-# Sidebar SQL Injection
-#          ↓
-# sidebar_filtered_data
-#          ↓
-# Main Dashboard list
-# ============================================================
-
-if st.session_state.get(
-    "incident_search_performed",
-    False
-):
-
-    results = st.session_state.get(
-        "incident_results",
-        sidebar_filtered_data
-    )
-
-else:
-
-    results = sidebar_filtered_data
-
-
-# Make sure results is always a DataFrame
-
-if not isinstance(
-    results,
-    pd.DataFrame
-):
-
-    results = pd.DataFrame()
-
-
-# ============================================================
-# RESULTS HEADER
-# ============================================================
-
-st.markdown(
-    '<div class="search-divider"></div>',
-    unsafe_allow_html=True
-)
-
-st.markdown(
-    '<div class="section-label">'
-    'INCIDENTS FOUND'
-    '</div>',
-    unsafe_allow_html=True
-)
-
-
-# ============================================================
-# RESULTS DESCRIPTION
-# ============================================================
-
-if selected_attack == "All":
-
-    st.caption(
-        "Showing incidents from all attack / "
-        "traffic types."
-    )
-
-else:
-
-    st.caption(
-        f"Showing **{selected_attack}** incidents "
-        "selected from the sidebar."
-    )
-
-
-# ============================================================
-# RESULTS COUNT
-# ============================================================
-
-st.info(
-    f"Found **{len(results):,}** incident(s)"
-)
-
-
-# ============================================================
-# DISPLAY RESULTS
-# ============================================================
-
-if len(results) > 0:
-
-    display_data = results[
-        [
-            "Incident ID",
-            "Time",
-            "Source IP",
-            "Attack Type",
-            "Type",
-            "Severity",
-            "Status"
-        ]
-    ].copy()
-
-
-    # --------------------------------------------------------
-    # Add row number
-    # --------------------------------------------------------
-
-    display_data.insert(
-        0,
-        "#",
-        range(
-            1,
-            len(display_data) + 1
-        )
-    )
-
-
-    # --------------------------------------------------------
-    # Display table
-    # --------------------------------------------------------
-
-    st.dataframe(
-        display_data,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-
-            "Incident ID":
-                st.column_config.TextColumn(
-                    "Incident ID",
-                    width="medium"
-                ),
-
-            "Time":
-                st.column_config.TextColumn(
-                    "Time",
-                    width="small"
-                ),
-
-            "Source IP":
-                st.column_config.TextColumn(
-                    "Source IP",
-                    width="medium"
-                ),
-
-            "Attack Type":
-                st.column_config.TextColumn(
-                    "Attack Type",
-                    width="medium"
-                ),
-
-            "Type":
-                st.column_config.TextColumn(
-                    "Type",
-                    width="small"
-                ),
-
-            "Severity":
-                st.column_config.TextColumn(
-                    "Severity",
-                    width="small"
-                ),
-
-            "Status":
-                st.column_config.TextColumn(
-                    "Status",
-                    width="medium"
-                )
-        }
-    )
-
-
-    # ========================================================
-    # SELECT INCIDENT
-    # ========================================================
-
-    st.markdown("### Select Incident")
-
-
-    selected_incident = st.selectbox(
-        "Select an incident to investigate",
-        results["Incident ID"].tolist(),
-        key="selected_incident"
-    )
-
-
-    # ========================================================
-    # VIEW INCIDENT
-    # ========================================================
-
-    if st.button(
-        "👁️  View Incident",
-        type="primary",
-        key="view_incident"
-    ):
-
-        selected_row = results[
-            results["Incident ID"]
-            == selected_incident
-        ].iloc[0]
-
-
-        # Save selected incident
-
-        st.session_state[
-            "selected_incident_data"
-        ] = selected_row.to_dict()
-
-
-        st.session_state[
-            "incident_selected"
-        ] = True
-
-        st.success(
-            f"Selected incident: "
-            f"{selected_incident}"
-        )
-
-    # ========================================================
-    # SQL INJECTION XAI → REQUEST & PAYLOAD
-    # Keep the selected incident visible across reruns.
-    # ========================================================
-
-    if st.session_state.get("incident_selected", False):
-
-        selected_detail = st.session_state.get(
-            "selected_incident_data",
-            {}
-        )
-
-        if selected_detail:
-
-            st.markdown(
-                '<div class="search-divider"></div>',
-                unsafe_allow_html=True
-            )
-
-            st.markdown(
-                "## SQL Injection Incident Analysis (XAI)"
-            )
-
-            st.caption(
-                "Request and payload evidence for the selected incident."
-            )
-
-            render_request_payload_section(
-                pd.Series(selected_detail)
-            )
-
-
-else:
-
-    # ========================================================
-    # NO RESULTS
-    # ========================================================
-
-    if selected_attack == "All":
-
-        st.warning(
-            "No incidents are available."
-        )
-
-    else:
-
-        st.warning(
-            f"No incidents were found for "
-            f"**{selected_attack}**."
-        )
+    st.markdown(payload_panel_html, unsafe_allow_html=True)

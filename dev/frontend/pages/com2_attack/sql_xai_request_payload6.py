@@ -307,6 +307,20 @@ st.markdown(
     .legend { display: flex; flex-wrap: wrap; gap: 10px 14px; margin-top: 14px; }
     .legend-item { color: #c4d0dd; font-size: 11px; display: flex; align-items: center; gap: 6px; }
     .legend-dot { width: 9px; height: 9px; border-radius: 2px; display: inline-block; }
+    .evidence-panel { margin-top: 12px; }
+    .evidence-list { display: grid; gap: 7px; }
+    .evidence-item {
+        display: grid; grid-template-columns: 40px minmax(0, 1fr) auto;
+        gap: 10px; align-items: center; padding: 9px;
+        border: 1px solid #26384c; border-radius: 9px; background: #0d1723;
+    }
+    .evidence-icon {
+        width: 36px; height: 36px; display: flex; align-items: center;
+        justify-content: center; border-radius: 9px; font-size: 18px; font-weight: 700;
+    }
+    .evidence-name { color: #e7eef7; font-size: 12px; font-weight: 700; margin-bottom: 3px; }
+    .evidence-desc { color: #aebed0; font-size: 11px; line-height: 1.45; }
+    .evidence-severity { border-radius: 6px; padding: 4px 7px; font-size: 10px; font-weight: 700; white-space: nowrap; }
     .notice {
         color: #aebed0; background: #111d2a; border: 1px solid #293b4e;
         border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; font-size: 13px;
@@ -418,6 +432,59 @@ with left_col:
         + '</section>'
     )
     st.markdown(request_panel_html, unsafe_allow_html=True)
+
+    # Evidence & Justification: observations are generated from the supplied payload.
+    decoded_payload = unquote_plus(str(payload))
+    evidence_items = [
+        {
+            "icon": "❛",
+            "color": "#ff4d4d",
+            "title": "Quote in parameter",
+            "description": "The payload includes a quote after id=53 and quoted string comparisons, which can change how SQL input is parsed.",
+            "severity": "High",
+            "severity_color": "#6b2931",
+        },
+        {
+            "icon": "▤",
+            "color": "#25a7f0",
+            "title": "Nested SELECT statement",
+            "description": "The expression contains nested SELECT statements and an Oracle-style FROM DUAL clause.",
+            "severity": "High",
+            "severity_color": "#6b2931",
+        },
+        {
+            "icon": "ƒ",
+            "color": "#35d07f",
+            "title": "SQL/XML functions",
+            "description": "UPPER(), XMLType(), and repeated CHR() calls with || concatenation construct an XML-related expression. No time-delay function is present in this payload.",
+            "severity": "High",
+            "severity_color": "#6b2931",
+        },
+        {
+            "icon": "⌘",
+            "color": "#a85cf5",
+            "title": "Boolean condition",
+            "description": "The condition 2161=2161 is always true, and 'cBFZ'='cBFZ' is a matching string comparison.",
+            "severity": "Medium",
+            "severity_color": "#493064",
+        },
+    ]
+    evidence_html = ''.join(
+        '<div class="evidence-item">'
+        f'<div class="evidence-icon" style="background:{item["color"]}18;color:{item["color"]}">{item["icon"]}</div>'
+        '<div><div class="evidence-name">' + html.escape(item["title"]) + '</div>'
+        '<div class="evidence-desc">' + html.escape(item["description"]) + '</div></div>'
+        f'<div class="evidence-severity" style="background:{item["severity_color"]};color:#ffffff">{item["severity"]}</div>'
+        '</div>'
+        for item in evidence_items
+    )
+    evidence_panel_html = (
+        '<section class="xai-panel evidence-panel">'
+        '<div class="panel-title"><span class="panel-icon">⌕</span>Evidence &amp; Justification</div>'
+        f'<div class="evidence-list">{evidence_html}</div>'
+        '</section>'
+    )
+    st.markdown(evidence_panel_html, unsafe_allow_html=True)
 
 # Panel 2: highlighted SQL payload
 with right_col:

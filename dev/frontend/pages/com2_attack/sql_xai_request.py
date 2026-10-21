@@ -1,3 +1,4 @@
+
 """
 SQL Injection Incident Analysis (XAI)
 - Select records by Incident ID, not row number.
@@ -17,7 +18,7 @@ from urllib.parse import unquote_plus
 import pandas as pd
 import streamlit as st
 import numpy as np
-import pickle
+import joblib
 
 try:
     import shap
@@ -467,12 +468,11 @@ with right:
         "tcp_payload_length"
     ]
 
-    def _load_pickle(uploaded_file, path):
+    def _load_artifact(uploaded_file, path):
         if uploaded_file is not None:
-            return pickle.load(uploaded_file)
+            return joblib.load(uploaded_file)
         if path is not None and path.is_file():
-            with open(path, "rb") as f:
-                return pickle.load(f)
+            return joblib.load(path)
         return None
 
     def _feature_text(selected_row):
@@ -562,8 +562,8 @@ with right:
         return pd.DataFrame([[vals.get(name, 0.0) for name in feature_names]], columns=feature_names)
 
     try:
-        model = _load_pickle(model_upload, default_model_path)
-        feature_names = _load_pickle(feature_columns_upload, default_feature_columns_path)
+        model = _load_artifact(model_upload, default_model_path)
+        feature_names = _load_artifact(feature_columns_upload, default_feature_columns_path)
         if feature_names is None and model is not None and hasattr(model, "feature_names_in_"):
             feature_names = list(model.feature_names_in_)
         if feature_names is None:

@@ -26,6 +26,14 @@ st.set_page_config(
 
 PROJECT_ROOT = Path(r"D:\4Y1S\research\xai_iiot_prototype")
 DATASET_PATH = PROJECT_ROOT / "data" / "EdgeIIoT_train_80_with_incident_id.csv"
+PREDICTION_PATHS = [
+    PROJECT_ROOT / "data" / "Student1_prediction_results.csv",
+    PROJECT_ROOT / "Student1_prediction_results.csv",
+    Path(__file__).resolve().parent / "data" / "Student1_prediction_results.csv",
+    Path(__file__).resolve().parent / "Student1_prediction_results.csv",
+    Path.cwd() / "data" / "Student1_prediction_results.csv",
+    Path.cwd() / "Student1_prediction_results.csv",
+]
 ID_COLUMNS = ["Incident ID", "Incident_ID", "incident_id", "incident id"]
 TEXT_COLUMNS = [
     "http.request.uri.query", "http.request.full_uri", "http.request.uri",
@@ -54,7 +62,7 @@ st.markdown("""
 .block-container {max-width:1500px;padding-top:1.2rem}
 .panel {background:#101b28;border:1px solid #26384c;border-radius:10px;padding:16px;margin-bottom:12px}
 .payload {background:#08111b;border:1px solid #385069;border-radius:8px;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:Consolas,monospace}
-.small-muted {color:#9fb2c7;font-size:.85rem}
+.small-muted {color:#9fb2c7;font-size:.85rem}\n.payload {background:#08111b;border:1px solid #385069;border-radius:8px;padding:14px;white-space:pre-wrap;overflow-wrap:anywhere;font-family:Consolas,monospace;font-size:.9rem}
 </style>
 """, unsafe_allow_html=True)
 
@@ -99,8 +107,19 @@ st.caption("Incident-level request inspection and SQL-like indicator filtering. 
 
 with st.sidebar:
     st.header("Dataset")
-    uploaded = st.file_uploader("Upload dataset CSV (optional)", type=["csv"])
-    st.caption(f"Default path: {DATASET_PATH}")
+    uploaded = st.file_uploader("Upload dataset CSV (optional)", type=["csv"], key="dataset_csv")
+    prediction_upload = st.file_uploader(
+        "Upload Student 1 prediction results CSV (optional override)", type=["csv"], key="student1_predictions_csv"
+    )
+    default_prediction_path = next((p for p in PREDICTION_PATHS if p.is_file()), None)
+    if prediction_upload is not None:
+        st.success(f"Prediction CSV uploaded: {prediction_upload.name}")
+    elif default_prediction_path:
+        st.success(f"Prediction CSV found: {default_prediction_path}")
+    else:
+        st.info("Prediction CSV not found automatically. Place Student1_prediction_results.csv in the project data folder or upload it here.")
+    st.caption("Predictions are matched by Incident_ID. A prediction CSV alone cannot generate SHAP/LIME values.")
+    st.caption(f"Default dataset path: {DATASET_PATH}")
 
 if uploaded is not None:
     try:
@@ -218,6 +237,46 @@ selected_id = st.selectbox(
 )
 row = df.loc[id_to_index[selected_id]]
 indicators = row["_indicators"]
+
+# Optional Student 1 prediction-results integration (display only; not enough for SHAP/LIME).
+prediction_row = None
+prediction_status = "No prediction results CSV found or uploaded"
+prediction_source_name = None
+if prediction_upload is not None or default_prediction_path is not None:
+    try:
+        if prediction_upload is not None:
+            predictions_df = pd.read_csv(prediction_upload, low_memory=False)
+            prediction_source_name = prediction_upload.name
+        else:
+            predictions_df = pd.read_csv(default_prediction_path, low_memory=False)
+            prediction_source_name = default_prediction_path.name
+        pred_id_col = find_col(predictions_df, ID_COLUMNS)
+        pred_label_col = find_col(predictions_df, [
+            "prediction", "predicted_label", "predicted_class", "predicted_attack",
+            "prediction_label", "class_prediction", "y_pred", "attack_prediction"
+        ])
+        pred_conf_col = find_col(predictions_df, [
+            "prediction_confidence", "confidence", "predicted_probability", "prediction_probability", "score"
+        ])
+        pred_source_col = find_col(predictions_df, ["prediction_source", "model_source", "source"])
+        if not pred_id_col:
+            prediction_status = "Prediction CSV loaded, but no Incident ID column was found."
+        elif not pred_label_col:
+            prediction_status = "Prediction CSV loaded, but no recognized prediction column was found."
+        else:
+            normalized_target_id = str(selected_id).strip().casefold()
+            matches = predictions_df[
+                predictions_df[pred_id_col].astype("string").fillna("").str.strip().str.casefold()
+                == normalized_target_id
+            ]
+            if matches.empty:
+                prediction_status = f"No Student 1 prediction found for Incident ID {selected_id}."
+            else:
+                prediction_row = matches.iloc[0]
+                prediction_status = f"Matched {prediction_source_name} by {pred_id_col} → {pred_label_col}."
+    except Exception as exc:
+        prediction_status = f"Could not read prediction results: {type(exc).__name__}: {exc}"
+
 request_fields = []
 for col in TEXT_COLUMNS:
     actual = find_col(df, [col])
@@ -228,10 +287,43 @@ st.subheader("Selected incident")
 c1, c2, c3 = st.columns(3)
 c1.metric("Incident ID", str(row[id_col]))
 c2.metric("SQL-like indicator groups", str(len(indicators)))
-if attack_col:
+if prediction_row is not None:
+    pred_metric = str(prediction_row[pred_label_col])
+    if pred_conf_col and usable(prediction_row[pred_conf_col]):
+        try:
+            conf_num = float(prediction_row[pred_conf_col])
+            conf_text = f" · {conf_num:.1%}" if 0 <= conf_num <= 1 else f" · {conf_num}"
+        except (TypeError, ValueError):
+            conf_text = ""
+        pred_metric += conf_text
+    c3.metric("IDS prediction", pred_metric)
+elif attack_col:
     c3.metric("Dataset Attack_label", str(row[attack_col]))
 else:
     c3.metric("Dataset Attack_label", "Not available")
+
+if prediction_upload is not None or default_prediction_path is not None:
+    if prediction_row is not None:
+        st.success(prediction_status)
+        if pred_conf_col and usable(prediction_row[pred_conf_col]):
+            conf_value = prediction_row[pred_conf_col]
+            try:
+                conf_num = float(conf_value)
+                conf_display = f"{conf_num:.1%}" if 0 <= conf_num <= 1 else str(conf_value)
+            except (TypeError, ValueError):
+                conf_display = str(conf_value)
+            st.caption(f"Prediction confidence field (`{pred_conf_col}`): {conf_display}")
+        if pred_source_col and usable(prediction_row[pred_source_col]):
+            source_text = str(prediction_row[pred_source_col])
+            if "standin" in source_text.lower() or "baseline" in source_text.lower():
+                st.warning(f"Prediction source: {source_text}. This is a stand-in baseline, not confirmed Student 1 model output.")
+            else:
+                st.caption(f"Prediction source: {source_text}")
+        with st.expander("Matched prediction result fields"):
+            st.dataframe(prediction_row.to_frame(name="Value"), use_container_width=True)
+        st.info("This prediction is matched by Incident_ID. SHAP/LIME still require the fitted model or a compatible prediction interface.")
+    else:
+        st.info(prediction_status)
 
 left, right = st.columns([1, 1], gap="large")
 with left:
@@ -247,21 +339,83 @@ with left:
         st.warning("No common HTTP fields were populated for this record.")
 
     st.markdown("#### SQL-like indicator evidence")
+    evidence_explanations = {
+        "SQL keyword": "SQL query keyword observed. Common words such as SELECT or UPDATE can also appear in benign text.",
+        "Boolean / logical expression": "A logical operator or boolean-like expression was observed; inspect its surrounding context.",
+        "SQL comment": "A SQL-style comment marker was observed. Comments can be used to alter how a query is parsed.",
+        "Database/time-delay function": "A database function name was observed. Delay functions can appear in time-based blind SQL injection attempts.",
+        "Nested query": "A SELECT statement appears inside parentheses, which may indicate a nested query pattern.",
+        "Quote with SQL-like operator": "A quote followed by AND/OR-like syntax was observed, which may indicate an attempt to change query logic.",
+    }
     if indicators:
         for indicator in indicators:
-            st.markdown(f"- **{indicator}** — matching text pattern observed in request-related fields.")
+            st.markdown(f"**{indicator}**")
+            st.write(evidence_explanations.get(indicator, "Matching text pattern observed in request-related fields."))
+            st.caption("Evidence source: actual request fields in the selected dataset record.")
+            st.divider()
     else:
         st.success("No configured SQL-like indicators found in this record.")
     st.caption("Indicator matching is heuristic. Benign text can contain SQL keywords, and encoded or obfuscated attacks may evade these patterns.")
 
+def highlight_payload(value: str) -> str:
+    """HTML-escape the real payload, then highlight only observed text indicators."""
+    text = html.escape(unquote_plus(value), quote=False)
+    token_pattern = re.compile(
+        r"(?P<quote>'[^']*'|&quot;[^&]*&quot;)|"
+        r"(?P<keyword>\b(?:SELECT|UNION|INSERT|UPDATE|DELETE|DROP|WHERE|FROM|HAVING|ORDER\s+BY)\b)|"
+        r"(?P<logic>\b(?:AND|OR)\b)|"
+        r"(?P<function>\b(?:CHR|CHAR|XMLTYPE|UPPER|SLEEP|PG_SLEEP|BENCHMARK)\s*\([^)]*\))|"
+        r"(?P<boolean>\b\d+\s*=\s*\d+\b|\bCASE\s+WHEN\b)|"
+        r"(?P<comment>--|/\*|\*/|#)",
+        re.I,
+    )
+    colors = {
+        "quote": "#ff626b", "keyword": "#35b8ff", "logic": "#f6a23a",
+        "function": "#35d07f", "boolean": "#b77aff", "comment": "#e0b84d",
+    }
+    out, last = [], 0
+    for match in token_pattern.finditer(text):
+        out.append(text[last:match.start()])
+        color = colors[match.lastgroup]
+        out.append(
+            f'<span style="color:{color};border:1px solid {color};'
+            f'border-radius:4px;padding:1px 3px;background:{color}18">'
+            f'{match.group(0)}</span>'
+        )
+        last = match.end()
+    out.append(text[last:])
+    return "".join(out)
+
+
 with right:
-    st.markdown("#### Request text")
-    if request_fields:
-        for field_name, value in request_fields:
+    st.markdown("#### Payload with highlighted indicators")
+    payload_values = [(name, value) for name, value in request_fields
+                      if any(token in name.lower() for token in
+                             ("query", "full_uri", "uri", "file_data", "payload", "request"))]
+    if payload_values:
+        for field_name, value in payload_values:
             st.markdown(f"**{field_name}**")
-            st.code(unquote_plus(value), language="text")
+            st.markdown(
+                f'<div class="payload">{highlight_payload(value)}</div>',
+                unsafe_allow_html=True,
+            )
     else:
-        st.warning("This incident has no usable text in the configured HTTP/request columns.")
+        st.warning("This incident has no usable payload/query text in the selected request fields.")
+    st.caption("Highlights show rule-based text matches only; they are not model explanations.")
+
+    st.markdown("#### SHAP model explanation")
+    st.info(
+        "Pending integration with the research team's trained IDS model. "
+        "Real SHAP values require that model and its exact preprocessing/features; "
+        "this dashboard does not generate placeholder values."
+    )
+
+    st.markdown("#### LIME local explanation")
+    st.info(
+        "Pending integration with the research team's trained IDS model and prediction function. "
+        "Real LIME weights require a callable model prediction interface; "
+        "no synthetic weights are displayed."
+    )
 
 with st.expander("Browse currently filtered incidents"):
     preview_cols = [id_col]
@@ -275,4 +429,4 @@ with st.expander("Browse currently filtered incidents"):
     st.dataframe(preview, use_container_width=True, hide_index=True)
 
 st.markdown("---")
-st.caption("Model prediction, SHAP, and LIME are intentionally not shown here. Integrate the research team's trained IDS model and its exact preprocessing pipeline before displaying model-derived explanations.")
+st.caption("Student 1 prediction-result CSVs can be displayed by Incident ID. Genuine SHAP/LIME still require the trained IDS model or a compatible callable prediction interface plus its exact feature preprocessing.")

@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-# J26-CS-328
-Explainable AI-Driven IDS and SOC Automation for Industrial IoT Security
-=======
 # J26-CS-328 - Explainable AI-Driven IDS and SOC Automation for Industrial IoT
 
 One repository, one frontend, four backend components.
@@ -26,4 +22,3 @@ streamlit run frontend/app.py
 2. Components talk to each other only through the JSON messages in `docs/interfaces.md`.
 3. Never push to `main`. Work on your branch, open a pull request into `develop`.
 4. Never commit datasets or trained models larger than 50 MB (see `.gitignore`).
->>>>>>> 521446f (Initial commit)

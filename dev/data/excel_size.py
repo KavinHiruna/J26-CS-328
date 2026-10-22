@@ -13,6 +13,7 @@ Usage:
     python excel_sample.py big_file.xlsx small_file.xlsx --mb 10
     python excel_sample.py big_file.xlsx small_file.csv  --mb 10      # CSV output (exact size, much faster)
     python excel_sample.py big_file.xlsx out.xlsx --mb 10 --sheet "Sheet1"
+    python excel_sample.py big_file.csv  small_file.csv  --mb 15      # CSV input (streams, keeps header)
 """
 
 import argparse
@@ -95,6 +96,20 @@ def extract_csv(src, dst, target_bytes, sheet_name=None):
     return written
 
 
+def extract_csv_from_csv(src, dst, target_bytes):
+    """CSV -> CSV: copy the header and first rows until the output reaches the target size."""
+    written = 0
+    with open(src, newline="", encoding="utf-8", errors="replace") as f_in, \
+            open(dst, "w", newline="", encoding="utf-8") as f_out:
+        reader, writer = csv.reader(f_in), csv.writer(f_out)
+        for row in reader:
+            writer.writerow(row)
+            written += 1
+            if written % 1000 == 0 and f_out.tell() >= target_bytes:
+                break
+    return written
+
+
 def main():
     p = argparse.ArgumentParser(description="Extract ~N MB of rows from a huge Excel file.")
     p.add_argument("src", help="Big input .xlsx file")
@@ -104,7 +119,9 @@ def main():
     args = p.parse_args()
 
     target = int(args.mb * 1024 * 1024)
-    if args.dst.lower().endswith(".csv"):
+    if args.src.lower().endswith(".csv"):
+        rows = extract_csv_from_csv(args.src, args.dst, target)
+    elif args.dst.lower().endswith(".csv"):
         rows = extract_csv(args.src, args.dst, target, args.sheet)
     else:
         rows = extract_xlsx(args.src, args.dst, target, args.sheet)

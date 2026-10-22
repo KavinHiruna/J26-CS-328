@@ -2,8 +2,12 @@
 Component 2 - Evidence-Grounded Hybrid XAI for SQL Injection (Streamlit page - FRONTEND)
 
 FILE LOCATION : dev/frontend/pages/com2_attack/sqli_xai_novelty_page.py
-STYLES FILE   : dev/backend/component2_xai/sqli_xai_styles.py   (all colours, fonts, CSS)
-ENGINE FILE   : sqli_xai_engine.py  (backend/component2_xai/ or next to this page)
+BACKEND FILES : dev/backend/component2_xai/
+                sqli_xai_config.py  (file paths: dataset, model, outputs)
+                sqli_xai_engine.py  (XAI logic)
+                sqli_xai_styles.py  (colours, fonts, CSS)
+DATASET       : dev/data/EdgeIIoT_train_80_with_incident_id.csv
+MODEL         : dev/backend/component2_xai/model/sql_injection_rf.pkl (+ sql_feature_columns.pkl)
 
 Run from the repo's dev folder:
   python -m streamlit run frontend\\pages\\com2_attack\\sqli_xai_novelty_page.py
@@ -40,25 +44,21 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
-import joblib
 import pandas as pd
 import streamlit as st
 
 # =============================================================================
-# [NO SCREEN] FOLDER PATHS + IMPORT OF ENGINE AND STYLES
-# HERE         = dev/frontend/pages/com2_attack   (this file's folder)
-# PROJECT_ROOT = dev
-# BACKEND_DIR  = dev/backend/component2_xai       (styles + model files)
+# [NO SCREEN] CONNECT TO THE BACKEND
+#   this page : dev/frontend/pages/com2_attack/
+#   backend   : dev/backend/component2_xai/   (config, engine, styles)
 # =============================================================================
-HERE = Path(__file__).resolve().parent
-PROJECT_ROOT = HERE.parents[2] if len(HERE.parents) > 2 else HERE   # .../dev
-BACKEND_DIR = PROJECT_ROOT / "backend" / "component2_xai"
-for p in (BACKEND_DIR, HERE):            # engine/styles may live in backend or next to this page
-    if str(p) not in sys.path:
-        sys.path.insert(0, str(p))
+BACKEND_DIR = Path(__file__).resolve().parents[3] / "backend" / "component2_xai"
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
-import sqli_xai_engine as X  # noqa: E402   -> backend logic (model, PSS, SHAP, LIME, trust)
-import sqli_xai_styles as S  # noqa: E402   -> backend/component2_xai/sqli_xai_styles.py
+import sqli_xai_config as C  # noqa: E402   -> file paths + model loading
+import sqli_xai_engine as X  # noqa: E402   -> XAI logic (model, PSS, SHAP, LIME, trust)
+import sqli_xai_styles as S  # noqa: E402   -> colours, fonts, CSS
 
 # =============================================================================
 # [SCREEN: BROWSER TAB + WHOLE PAGE] page title in browser tab, wide layout, theme
@@ -68,60 +68,14 @@ st.set_page_config(page_title="SQLi Evidence-Grounded XAI", page_icon="🛡️",
                    layout="wide", initial_sidebar_state="expanded")
 S.apply_theme(st)
 
-# =============================================================================
-# [NO SCREEN] FILE LOCATIONS the page searches automatically (first one found is used)
-# =============================================================================
-DATASET_PATHS = [                                                      # dataset CSV
-    PROJECT_ROOT / "data" / "raw" / "EdgeIIoT_train_80_with_incident_id.csv",
-    PROJECT_ROOT / "data" / "EdgeIIoT_train_80_with_incident_id.csv",
-    HERE / "data" / "EdgeIIoT_train_80_with_incident_id.csv",
-]
-MODEL_PATHS = [                                                        # trained model
-    BACKEND_DIR / "model" / "sql_injection_rf.pkl",
-    PROJECT_ROOT / "models" / "sql_injection_rf.pkl",
-    HERE / "models" / "sql_injection_rf.pkl",
-]
-FEATURE_PATHS = [                                                      # feature column list
-    BACKEND_DIR / "model" / "sql_feature_columns.pkl",
-    PROJECT_ROOT / "models" / "sql_feature_columns.pkl",
-    HERE / "models" / "sql_feature_columns.pkl",
-]
-# Text pattern used by the "Show only requests containing SQL-like text" toggle in [SCREEN-3]
-CANDIDATE_PATTERN = (r"(?i)(?:%27|'|%22|\bunion\b|union%20|\bselect\b|select%20|sleep|benchmark|"
-                     r"%23|--|information_schema|extractvalue|updatexml|xmltype|0x[0-9a-f]{4})")
-
 
 # =============================================================================
-# [NO SCREEN] HELPER FUNCTIONS - loading files and filtering rows
+# [NO SCREEN] dataset cache (the only helper kept in the frontend)
 # =============================================================================
-def first_existing(paths):
-    """Return the first path in the list that exists on disk."""
-    return next((p for p in paths if p.is_file()), None)
-
-
 @st.cache_data(show_spinner="Loading dataset...")
 def load_csv(source) -> pd.DataFrame:
     """Read the dataset CSV once and cache it (fast reloads)."""
     return pd.read_csv(source, low_memory=False)
-
-
-def load_artifact(upload, path):
-    """Load the model / feature list from a sidebar upload, or from the default path."""
-    if upload is not None:
-        return joblib.load(upload)
-    if path is not None:
-        return joblib.load(path)
-    return None
-
-
-def candidate_mask(df: pd.DataFrame) -> pd.Series:
-    """True for rows whose request text contains SQL-like characters/words (used in [SCREEN-3])."""
-    res = X.ColumnResolver(df.columns)
-    cols = [c for c in res.target + res.body + [res.query, res.referer] if c]
-    mask = pd.Series(False, index=df.index)
-    for c in dict.fromkeys(cols):
-        mask |= df[c].astype("string").str.contains(CANDIDATE_PATTERN, regex=True, na=False)
-    return mask
 
 
 # =============================================================================
@@ -145,27 +99,27 @@ with st.sidebar:
 # =============================================================================
 # [NO SCREEN] LOAD DATASET - shows a red error box at the top only if no dataset is found
 # =============================================================================
-dataset_path = first_existing(DATASET_PATHS)
+dataset_path = C.first_existing(C.DATASET_PATHS)
 if data_up is not None:
     df, data_name = load_csv(data_up), data_up.name
 elif dataset_path:
     df, data_name = load_csv(str(dataset_path)), dataset_path.name
 else:
     st.error("Dataset not found. Upload it in the sidebar or place it at:")
-    st.code(str(DATASET_PATHS[0]))
+    st.code(str(C.DATASET_PATHS[0]))
     st.stop()
 
 # =============================================================================
 # [NO SCREEN] LOAD MODEL + FEATURE LIST - shows a warning box only if the model is missing
 # =============================================================================
 try:
-    model = load_artifact(model_up, first_existing(MODEL_PATHS))
-    feature_names = load_artifact(feat_up, first_existing(FEATURE_PATHS))
+    model = C.load_artifact(model_up or C.first_existing(C.MODEL_PATHS))
+    feature_names = C.load_artifact(feat_up or C.first_existing(C.FEATURE_PATHS))
 except Exception as exc:
     st.error(f"Could not load model/feature file: {type(exc).__name__}: {exc}")
     st.stop()
 if model is None:
-    st.warning("No trained model found. Upload `sql_injection_rf.pkl` (and its feature column list) in the sidebar. "
+    st.warning(f"No trained model found in {C.MODEL_DIR}. Upload `sql_injection_rf.pkl` (and its feature column list) in the sidebar. "
                "This page never shows explanations without a real model.")
     st.stop()
 
@@ -217,12 +171,12 @@ if not res.id_col:
 # --- "Show only requests containing SQL-like text" switch
 only_candidates = st.toggle("Show only requests containing SQL-like text", True,
                             help="Fast text pre-filter to find interesting incidents. It is not a classifier.")
-view_df = df[candidate_mask(df)] if only_candidates else df
+view_df = df[X.candidate_mask(df)] if only_candidates else df
 if view_df.empty:
     st.warning("No incidents match the filter.")
     st.stop()
 # --- "Search Incident ID" text box
-search = st.text_input("Search Incident ID (optional)", key="incident_id_search")
+search = st.text_input("Search Incident ID (optional)")
 ids = view_df[res.id_col].astype(str)
 if search:
     ids = ids[ids.str.contains(search, case=False, regex=False)]
@@ -231,7 +185,7 @@ if not options:
     st.warning("No Incident ID matches the search.")
     st.stop()
 # --- "Incident (N shown)" dropdown - the selected incident is explained below
-selected = st.selectbox(f"Incident ({len(options):,} shown)", options, key="incident_selector")
+selected = st.selectbox(f"Incident ({len(options):,} shown)", options)
 record = view_df[view_df[res.id_col].astype(str) == selected].iloc[0]
 
 # [NO SCREEN] run the explanation for the selected incident (spinner while it runs)

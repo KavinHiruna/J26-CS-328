@@ -154,6 +154,8 @@ select.input { appearance: none; padding-right: 34px;
 .view-btn svg { width: 18px; height: 18px; fill: currentColor; }
 .sqli-btn { display: inline-flex; align-items: center; height: 33px; margin-left: 6px; padding: 0 14px; border-radius: 3px; background: var(--blue-dark); color: #fff; font-size: 14px; text-decoration: none; white-space: nowrap; }
 .sqli-btn:hover { background: var(--blue); }
+.sqli-btn.xai-ddos { background: #0e7490; }
+.sqli-btn.xai-ddos:hover { background: #0891b2; }
 .id-link { color: inherit; text-decoration: underline dotted; }
 .id-link:hover { color: var(--blue); }
 .breakdown { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 14px; }

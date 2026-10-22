@@ -167,6 +167,11 @@ class IncidentDataset:
             hits = df[uri_col].astype(str).str.contains(config.SQLI_URI_PATTERN, case=False, regex=False)
             is_sqli |= hits & (df[self.label_col] != "Normal")
         df["_is_sqli"] = is_sqli.to_numpy(dtype=bool)
+        is_ddos_http = df[self.label_col].str.lower().isin(config.DDOS_HTTP_TYPES)
+        if uri_col is not None:
+            flood = df[uri_col].astype(str).str.strip().str.match(config.DDOS_HTTP_URI_REGEX, case=False)
+            is_ddos_http |= flood & (df[self.label_col] != "Normal")
+        df["_is_ddos_http"] = is_ddos_http.to_numpy(dtype=bool)
         df["_row"] = np.arange(len(df))
 
         self.df = df
@@ -218,6 +223,7 @@ class IncidentDataset:
             "severity": r["_severity"],
             "status": r["_status"],
             "is_sqli": bool(r["_is_sqli"]),
+            "is_ddos_http": bool(r["_is_ddos_http"]),
         }
 
     def search(self, start=None, end=None, traffic_type="All", severity="All",

@@ -4,7 +4,9 @@ DDoS HTTP Flood — Explainable AI dashboard (Component 2, Edge-IIoTset).
 Location : dev/frontend/pages/com2_attack/ddos_http.py
 Backend  : dev/backend/component2_xai/DDoS_http
 
-Run standalone:   streamlit run frontend/pages/com2_attack/ddos_http.py   (from dev/)
+Run standalone:   python -m streamlit run frontend/pages/com2_attack/ddos_http.py --server.port 8510   (from dev/)
+XAI IDS link    : the IDS dashboard opens this page as  ?incident=ALR-000067  (DDOS_XAI_URL, default port 8510);
+                  "← Back to XAI IDS" returns to XAI_IDS_URL (default http://127.0.0.1:5000).
 """
 from __future__ import annotations
 

@@ -30,3 +30,16 @@ and keeps retrying every 5 seconds.
 
 If the backend runs on another port or machine, set `BACKEND_URL` in
 `settings.py` (or the `XAI_IDS_BACKEND_URL` environment variable).
+
+## Links to the Component-2 attack XAI pages
+
+Incidents the backend tags as SQL injection or DDoS HTTP Flood link to their XAI
+page (incident ID, the row button, the incident popup, the top bar and the sidebar).
+Each page opens with `?incident=<ID>` selected and has a "← Back to XAI IDS" button.
+
+| Page | Default URL | Override (`settings.py` or env var) | Start it (from `dev/`) |
+|---|---|---|---|
+| SQL Injection XAI | http://localhost:8501 | `SQLI_XAI_URL` | `python -m streamlit run frontend/pages/com2_attack/sqli_xai_novelty_page.py --server.port 8501` |
+| DDoS HTTP Flood XAI | http://localhost:8510 | `DDOS_XAI_URL` | `python -m streamlit run frontend/pages/com2_attack/ddos_http.py --server.port 8510` |
+
+The XAI pages link back to `XAI_IDS_URL` (default http://127.0.0.1:5000).

@@ -9,3 +9,6 @@ PORT = int(os.environ.get("XAI_IDS_FRONTEND_PORT", 5000))
 
 # Where the SQL Injection XAI Streamlit page is running (linked from SQL injection incidents)
 SQLI_XAI_URL = os.environ.get("SQLI_XAI_URL", "http://localhost:8501").rstrip("/")
+
+# Where the DDoS HTTP Flood XAI Streamlit page is running (linked from DDoS HTTP Flood incidents)
+DDOS_XAI_URL = os.environ.get("DDOS_XAI_URL", "http://localhost:8510").rstrip("/")

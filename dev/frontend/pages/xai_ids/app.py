@@ -19,7 +19,7 @@ app = Flask(
 @app.route("/")
 def index():
     return render_template("index.html", api_base=settings.BACKEND_URL,
-                           sqli_xai_url=settings.SQLI_XAI_URL)
+                           sqli_xai_url=settings.SQLI_XAI_URL, ddos_xai_url=settings.DDOS_XAI_URL)
 
 
 if __name__ == "__main__":

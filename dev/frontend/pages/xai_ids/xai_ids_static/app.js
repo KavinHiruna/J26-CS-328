@@ -45,31 +45,45 @@ setInterval(tick, 1000); tick();
 const typeBadge = (inc) => `<span class="badge ${inc.type === "Normal" ? "t-normal" : "t-attack"}" title="${esc(inc.type)}">${esc(inc.type_display)}</span>`;
 const sevBadge = (s) => `<span class="badge s-${esc(s)}">${esc(s)}</span>`;
 const stBadge = (s) => `<span class="badge st-${esc(s)}">${esc(s)}</span>`;
-const SQLI_XAI_URL = (window.SQLI_XAI_URL || "").replace(/\/$/, "");
-// SQL injection is decided by the backend from the dataset (label / request URI), not the model
-const isSqli = (inc) => !!inc.is_sqli;
-const sqliUrl = (inc) => `${SQLI_XAI_URL}/?incident=${encodeURIComponent(inc.incident_id)}`;
-const sqliLink = (inc) => isSqli(inc) && SQLI_XAI_URL
-  ? `<a class="sqli-btn" href="${esc(sqliUrl(inc))}" target="_blank" rel="noopener">🛡 SQLi XAI</a>` : "";
-const idCell = (inc) => isSqli(inc) && SQLI_XAI_URL
-  ? `<a class="id-link" href="${esc(sqliUrl(inc))}" target="_blank" rel="noopener" title="Open in SQLi XAI">${esc(inc.incident_id)}</a>`
-  : esc(inc.incident_id);
-// top bar button: opens the SQLi XAI page (with the incident open in the popup, if any)
-function setTopSqli(id = null) {
-  const a = $("sqliTopBtn");
-  if (!SQLI_XAI_URL) { a.hidden = true; return; }
-  a.href = id ? `${SQLI_XAI_URL}/?incident=${encodeURIComponent(id)}` : `${SQLI_XAI_URL}/`;
-  a.title = id ? `Open incident ${id} in the SQL Injection XAI page` : "Open the SQL Injection XAI page";
+// Component-2 attack XAI pages. Which incidents link where is decided by the backend
+// from the dataset (label / request URI), not the model.
+const XAI_PAGES = [
+  { key: "sqli", flag: "is_sqli", url: (window.SQLI_XAI_URL || "").replace(/\/$/, ""),
+    label: "🛡 SQLi XAI", name: "SQL Injection XAI", top: "sqliTopBtn", dash: "sqliDashBtn" },
+  { key: "ddos", flag: "is_ddos_http", url: (window.DDOS_XAI_URL || "").replace(/\/$/, ""),
+    label: "🌊 DDoS XAI", name: "DDoS HTTP Flood XAI", top: "ddosTopBtn", dash: "ddosDashBtn" },
+];
+const pageFor = (inc) => XAI_PAGES.find((p) => p.url && inc[p.flag]);
+const xaiUrl = (p, id) => (id ? `${p.url}/?incident=${encodeURIComponent(id)}` : `${p.url}/`);
+const xaiLink = (inc) => {
+  const p = pageFor(inc);
+  return p ? `<a class="sqli-btn xai-${p.key}" href="${esc(xaiUrl(p, inc.incident_id))}" target="_blank" rel="noopener">${p.label}</a>` : "";
+};
+const idCell = (inc) => {
+  const p = pageFor(inc);
+  return p ? `<a class="id-link" href="${esc(xaiUrl(p, inc.incident_id))}" target="_blank" rel="noopener" title="Open in ${p.name}">${esc(inc.incident_id)}</a>`
+    : esc(inc.incident_id);
+};
+// top bar buttons: open each XAI page (with the incident open in the popup, if any)
+function setTopXai(id = null) {
+  for (const p of XAI_PAGES) {
+    const a = $(p.top);
+    if (!p.url) { a.hidden = true; continue; }
+    a.href = xaiUrl(p, id);
+    a.title = id ? `Open incident ${id} in the ${p.name} page` : `Open the ${p.name} page`;
+  }
 }
-setTopSqli();
-// sidebar button: opens the SQLi XAI dashboard for the current traffic record
-function setSqliDash(id = null) {
-  const a = $("sqliDashBtn");
-  if (!SQLI_XAI_URL) { a.hidden = true; return; }
-  a.href = id ? `${SQLI_XAI_URL}/?incident=${encodeURIComponent(id)}` : `${SQLI_XAI_URL}/`;
-  a.title = id ? `Open record ${id} in the SQL Injection XAI dashboard` : "Open the SQL Injection XAI dashboard";
+setTopXai();
+// sidebar buttons: open each XAI dashboard for the current traffic record
+function setXaiDash(id = null) {
+  for (const p of XAI_PAGES) {
+    const a = $(p.dash);
+    if (!p.url) { a.hidden = true; continue; }
+    a.href = xaiUrl(p, id);
+    a.title = id ? `Open record ${id} in the ${p.name} dashboard` : `Open the ${p.name} dashboard`;
+  }
 }
-setSqliDash();
+setXaiDash();
 const eye = `<svg viewBox="0 0 24 24"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2.3a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z"/></svg>`;
 
 /* ---------- init ---------- */
@@ -114,7 +128,7 @@ async function loadMeta() {
     await loadRecord(1);
     await searchRange(1);
     refreshBell();
-    // arriving from the SQLi XAI page's back link: /?incident=ALR-000024
+    // arriving from an XAI page's back link (SQLi or DDoS HTTP Flood): /?incident=ALR-000024
     const incoming = new URLSearchParams(location.search).get("incident");
     if (incoming) {
       history.replaceState(null, "", location.pathname);   // only once, not on dataset change
@@ -179,7 +193,7 @@ async function runSearch(params, page, subtitle) {
           <td>${typeBadge(inc)}</td>
           <td>${sevBadge(inc.severity)}</td>
           <td>${stBadge(inc.status)}</td>
-          <td><button class="view-btn" data-id="${esc(inc.incident_id)}">${eye}View</button>${sqliLink(inc)}</td>
+          <td><button class="view-btn" data-id="${esc(inc.incident_id)}">${eye}View</button>${xaiLink(inc)}</td>
         </tr>`).join("");
     }
     renderPager(r);
@@ -229,7 +243,7 @@ async function loadRecord(n) {
     $("recInput").value = r.n; $("recInput").max = r.total;
     $("recN").textContent = r.n.toLocaleString(); $("recTotal").textContent = r.total.toLocaleString();
     $("recId").textContent = `${r.incident.incident_id} · ${r.incident.time}`;
-    setSqliDash(r.incident.incident_id);
+    setXaiDash(r.incident.incident_id);
     setStatus("Not Analyzed");
   } catch (e) { toast(e.message); }
 }
@@ -334,7 +348,7 @@ async function openIncident(id) {
   try {
     const [x, d] = await Promise.all([api("/api/explain", { incident_id: id }), api(`/api/incident/${encodeURIComponent(id)}`)]);
     const inc = x.incident;
-    setTopSqli(inc.incident_id);
+    setTopXai(inc.incident_id);
     const opts = state.meta.statuses.map((s) => `<option ${s === inc.status ? "selected" : ""}>${s}</option>`).join("");
     $("modalBody").innerHTML = `
       <div class="meta-row">
@@ -342,7 +356,7 @@ async function openIncident(id) {
         <div><span class="k">Severity</span>${sevBadge(inc.severity)}</div>
         <div class="status-edit"><span class="k">Status</span><select class="input" id="statusSel">${opts}</select>
           <button class="btn btn-primary" id="statusSave" style="height:32px;font-size:14px;padding:0 14px">Update</button></div>
-        ${sqliLink(inc) ? `<div>${sqliLink(inc)}</div>` : ""}
+        ${xaiLink(inc) ? `<div>${xaiLink(inc)}</div>` : ""}
       </div>
       <div class="res-grid">
         <div>${verdictHTML(inc, x.prediction)}<div style="margin-top:18px">${probsHTML(x.prediction)}</div></div>
@@ -366,7 +380,7 @@ async function openIncident(id) {
     $("modalBody").innerHTML = `<div class="banner error">${esc(e.message)}</div>`;
   }
 }
-const closeModal = () => { $("modal").hidden = true; setTopSqli(); };
+const closeModal = () => { $("modal").hidden = true; setTopXai(); };
 $("modalClose").onclick = closeModal;
 $("modal").onclick = (e) => { if (e.target.id === "modal") closeModal(); };
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });

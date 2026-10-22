@@ -112,6 +112,12 @@ SQLI_TYPES = {"sql_injection", "sqli", "sql injection"}
 SQLI_URI_CANDIDATES = ["http.request.full_uri", "http.request.uri"]
 SQLI_URI_PATTERN = "/vulnerabilities/sqli"
 
+# DDoS HTTP Flood incidents get a link to the DDoS HTTP Flood XAI page (component 2).
+# Same rule as backend/component2_xai/DDoS_http/config.py (FLOOD_URI_REGEX): an attack whose
+# request is the repeated flood target URL. A multi-class label in DDOS_HTTP_TYPES also counts.
+DDOS_HTTP_TYPES = {"ddos_http", "ddos http", "ddos_http_flood", "ddos http flood"}
+DDOS_HTTP_URI_REGEX = r"^https?://[^/]+/dvwa/vulnerabilities/?$"
+
 # ---------------------------------------------------------------------------
 # Model
 # If MODEL_PATH exists it is loaded; otherwise a Random Forest is trained on a

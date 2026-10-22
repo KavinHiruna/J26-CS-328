@@ -1,161 +1,150 @@
 """
-Configuration for the DDoS ICMP Flood Explainable-AI component (Component 2).
+Configuration for the DDoS ICMP Flood XAI component (Edge-IIoTset).
 
-Every model feature below comes from the project parameter sheet
-"DDoS_ICMP_Flood_parameters.xlsx". Source/Destination IP are kept as incident
-context only (they are not model inputs, so the model cannot overfit to the
-lab's IP addresses).
+All paths are resolved relative to this file so the package works the same on
+Windows (D:\\4Y1S\\research\\J26-CS-328\\dev\\backend\\component2_xai\\DDoS_icmp)
+and Linux.
 """
-from __future__ import annotations
-
-from dataclasses import dataclass, field
 from pathlib import Path
 
+# --------------------------------------------------------------------------- #
+# Paths
+# --------------------------------------------------------------------------- #
 PACKAGE_DIR = Path(__file__).resolve().parent
-MODELS_DIR = PACKAGE_DIR / "models"
-DEFAULT_MODEL_PATH = MODELS_DIR / "ddos_icmp_model.joblib"
+ARTIFACTS_DIR = PACKAGE_DIR / "artifacts"
+# Default dataset for the dashboard (dev/data/raw/...); the sidebar can override it.
+DATASET_PATH = PACKAGE_DIR.parents[2] / "data" / "raw" / "EdgeIIoT_train_80_with_incident_id.csv"
 
-ATTACK_NAME = "DDoS ICMP Flood"
-# Label names used by Edge-IIoTset for this attack (Attack_type column)
-ATTACK_TYPE_ALIASES = ("DDoS_ICMP", "DDoS_ICMP_Flood", "DDOS_ICMP", "ICMP_Flood")
-NORMAL_TYPE_ALIASES = ("Normal", "normal", "BENIGN", "Benign")
+MODEL_PATH = ARTIFACTS_DIR / "rf_ddos_icmp.joblib"
+ENCODER_PATH = ARTIFACTS_DIR / "feature_encoder.joblib"
+SURROGATE_PATH = ARTIFACTS_DIR / "surrogate_tree.joblib"
+METRICS_PATH = ARTIFACTS_DIR / "metrics.json"
+GLOBAL_XAI_PATH = ARTIFACTS_DIR / "global_explanations.json"
+SHAP_SAMPLE_PATH = ARTIFACTS_DIR / "shap_sample.npz"
+BACKGROUND_PATH = ARTIFACTS_DIR / "background.parquet"
+SAMPLE_TRAFFIC_PATH = ARTIFACTS_DIR / "sample_traffic.csv"
+BASELINE_PATH = ARTIFACTS_DIR / "class_baselines.json"
 
-# Width of the traffic window (seconds) used for rate / distribution features
-WINDOW_SECONDS = 1.0
+# --------------------------------------------------------------------------- #
+# Labels
+# --------------------------------------------------------------------------- #
+LABEL_COL = "Attack_type"
+BINARY_LABEL_COL = "Attack_label"
+NORMAL_LABEL = "Normal"
+# Edge-IIoTset names the class "DDoS_ICMP"; matched case-insensitively.
+ATTACK_LABEL = "DDoS_ICMP"
+CLASS_NAMES = ["Normal", "DDoS ICMP Flood"]
 
+# Files with only the binary Attack_label (e.g. EdgeIIoT_train_80_with_incident_id.csv)
+# get Attack_type derived the same way as the HTTP-flood / SQLi labels: an attack row
+# is DDoS_ICMP when it carries ICMP fields and does not involve the scanner host.
+# In Edge-IIoTset the ICMP flood is ~10k echo packets from thousands of spoofed
+# sources to 192.168.0.128 (23:17-23:24) plus its replies; 192.168.0.170 only sends a
+# few hundred ICMP probes/timestamp requests while scanning (22:14-22:28), not a flood.
+ICMP_COLS = ["icmp.checksum", "icmp.seq_le"]          # non-zero -> packet is ICMP
+SCANNER_HOSTS = {"192.168.0.170"}
+# ~1k rows of the export have shifted columns (frame.time holds an IP); they are left out.
+TIME_COL = "frame.time"
+OTHER_ATTACK_LABEL = "Other_attack"
 
-@dataclass(frozen=True)
-class FeatureSpec:
-    name: str            # engineered column name used by the model
-    group: str           # group from the parameter sheet
-    parameter: str       # parameter name exactly as in the sheet
-    why: str             # "Why important for ICMP Flood" (from the sheet)
-    unit: str = ""
-    model_input: bool = True
+# --------------------------------------------------------------------------- #
+# Feature selection
+# --------------------------------------------------------------------------- #
+# Columns dropped by the Edge-IIoTset authors (Ferrag et al., 2022, Sec. V):
+# identifiers, IPs, ports, timestamps and raw payloads that would let a model
+# memorise the testbed instead of learning attack behaviour.
+PAPER_DROP_COLUMNS = [
+    "frame.time", "ip.src_host", "ip.dst_host",
+    "arp.src.proto_ipv4", "arp.dst.proto_ipv4",
+    "http.file_data", "http.request.full_uri", "icmp.transmit_timestamp",
+    "http.request.uri.query", "tcp.options", "tcp.payload",
+    "tcp.srcport", "tcp.dstport", "udp.port", "mqtt.msg",
+]
 
+# Extra near-identifier columns dropped here: raw sequence numbers and
+# checksums are effectively random per packet and leak capture artefacts.
+EXTRA_DROP_COLUMNS = ["tcp.ack_raw", "tcp.checksum", "icmp.checksum"]
+# Row identifiers added by the project's EdgeIIoT_train_80 export.
+EXTRA_DROP_COLUMNS += ["Incident ID", "Incident_ID"]
 
-FEATURE_SPECS: tuple[FeatureSpec, ...] = (
-    FeatureSpec("ip_proto", "Protocol", "ip.proto", "Identifies ICMP traffic"),
-    FeatureSpec("icmp_type", "ICMP", "icmp.type", "Identifies Echo Request/Reply etc."),
-    FeatureSpec("icmp_code", "ICMP", "icmp.code", "Gives ICMP message subtype"),
-    FeatureSpec("frame_len", "Packet", "frame.len", "Packet size", "bytes"),
-    FeatureSpec("frame_time_delta", "Packet", "frame.time_delta", "Time between packets", "s"),
-    FeatureSpec("pkts_per_sec", "Rate", "Packets/sec", "One of the strongest flood indicators", "pkt/s"),
-    FeatureSpec("bytes_per_sec", "Rate", "Bytes/sec", "Measures traffic volume", "B/s"),
-    FeatureSpec("flow_duration", "Flow", "Flow duration", "Helps distinguish short bursts", "s"),
-    FeatureSpec("flow_pkt_count", "Flow", "Packet count", "Number of packets in the flow/window", "pkts"),
-    FeatureSpec("flow_byte_count", "Flow", "Byte count", "Total transferred bytes", "bytes"),
-    FeatureSpec("src_ip", "Source", "Source IP", "Identifies traffic source", model_input=False),
-    FeatureSpec("dst_ip", "Destination", "Destination IP", "Identifies target", model_input=False),
-    FeatureSpec("ttl", "Network", "TTL", "Can provide supporting traffic information"),
-    FeatureSpec("unique_src_count", "Distribution", "Unique source IP count", "Very useful for DDoS vs DoS", "IPs"),
-    FeatureSpec("src_concentration", "Distribution", "Source packet concentration",
-                "Helps identify distributed behaviour", "share"),
+DROP_COLUMNS = PAPER_DROP_COLUMNS + EXTRA_DROP_COLUMNS + [LABEL_COL, BINARY_LABEL_COL, "__source"]
+
+# Human-readable descriptions shown in the dashboard explanations.
+FEATURE_DESCRIPTIONS = {
+    "http.request.method": "HTTP request method (GET/POST…)",
+    "http.request.version": "HTTP protocol version",
+    "http.response": "Packet is an HTTP response",
+    "http.content_length": "HTTP Content-Length header",
+    "http.referer": "HTTP Referer header present/value",
+    "http.tls_port": "Plain HTTP seen on a TLS port",
+    "icmp.seq_le": "ICMP echo sequence number",
+    "icmp.unused": "ICMP unused/reserved field",
+    "tcp.len": "TCP payload length (bytes)",
+    "tcp.flags": "TCP flag bits (SYN/ACK/PSH/FIN…)",
+    "tcp.flags.ack": "TCP ACK flag set",
+    "tcp.ack": "Relative TCP acknowledgement number",
+    "tcp.seq": "Relative TCP sequence number",
+    "tcp.connection.syn": "Connection-opening SYN packet",
+    "tcp.connection.synack": "SYN-ACK handshake reply",
+    "tcp.connection.fin": "Connection-closing FIN packet",
+    "tcp.connection.rst": "Connection reset (RST)",
+    "udp.stream": "UDP stream index",
+    "udp.time_delta": "Time since previous UDP packet",
+    "mqtt.len": "MQTT message length",
+    "mqtt.msgtype": "MQTT message type",
+    "mqtt.topic_len": "MQTT topic length",
+    "mqtt.ver": "MQTT protocol version",
+    "mqtt.hdrflags": "MQTT header flags",
+    "mqtt.conflags": "MQTT connect flags",
+    "mqtt.protoname": "MQTT protocol name",
+    "mqtt.topic": "MQTT topic",
+    "dns.qry.name": "DNS query name",
+    "dns.qry.name.len": "DNS query name length",
+    "dns.qry.type": "DNS query type",
+    "arp.opcode": "ARP operation code",
+    "arp.hw.size": "ARP hardware size",
+    "mbtcp.len": "Modbus/TCP length",
+    "mbtcp.trans_id": "Modbus/TCP transaction id",
+    "mbtcp.unit_id": "Modbus/TCP unit id",
+}
+
+# --------------------------------------------------------------------------- #
+# Training
+# --------------------------------------------------------------------------- #
+RANDOM_STATE = 42
+TEST_SIZE = 0.2
+# Normal traffic is ~11M rows in the full dataset; cap per file so attack and
+# normal stay roughly balanced and training fits in laptop memory.
+MAX_NORMAL_ROWS_PER_FILE = 15_000
+MAX_ATTACK_ROWS = 120_000
+# Paper preprocessing removes duplicate rows; after identifier columns are
+# dropped many packets become identical, so this also prevents train/test
+# leakage of identical feature vectors.
+DROP_DUPLICATES = True
+# Flood packets are near-identical by design; keep their repetition (normal rows are
+# still de-duplicated), as in the HTTP-flood component.
+DROP_DUPLICATE_ATTACK_ROWS = False
+
+RF_PARAMS = dict(
+    n_estimators=200,
+    max_depth=20,
+    min_samples_leaf=2,
+    class_weight="balanced",
+    n_jobs=-1,
+    random_state=RANDOM_STATE,
 )
 
-SPEC_BY_NAME = {s.name: s for s in FEATURE_SPECS}
-MODEL_FEATURES: tuple[str, ...] = tuple(s.name for s in FEATURE_SPECS if s.model_input)
-CONTEXT_COLUMNS: tuple[str, ...] = ("row_id", "src_ip", "dst_ip", "timestamp", "window_id")
+SURROGATE_MAX_DEPTH = 4          # global, human-readable rule set
+SHAP_SAMPLE_SIZE = 600           # rows used for global SHAP / beeswarm
+BACKGROUND_SIZE = 200            # background rows for SHAP / LIME
+PERMUTATION_REPEATS = 5
 
-
-def pretty(feature: str) -> str:
-    """Human label for a feature, e.g. 'pkts_per_sec' -> 'Packets/sec'."""
-    spec = SPEC_BY_NAME.get(feature)
-    return spec.parameter if spec else feature
-
-
-# ---------------------------------------------------------------------------
-# Domain knowledge used by the novelty layer (knowledge-grounded explanation).
-# feature, operator, threshold, description. Tune thresholds to your testbed.
-# ---------------------------------------------------------------------------
-@dataclass(frozen=True)
-class DomainRule:
-    rule_id: str
-    feature: str
-    op: str          # one of ">=", "<=", "==", "in"
-    value: object
-    text: str
-    weight: float = 1.0
-
-
-DOMAIN_RULES: tuple[DomainRule, ...] = (
-    DomainRule("R1", "ip_proto", "==", 1, "Packet is ICMP (ip.proto = 1)", 1.0),
-    DomainRule("R2", "icmp_type", "in", (8, 0), "ICMP Echo Request/Reply (ping) traffic", 0.8),
-    DomainRule("R3", "pkts_per_sec", ">=", 100.0, "Packet rate toward target >= 100 pkt/s", 1.5),
-    DomainRule("R4", "frame_time_delta", "<=", 0.01, "Inter-arrival time <= 10 ms (burst)", 1.0),
-    DomainRule("R5", "bytes_per_sec", ">=", 10_000.0, "Traffic volume >= 10 kB/s", 1.0),
-    DomainRule("R6", "unique_src_count", ">=", 3, "3+ distinct sources hit the target (distributed)", 1.2),
-    DomainRule("R7", "src_concentration", "<=", 0.6, "No single source dominates (<= 60% of packets)", 0.8),
-)
-
-# DDoS vs DoS attribution thresholds
-DISTRIBUTED_MIN_SOURCES = 3
-DISTRIBUTED_MAX_CONCENTRATION = 0.6
-
-# Severity bands: (min probability, min pkts/sec, label)
-SEVERITY_BANDS = (
-    (0.90, 1000.0, "Critical"),
-    (0.80, 200.0, "High"),
-    (0.60, 0.0, "Medium"),
-    (0.00, 0.0, "Low"),
-)
-
-
-# ---------------------------------------------------------------------------
-# Component 2 novelty statement shown on the dashboard. Edit the wording here
-# so the page always matches the thesis / proposal.
-# ---------------------------------------------------------------------------
-@dataclass(frozen=True)
-class NoveltyItem:
-    key: str
-    title: str
-    summary: str
-
-
-COMPONENT2_NOVELTY_TITLE = "Component 2 novelty - trustworthy, incident-level XAI for IIoT DDoS ICMP floods"
-COMPONENT2_NOVELTY: tuple[NoveltyItem, ...] = (
-    NoveltyItem(
-        "consensus",
-        "SHAP-LIME Explanation Consensus Score",
-        "Two independent explainers are run on the same incident and compared (top-k overlap, "
-        "direction agreement, rank correlation). The analyst sees how far the explanation can be trusted, "
-        "not just what it says.",
-    ),
-    NoveltyItem(
-        "grounding",
-        "Knowledge-grounded alignment with ICMP flood indicators",
-        "The model's reasons are checked against protocol-level ICMP flood rules taken from the parameter "
-        "study (ICMP protocol, echo traffic, packet rate, inter-arrival, volume, source spread). "
-        "An alignment score shows whether the model flagged the incident for the right reasons.",
-    ),
-    NoveltyItem(
-        "counterfactual",
-        "Counterfactual 'what would make it benign'",
-        "A minimal set of feature changes that would flip the decision to benign, giving the analyst an "
-        "actionable view of which traffic properties actually drive the alert.",
-    ),
-    NoveltyItem(
-        "attribution",
-        "Distributed-vs-single-source attribution",
-        "Unique source count and source packet concentration are used to tell a distributed (DDoS) flood from "
-        "a single-host (DoS) flood and to choose the right mitigation.",
-    ),
-    NoveltyItem(
-        "report",
-        "Analyst-ready incident narrative and mitigation",
-        "Every decision is turned into a plain-language incident report with severity, evidence, and "
-        "recommended response, exportable as JSON / Markdown for the SOC workflow.",
-    ),
-)
-
-
-@dataclass
-class ExplainSettings:
-    background_rows: int = 300
-    compute_shap: bool = True
-    compute_lime: bool = True
-    threshold: float = 0.5
-    top_k: int = 10
-    random_state: int = 42
-    lime_samples: int = 2000
-    extra: dict = field(default_factory=dict)
+# --------------------------------------------------------------------------- #
+# NOVELTY: Multi-method XAI consensus
+# --------------------------------------------------------------------------- #
+CONSENSUS_TOP_K = 5
+CONSENSUS_WEIGHTS = {"rank": 0.25, "topk": 0.25, "direction": 0.25, "verdict": 0.25}
+CONSENSUS_HIGH = 0.75
+CONSENSUS_MEDIUM = 0.50
+CONSENSUS_TRIAGE_MAX = 300        # packets scored in the batch consensus triage
+CONSENSUS_GLOBAL_SAMPLE = 300     # held-out packets for the global consensus study

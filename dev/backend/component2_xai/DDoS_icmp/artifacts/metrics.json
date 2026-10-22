@@ -1,0 +1,230 @@
+{
+  "trained_at": "2026-10-22T17:55:31+00:00",
+  "model": "RandomForestClassifier",
+  "params": {
+    "n_estimators": 200,
+    "max_depth": 20,
+    "min_samples_leaf": 2,
+    "class_weight": "balanced",
+    "random_state": 42
+  },
+  "data_sources": [
+    "Distance_15MB.csv",
+    "EdgeIIoT_train_80_with_incident_id.csv",
+    "Flame_Sensor_15MB.csv",
+    "Heart_Rate_15MB.csv",
+    "IR_Receiver_15MB.csv",
+    "Modbus_15MB.csv",
+    "Soil_Moisture_15MB.csv",
+    "Sound_Sensor_15MB.csv",
+    "Temperature_and_Humidity_15MB.csv",
+    "Water_Level_15MB.csv",
+    "phValue_15MB.csv"
+  ],
+  "n_train": 23080,
+  "n_test": 5770,
+  "class_counts": {
+    "Normal": 17494,
+    "DDoS ICMP Flood": 11356
+  },
+  "source_counts": {
+    "Distance_15MB.csv": 33,
+    "EdgeIIoT_train_80_with_incident_id.csv": 13945,
+    "Flame_Sensor_15MB.csv": 31,
+    "Heart_Rate_15MB.csv": 25,
+    "IR_Receiver_15MB.csv": 38,
+    "Modbus_15MB.csv": 14737,
+    "Soil_Moisture_15MB.csv": 8,
+    "Sound_Sensor_15MB.csv": 3,
+    "Temperature_and_Humidity_15MB.csv": 21,
+    "Water_Level_15MB.csv": 5,
+    "phValue_15MB.csv": 4
+  },
+  "accuracy": 1.0,
+  "precision": 1.0,
+  "recall": 1.0,
+  "f1": 1.0,
+  "roc_auc": 1.0,
+  "pr_auc": 1.0,
+  "false_positive_rate": 0.0,
+  "confusion_matrix": [
+    [
+      3499,
+      0
+    ],
+    [
+      0,
+      2271
+    ]
+  ],
+  "roc_curve": {
+    "fpr": [
+      0.0,
+      0.0,
+      0.0008573878250928837,
+      0.002000571591883395,
+      0.003143755358673907,
+      0.014004001143183767,
+      0.014861388968276651,
+      0.06830523006573307,
+      0.07059159759931409,
+      1.0
+    ],
+    "tpr": [
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ]
+  },
+  "pr_curve": {
+    "recall": [
+      0.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0
+    ],
+    "precision": [
+      1.0,
+      1.0,
+      0.9986807387862797,
+      0.9978031634446397,
+      0.9969271290605795,
+      0.9964896884598509,
+      0.9960526315789474,
+      0.995615957913196,
+      0.9951796669588081,
+      0.9788793103448276,
+      0.9776151528196297,
+      0.904780876494024,
+      0.9019062748212867,
+      0.39358752166377814
+    ]
+  },
+  "classification_report": {
+    "Normal": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3499.0
+    },
+    "DDoS ICMP Flood": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2271.0
+    },
+    "accuracy": 1.0,
+    "macro avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5770.0
+    },
+    "weighted avg": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 5770.0
+    }
+  },
+  "fit_seconds": 0.58,
+  "inference_ms_per_packet": 0.0111,
+  "features": [
+    "arp.opcode",
+    "arp.hw.size",
+    "icmp.seq_le",
+    "http.tls_port",
+    "tcp.ack",
+    "tcp.connection.fin",
+    "tcp.connection.rst",
+    "tcp.connection.syn",
+    "tcp.connection.synack",
+    "tcp.flags",
+    "tcp.flags.ack",
+    "tcp.len",
+    "tcp.seq",
+    "udp.stream",
+    "udp.time_delta",
+    "dns.qry.name",
+    "dns.qry.name.len",
+    "dns.qry.qu",
+    "dns.qry.type",
+    "dns.retransmission",
+    "dns.retransmit_request",
+    "mqtt.conflag.cleansess",
+    "mqtt.conflags",
+    "mqtt.hdrflags",
+    "mqtt.len",
+    "mqtt.msgtype",
+    "mqtt.proto_len",
+    "mqtt.protoname",
+    "mqtt.topic",
+    "mqtt.topic_len",
+    "mqtt.ver",
+    "mbtcp.len",
+    "mbtcp.trans_id"
+  ],
+  "categorical_features": [
+    "arp.hw.size",
+    "tcp.len",
+    "dns.qry.name",
+    "dns.qry.name.len",
+    "mqtt.protoname",
+    "mqtt.topic"
+  ],
+  "dropped_columns": [
+    "frame.time",
+    "ip.src_host",
+    "ip.dst_host",
+    "arp.src.proto_ipv4",
+    "arp.dst.proto_ipv4",
+    "http.file_data",
+    "http.request.full_uri",
+    "icmp.transmit_timestamp",
+    "http.request.uri.query",
+    "tcp.options",
+    "tcp.payload",
+    "tcp.srcport",
+    "tcp.dstport",
+    "udp.port",
+    "mqtt.msg",
+    "tcp.ack_raw",
+    "tcp.checksum",
+    "icmp.checksum",
+    "Incident ID",
+    "Incident_ID",
+    "Attack_type",
+    "Attack_label",
+    "__source"
+  ],
+  "dropped_constant_columns": [
+    "icmp.unused",
+    "http.content_length",
+    "http.request.method",
+    "http.referer",
+    "http.request.version",
+    "http.response",
+    "dns.retransmit_request_in",
+    "mqtt.conack.flags",
+    "mqtt.msg_decoded_as",
+    "mbtcp.unit_id"
+  ],
+  "total_seconds": 21.5
+}

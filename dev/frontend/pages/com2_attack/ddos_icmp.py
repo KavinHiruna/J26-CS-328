@@ -1,696 +1,1063 @@
 """
-DDoS ICMP Flood - Explainable AI dashboard (Component 2)
+DDoS ICMP Flood — Explainable AI dashboard (Component 2, Edge-IIoTset).
+Built on the same structure as ddos_http.py; the flood evidence is ICMP-specific
+(packet rate to the target, distinct sources, source concentration).
 
-One incident, fully explained: search the capture, pick an incident, and see
-SHAP + LIME reasons together with the Component 2 novelty layer
-(explanation consensus, knowledge-grounded alignment, counterfactual,
-DDoS-vs-DoS attribution and an analyst report).
+Location : dev/frontend/pages/com2_attack/ddos_icmp.py
+Backend  : dev/backend/component2_xai/DDoS_icmp
 
-Backend: dev/backend/component2_xai/DDoS_icmp
+Run standalone:   python -m streamlit run frontend/pages/com2_attack/ddos_icmp.py --server.port 8511   (from dev/)
+XAI IDS link    : the IDS dashboard opens this page as  ?incident=<ID>  (e.g. linked from the XAI IDS);
+                  "← Back to XAI IDS" returns to XAI_IDS_URL (default http://127.0.0.1:5000).
 """
 from __future__ import annotations
 
-import hashlib
-import io
-import re as _re
+import copy
+import json
+import os
 import sys
+from io import BytesIO
 from pathlib import Path
 
+import joblib
 import numpy as np
 import pandas as pd
+import plotly.express as px
+import plotly.graph_objects as go
 import streamlit as st
 
-# ---------------------------------------------------------------- backend import
-_DEV_DIR = Path(__file__).resolve().parents[3]          # .../dev
-_BACKEND = _DEV_DIR / "backend"
-if str(_BACKEND) not in sys.path:
-    sys.path.insert(0, str(_BACKEND))
+# --------------------------------------------------------------------------- #
+# Backend import (dev/frontend/pages/com2_attack/ddos_icmp.py -> dev/backend)
+# --------------------------------------------------------------------------- #
+DEV_ROOT = Path(__file__).resolve().parents[3]
+BACKEND_DIR = DEV_ROOT / "backend"
+if str(BACKEND_DIR) not in sys.path:
+    sys.path.insert(0, str(BACKEND_DIR))
 
-from component2_xai.DDoS_icmp import (  # noqa: E402
-    ATTACK_NAME, COMPONENT2_NOVELTY, COMPONENT2_NOVELTY_TITLE, DEFAULT_MODEL_PATH, FEATURE_SPECS, MODEL_FEATURES,
-    SEARCH_HELP, SPEC_BY_NAME, ExplainSettings, ModelAdapter, background_sample, benign_reference_from_scores,
-    build_features, build_incident, incident_options, incident_to_json, incident_to_markdown, make_demo_dataset,
-    pretty, score, search_incidents, train_model,
-)
-from component2_xai.DDoS_icmp.novelty import severity as _sev  # noqa: E402
+from component2_xai.DDoS_icmp import DDoSIcmpXAI, ModelNotTrainedError  # noqa: E402
+from component2_xai.DDoS_icmp import config as ddos_cfg                  # noqa: E402
 
-try:
-    import plotly.graph_objects as go
-    from plotly.subplots import make_subplots
-    HAS_PLOTLY = True
-except Exception:  # pragma: no cover
-    HAS_PLOTLY = False
-
-# ---------------------------------------------------------------- page config
-try:
-    st.set_page_config(page_title="DDoS ICMP Flood XAI", page_icon="📡", layout="wide")
-except Exception:
-    pass  # already set by the multipage app
-
-# ---------------------------------------------------------------- palette
-C = {
-    "bg": "#070d1a", "panel": "#0d1628", "panel2": "#111c33", "line": "#1d2a44", "text": "#e6edf7",
-    "muted": "#8ea3c2", "icmp": "#22d3ee", "attack": "#f43f5e", "benign": "#34d399", "warn": "#f59e0b",
-    "blue": "#3b82f6",
+# --------------------------------------------------------------------------- #
+# Theme — keep every colour/style decision here so it can be aligned with the
+# SQLi XAI page in one place.
+# --------------------------------------------------------------------------- #
+THEME = {
+    "bg": "#0b1020",
+    "panel": "#121a2f",
+    "panel_border": "#1f2b4a",
+    "text": "#e6ecff",
+    "muted": "#8a96b8",
+    "accent": "#4cc9f0",
+    "attack": "#ff4d6d",
+    "normal": "#2ec4b6",
+    "warn": "#ffb703",
+    "font": "Inter, 'Segoe UI', sans-serif",
+    "mono": "'JetBrains Mono', Consolas, monospace",
+    "sidebar_top": "#1e6fe8",
+    "sidebar_bottom": "#0d47a1",
+    "sidebar_text": "#ffffff",
 }
-SEV_COLOR = {"Critical": "#ef4444", "High": "#f97316", "Medium": "#f59e0b", "Low": "#22c55e", "None": "#64748b"}
-TRUST_COLOR = {"High": C["benign"], "Medium": C["warn"], "Low": C["attack"], "n/a": "#64748b"}
-STATUS_LABEL = {"column": "", "inferred": "inferred", "estimated": "est.", "unavailable": "n/a"}
-
-CSS = f"""
-<style>
-:root {{
-  --bg:{C['bg']}; --panel:{C['panel']}; --panel2:{C['panel2']}; --line:{C['line']}; --text:{C['text']};
-  --muted:{C['muted']}; --icmp:{C['icmp']}; --attack:{C['attack']}; --benign:{C['benign']}; --warn:{C['warn']};
-}}
-.stApp {{
-  background:
-    radial-gradient(900px 480px at 85% -8%, rgba(34,211,238,.10), transparent 60%),
-    radial-gradient(700px 420px at -5% 10%, rgba(244,63,94,.07), transparent 60%),
-    var(--bg);
-  color: var(--text);
-}}
-.stApp [data-testid="stMarkdownContainer"] p, .stApp label, .stApp li {{ color: var(--text); }}
-.block-container {{ padding-top: 1.6rem; max-width: 1400px; }}
-h1, h2, h3, h4 {{ color: var(--text) !important; letter-spacing: -.01em; }}
-
-/* ---------- sidebar (blue, as in the shared design) ---------- */
-[data-testid="stSidebar"] {{
-  background: linear-gradient(180deg, #1e40af 0%, #1d4ed8 38%, #1e3a8a 100%);
-  border-right: 1px solid rgba(255,255,255,.08);
-}}
-[data-testid="stSidebar"] * {{ color: #ffffff; }}
-[data-testid="stSidebar"] h2 {{ font-size: 1.35rem; font-weight: 800; margin: .4rem 0 .6rem; }}
-[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {{
-  background: rgba(255,255,255,.04); border: 1px dashed rgba(255,255,255,.35); border-radius: 10px;
-}}
-[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button {{
-  background: #1f2433 !important; border: 1px solid rgba(255,255,255,.18) !important; border-radius: 8px;
-}}
-[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] small,
-[data-testid="stSidebar"] [data-testid="stCaptionContainer"] {{ color: rgba(255,255,255,.72) !important; }}
-[data-testid="stSidebar"] [data-baseweb="select"] > div {{ background: #0b1220; border-color: rgba(255,255,255,.2); }}
-[data-testid="stSidebar"] [data-baseweb="select"] span {{ color: #60a5fa !important; }}
-
-/* ---------- hero ---------- */
-.hero {{ display:flex; align-items:center; gap:22px; padding: 22px 26px; border:1px solid var(--line);
-  border-radius: 18px; background: linear-gradient(120deg, rgba(34,211,238,.08), rgba(13,22,40,.9) 45%, rgba(244,63,94,.08));
-  margin-bottom: 14px; }}
-.pulse {{ position:relative; width:64px; height:64px; flex:0 0 64px; }}
-.pulse .core {{ position:absolute; inset:24px; border-radius:50%; background: var(--icmp); box-shadow: 0 0 18px var(--icmp); }}
-.pulse .ring {{ position:absolute; inset:0; border-radius:50%; border:2px solid var(--icmp); opacity:0;
-  animation: ping 2.4s cubic-bezier(.2,.6,.4,1) infinite; }}
-.pulse .ring:nth-child(2) {{ animation-delay: .8s; }} .pulse .ring:nth-child(3) {{ animation-delay: 1.6s; }}
-@keyframes ping {{ 0% {{ transform: scale(.35); opacity:.95; }} 100% {{ transform: scale(1.15); opacity:0; }} }}
-@media (prefers-reduced-motion: reduce) {{ .pulse .ring {{ animation: none; opacity:.35; }} }}
-.hero h1 {{ font-size: 1.9rem; margin: 0; line-height: 1.15; }}
-.hero .sub {{ color: var(--muted); margin-top: 4px; font-size: .95rem; }}
-.chips {{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }}
-.chip {{ font-size:.76rem; padding:3px 10px; border-radius:999px; border:1px solid var(--line); color: var(--muted);
-  background: rgba(255,255,255,.02); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }}
-.chip.warn {{ border-color: rgba(245,158,11,.5); color: #fbbf24; }}
-.chip.ok {{ border-color: rgba(52,211,153,.45); color: #6ee7b7; }}
-
-/* ---------- section labels ---------- */
-.eyebrow {{ text-transform: uppercase; letter-spacing: .14em; font-size: .72rem; color: var(--icmp); font-weight: 700;
-  margin: 18px 0 6px; }}
-.section-title {{ font-size: 1.25rem; font-weight: 750; margin: 0 0 10px; color: var(--text); }}
-
-/* ---------- novelty ---------- */
-.novelty-wrap {{ border: 1px solid rgba(34,211,238,.35); border-radius: 16px; padding: 16px 18px;
-  background: linear-gradient(180deg, rgba(34,211,238,.06), rgba(13,22,40,.6)); }}
-.novelty-head {{ font-weight: 800; font-size: 1.02rem; margin-bottom: 10px; }}
-.novelty-grid {{ display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; }}
-.nov {{ background: var(--panel); border:1px solid var(--line); border-radius: 12px; padding: 12px 13px; }}
-.nov .n {{ font-family: ui-monospace, monospace; color: var(--icmp); font-size: .75rem; }}
-.nov .t {{ font-weight: 700; margin: 2px 0 4px; font-size: .92rem; }}
-.nov .d {{ color: var(--muted); font-size: .82rem; line-height: 1.4; }}
-
-/* ---------- cards / kpis ---------- */
-.card {{ background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 14px 16px; }}
-.kpi {{ background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 12px 14px; }}
-.kpi .l {{ color: var(--muted); font-size: .76rem; text-transform: uppercase; letter-spacing: .06em; }}
-.kpi .v {{ font-size: 1.55rem; font-weight: 800; margin-top: 2px; font-variant-numeric: tabular-nums; }}
-.kpi .s {{ color: var(--muted); font-size: .76rem; }}
-.tag {{ font-size: .66rem; padding: 1px 6px; border-radius: 6px; border:1px solid var(--line); color: var(--muted);
-  margin-left: 6px; vertical-align: middle; }}
-
-/* ---------- incident header ---------- */
-.incident {{ border-radius: 16px; padding: 18px 20px; border: 1px solid var(--line); background: var(--panel2); }}
-.incident.attack {{ border-color: rgba(244,63,94,.55); box-shadow: inset 4px 0 0 var(--attack); }}
-.incident.benign {{ border-color: rgba(52,211,153,.45); box-shadow: inset 4px 0 0 var(--benign); }}
-.incident .id {{ font-family: ui-monospace, monospace; color: var(--muted); font-size: .8rem; }}
-.incident .verdict {{ font-size: 1.45rem; font-weight: 800; margin: 2px 0 6px; }}
-.badge {{ display:inline-block; padding: 3px 10px; border-radius: 999px; font-weight: 700; font-size: .78rem; margin-right: 6px; }}
-.flow {{ font-family: ui-monospace, monospace; font-size: .95rem; margin-top: 6px; }}
-.flow .arrow {{ color: var(--icmp); padding: 0 8px; }}
-.narr {{ background: var(--panel); border:1px solid var(--line); border-left: 3px solid var(--icmp); border-radius: 12px;
-  padding: 14px 16px; }}
-.narr p {{ margin: 0 0 .55rem 0; }}
-
-/* ---------- search ---------- */
-.search-help {{ color: var(--muted); font-size: .8rem; margin-top: -6px; }}
-div[data-testid="stTextInput"] input {{ font-family: ui-monospace, monospace; }}
-
-/* ---------- tabs ---------- */
-.stTabs [data-baseweb="tab-list"] {{ gap: 4px; flex-wrap: wrap; }}
-.stTabs [data-baseweb="tab"] {{ background: var(--panel); border: 1px solid var(--line); border-radius: 10px 10px 0 0;
-  padding: 6px 12px; }}
-.stTabs [aria-selected="true"] {{ border-color: var(--icmp) !important; }}
-</style>
-"""
-st.markdown(CSS, unsafe_allow_html=True)
+ATTACK, NORMAL = ddos_cfg.CLASS_NAMES[1], ddos_cfg.CLASS_NAMES[0]
+CLASS_COLORS = {ATTACK: THEME["attack"], NORMAL: THEME["normal"]}
 
 
-# ================================================================ helpers
-def _stretch(fn, *args, **kwargs):
-    """Full-width rendering across Streamlit versions (width='stretch' vs use_container_width)."""
-    try:
-        return fn(*args, width="stretch", **kwargs)
-    except Exception:
-        return fn(*args, use_container_width=True, **kwargs)
+def inject_styles() -> None:
+    t = THEME
+    st.markdown(f"""
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap');
+      .stApp {{ background: radial-gradient(1200px 600px at 10% -10%, #16224a 0%, {t['bg']} 55%); color:{t['text']}; font-family:{t['font']}; }}
+      /* sidebar — same blue gradient as the SQL Injection XAI page */
+      [data-testid="stSidebar"] {{ background:linear-gradient(180deg,{t['sidebar_top']} 0%,{t['sidebar_bottom']} 100%); }}
+      [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
+      [data-testid="stSidebar"] label, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span,
+      [data-testid="stSidebar"] small {{ color:{t['sidebar_text']} !important; }}
+      [data-testid="stSidebar"] [data-baseweb="select"] *, [data-testid="stSidebar"] input {{ color:{t['sidebar_bottom']} !important; }}
+      [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {{ background:rgba(255,255,255,.08);
+          border:1px dashed rgba(255,255,255,.35); }}
+      [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button span {{ color:{t['sidebar_bottom']} !important; }}
+      h1, h2, h3, h4 {{ color:{t['text']}; font-family:{t['font']}; letter-spacing:-0.01em; }}
+      .xai-hero {{ padding:22px 26px; border-radius:16px; margin-bottom:18px;
+                  background:linear-gradient(135deg, rgba(255,77,109,.18), rgba(76,201,240,.10));
+                  border:1px solid {t['panel_border']}; }}
+      .xai-hero h1 {{ margin:0; font-size:2rem; font-weight:800; }}
+      .xai-hero p {{ margin:6px 0 0; color:{t['muted']}; }}
+      .xai-badge {{ display:inline-block; padding:3px 10px; border-radius:999px; font-size:.72rem; font-weight:600;
+                   margin-right:6px; border:1px solid {t['panel_border']}; background:{t['panel']}; color:{t['accent']}; }}
+      .xai-card {{ background:{t['panel']}; border:1px solid {t['panel_border']}; border-radius:14px; padding:16px 18px; height:100%; }}
+      .xai-card .label {{ color:{t['muted']}; font-size:.78rem; text-transform:uppercase; letter-spacing:.06em; }}
+      .xai-card .value {{ font-size:1.7rem; font-weight:800; margin-top:4px; font-family:{t['mono']}; }}
+      .xai-card .sub {{ color:{t['muted']}; font-size:.8rem; margin-top:2px; }}
+      .xai-verdict {{ border-radius:14px; padding:18px 20px; border:1px solid {t['panel_border']}; }}
+      .xai-verdict.attack {{ background:rgba(255,77,109,.12); border-color:{t['attack']}; }}
+      .xai-verdict.normal {{ background:rgba(46,196,182,.12); border-color:{t['normal']}; }}
+      .xai-verdict .title {{ font-size:1.35rem; font-weight:800; }}
+      .xai-section {{ font-size:1.05rem; font-weight:700; margin:14px 0 6px; color:{t['text']};
+                     border-left:3px solid {t['accent']}; padding-left:10px; }}
+      .xai-path {{ font-family:{t['mono']}; font-size:.85rem; background:{t['panel']}; border:1px solid {t['panel_border']};
+                  border-radius:10px; padding:12px 14px; line-height:1.9; }}
+      .stTabs [data-baseweb="tab-list"] {{ gap:6px; }}
+      .stTabs [data-baseweb="tab"] {{ background:{t['panel']}; border-radius:10px 10px 0 0; padding:8px 16px; }}
+      .stTabs [aria-selected="true"] {{ border-bottom:2px solid {t['accent']} !important; }}
+      div[data-testid="stDataFrame"] {{ border:1px solid {t['panel_border']}; border-radius:10px; }}
+      .xai-novelty {{ padding:20px 24px; border-radius:16px; margin:4px 0 16px; border:1px solid {t['accent']};
+                     background:linear-gradient(135deg, rgba(76,201,240,.14), rgba(255,77,109,.10)); }}
+      .xai-novelty .tag {{ color:{t['warn']}; font-size:.75rem; font-weight:800; letter-spacing:.12em; }}
+      .xai-novelty h3 {{ margin:4px 0 6px; font-weight:800; }}
+      .xai-novelty p {{ color:{t['muted']}; margin:0 0 10px; line-height:1.55; }}
+      .xai-novelty .chips span {{ display:inline-block; padding:4px 10px; margin:0 6px 6px 0; border-radius:999px;
+                                 background:{t['panel']}; border:1px solid {t['panel_border']}; font-size:.8rem; }}
+      .xai-novelty .formula {{ font-family:{t['mono']}; font-size:.82rem; background:{t['panel']};
+                              border:1px solid {t['panel_border']}; border-radius:10px; padding:10px 12px; margin-top:4px; }}
+    </style>
+    """, unsafe_allow_html=True)
 
 
-def _hash(b: bytes | None) -> str:
-    return hashlib.sha1(b).hexdigest()[:16] if b else "none"
-
-
-def _fmt_num(v: float, unit: str = "") -> str:
-    if v is None or (isinstance(v, float) and np.isnan(v)):
-        return "-"
-    if abs(v) >= 1e6:
-        s = f"{v / 1e6:,.2f}M"
-    elif abs(v) >= 1e4:
-        s = f"{v / 1e3:,.1f}k"
-    elif abs(v) >= 100:
-        s = f"{v:,.0f}"
-    elif abs(v) >= 1:
-        s = f"{v:,.2f}"
-    else:
-        s = f"{v:.4f}"
-    return f"{s} {unit}".strip()
-
-
-def kpi(label: str, value: str, sub: str = "", tag: str = "", color: str | None = None) -> str:
-    t = f'<span class="tag">{tag}</span>' if tag else ""
-    style = f' style="color:{color}"' if color else ""
-    return f'<div class="kpi"><div class="l">{label}{t}</div><div class="v"{style}>{value}</div><div class="s">{sub}</div></div>'
-
-
-def _fig_layout(fig, height=360, title=None):
+def style_fig(fig: go.Figure, height: int = 380, legend: bool = True) -> go.Figure:
+    t = THEME
     fig.update_layout(
-        template="plotly_dark", height=height, title=title, margin=dict(l=10, r=10, t=40 if title else 10, b=10),
+        height=height, margin=dict(l=10, r=10, t=40, b=10),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
-        font=dict(color=C["text"], size=12), legend=dict(orientation="h", y=1.08, x=0),
+        font=dict(family=t["font"], color=t["text"], size=12),
+        showlegend=legend, legend=dict(orientation="h", y=1.08, x=0, bgcolor="rgba(0,0,0,0)"),
+        title_font=dict(size=14),
     )
-    fig.update_xaxes(gridcolor=C["line"], zerolinecolor="#334155")
-    fig.update_yaxes(gridcolor=C["line"], zerolinecolor="#334155")
+    fig.update_xaxes(gridcolor=t["panel_border"], zerolinecolor=t["panel_border"])
+    fig.update_yaxes(gridcolor=t["panel_border"], zerolinecolor=t["panel_border"])
     return fig
 
 
-def _plot(fig):
-    _stretch(st.plotly_chart, fig, config={"displaylogo": False})
-
-
-# ================================================================ cached work
-@st.cache_data(show_spinner=False)
-def load_csv(data: bytes) -> pd.DataFrame:
-    return pd.read_csv(io.BytesIO(data), low_memory=False)
-
-
-@st.cache_data(show_spinner=False)
-def demo_raw(seed: int = 7, base_key: str = "none", _base: pd.DataFrame | None = None) -> pd.DataFrame:
-    return make_demo_dataset(_base, seed=seed)
-
-
-@st.cache_data(show_spinner=False)
-def engineer(key: str, _raw: pd.DataFrame):
-    return build_features(_raw)
-
-
-@st.cache_resource(show_spinner=False)
-def load_adapter(model_key: str, model_bytes: bytes | None, enc_bytes: bytes | None) -> ModelAdapter:
-    if model_bytes:
-        return ModelAdapter.from_bytes(model_bytes, enc_bytes)
-    enc_obj = None
-    if enc_bytes:
-        import joblib
-        enc_obj = joblib.load(io.BytesIO(enc_bytes))
-    import joblib
-    return ModelAdapter.from_objects(joblib.load(DEFAULT_MODEL_PATH), enc_obj)
-
-
-@st.cache_resource(show_spinner=False)
-def train_baseline(key: str, _features: pd.DataFrame):
-    bundle, metrics = train_model(_features, n_estimators=150)
-    return ModelAdapter.from_objects(bundle), bundle, metrics
-
-
-@st.cache_data(show_spinner=False)
-def score_cached(key: str, _features: pd.DataFrame, _adapter: ModelAdapter, attack_class):
-    # probabilities do not depend on the threshold, so moving the slider never re-scores
-    return score(_features, _adapter, attack_class, 0.5)
-
-
-# ================================================================ sidebar
-with st.sidebar:
-    st.markdown("## Inputs")
-    up_csv = st.file_uploader("Dataset CSV (optional)", type=["csv"], key="icmp_csv")
-    up_model = st.file_uploader("Trained DDoS ICMP model (.joblib / .pkl)", type=["joblib", "pkl"], key="icmp_model")
-    up_enc = st.file_uploader("Feature encoder (.joblib, optional)", type=["joblib", "pkl"], key="icmp_enc")
-    st.caption("Only load pickle files you trust - loading a pickle can run code.")
-
-    st.markdown("## Explanation settings")
-    bg_rows = st.slider("Background sample (rows)", 50, 1000, 300, 50,
-                        help="Rows sampled from the dataset as the reference distribution for SHAP (Kernel / "
-                             "sampling) and LIME. More rows = more stable explanations, slower.")
-    do_shap = st.toggle("Compute SHAP", value=True,
-                        help="TreeExplainer for tree models, KernelExplainer otherwise. "
-                             "Falls back to Monte-Carlo Shapley sampling if `shap` is not installed.")
-    do_lime = st.toggle("Compute LIME", value=True)
-    threshold = st.slider("Decision threshold", 0.05, 0.95, 0.50, 0.01,
-                          help="Attack probability at or above this value is treated as a DDoS ICMP flood.")
-    top_k = st.slider("Features shown in explanations", 3, len(MODEL_FEATURES), min(10, len(MODEL_FEATURES)))
-    class_slot = st.empty()   # filled once the model is known
-
-
-# ================================================================ data
-notices: list[tuple[str, str]] = []
-model_bytes = up_model.getvalue() if up_model else None
-enc_bytes = up_enc.getvalue() if up_enc else None
-
-if up_csv is not None:
-    csv_bytes = up_csv.getvalue()
-    data_key = _hash(csv_bytes)
-    with st.spinner("Reading CSV ..."):
-        raw = load_csv(csv_bytes)
-    data_label = up_csv.name
-    synthetic = False
-else:
-    raw = demo_raw(7)
-    data_key = "demo-7"
-    data_label = "demo capture"
-    synthetic = True
-    notices.append(("warn", "No CSV uploaded - showing a demo capture with **synthetic** ICMP floods. "
-                            "Upload an Edge-IIoTset CSV (e.g. `DDoS_ICMP_Flood_attack.csv`) for real results."))
-
-with st.spinner("Engineering ICMP flood features (rates, windows, source spread) ..."):
-    features, report = engineer(data_key, raw)
-
-has_icmp_attack = report.has_labels and any("icmp" in str(k).lower() for k in report.attack_types)
-if up_csv is not None and report.has_labels and not has_icmp_attack and model_bytes is None \
-        and not DEFAULT_MODEL_PATH.exists():
-    inject = st.toggle("This CSV has no DDoS ICMP flood rows - inject synthetic floods for a demo", value=True)
-    if inject:
-        raw = demo_raw(7, base_key=data_key, _base=raw)
-        data_key = f"{data_key}+demo"
-        synthetic = True
-        features, report = engineer(data_key, raw)
-        notices.append(("warn", "Synthetic ICMP flood bursts were injected into your normal capture (demo only)."))
-
-# ================================================================ model
-adapter: ModelAdapter | None = None
-model_source = ""
-trained_metrics = trained_bundle = None
-try:
-    if model_bytes:
-        adapter = load_adapter(_hash(model_bytes) + _hash(enc_bytes), model_bytes, enc_bytes)
-        model_source = up_model.name
-    elif DEFAULT_MODEL_PATH.exists():
-        adapter = load_adapter(f"default-{DEFAULT_MODEL_PATH.stat().st_mtime}{_hash(enc_bytes)}", None, enc_bytes)
-        model_source = DEFAULT_MODEL_PATH.name
-        if "DEMO" in str(adapter.meta.get("model_name", "")):
-            notices.append(("warn", "The saved backend model is a **demo** model trained on synthetic ICMP floods."))
-    elif report.has_labels and features["target"].nunique() == 2:
-        with st.spinner("No model uploaded - training a baseline RandomForest on this capture ..."):
-            adapter, trained_bundle, trained_metrics = train_baseline(data_key, features)
-        model_source = "baseline trained in-app"
-        notices.append(("info", "No model was uploaded, so a baseline RandomForest was trained on this capture. "
-                                "Download it from the Report tab or upload your own model."))
-except Exception as exc:
-    st.error(f"Could not load the model: {exc}")
-    st.stop()
-
-if adapter is None:
-    st.error("No model available. Upload a trained DDoS ICMP model, or upload a labelled Edge-IIoTset CSV "
-             "(with `Attack_type`) so a baseline can be trained.")
-    st.stop()
-
-classes = adapter.classes
-with class_slot:
-    attack_class = st.selectbox("Class that means 'DDoS ICMP flood / attack'", classes,
-                                index=classes.index(adapter.guess_attack_class()),
-                                format_func=lambda c: f"{c}" if adapter.display_class(c) == str(c)
-                                else f"{c} - {adapter.display_class(c)}")
-
-missing = [f for f in adapter.feature_names if f not in features.columns]
-if missing:
-    notices.append(("warn", f"Model features not found in the data and set to 0: {', '.join(missing[:8])}"
-                            + (" ..." if len(missing) > 8 else "")))
-
-with st.spinner("Scoring traffic ..."):
-    scored, X = score_cached(f"{data_key}|{model_source}|{_hash(model_bytes)}|{_hash(enc_bytes)}|{attack_class}",
-                             features, adapter, attack_class)
-    scored["is_attack"] = scored["prob"] >= threshold
-    scored["verdict"] = np.where(scored["is_attack"], ATTACK_NAME, "Benign")
-    scored["severity"] = [(_sev(p, pps) if a else "None")
-                          for p, pps, a in zip(scored["prob"], scored["pkts_per_sec"], scored["is_attack"])]
-
-# ================================================================ hero
-chips = [f'<span class="chip">data: {data_label}</span>',
-         f'<span class="chip">{len(scored):,} packets</span>',
-         f'<span class="chip">model: {type(adapter.model).__name__} ({model_source})</span>',
-         f'<span class="chip">threshold {threshold:.2f}</span>']
-if synthetic:
-    chips.append('<span class="chip warn">synthetic ICMP floods</span>')
-else:
-    chips.append('<span class="chip ok">real capture</span>')
-st.markdown(f"""
-<div class="hero">
-  <div class="pulse" aria-hidden="true"><div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="core"></div></div>
-  <div>
-    <h1>DDoS ICMP Flood &mdash; Explainable AI dashboard</h1>
-    <div class="sub">Component 2 &middot; Edge-IIoTset &middot; one ICMP flood incident, explained end-to-end:
-      why the model raised it, whether two explainers agree, and whether the reasons match ICMP flood knowledge.</div>
-    <div class="chips">{''.join(chips)}</div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-for kind, msg in notices:
-    (st.warning if kind == "warn" else st.info)(msg)
-
-# ================================================================ novelty
-nov_cards = "".join(
-    f'<div class="nov"><div class="n">N{i}</div><div class="t">{n.title}</div><div class="d">{n.summary}</div></div>'
-    for i, n in enumerate(COMPONENT2_NOVELTY, 1))
-st.markdown(f"""<div class="novelty-wrap"><div class="novelty-head">✦ {COMPONENT2_NOVELTY_TITLE}</div>
-<div class="novelty-grid">{nov_cards}</div></div>""", unsafe_allow_html=True)
-
-# ================================================================ overview
-attacks = scored[scored["is_attack"]]
-k1, k2, k3, k4 = st.columns(4)
-k1.markdown(kpi("Packets analysed", f"{len(scored):,}", f"{(scored['ip_proto'] == 1).mean():.1%} ICMP"),
-            unsafe_allow_html=True)
-k2.markdown(kpi("Flagged as ICMP flood", f"{len(attacks):,}", f"{len(attacks) / max(len(scored), 1):.1%} of packets",
-                color=C["attack"] if len(attacks) else None), unsafe_allow_html=True)
-k3.markdown(kpi("Targets under attack", f"{attacks['dst_ip'].nunique():,}",
-                ", ".join(attacks["dst_ip"].value_counts().index[:2]) or "none"), unsafe_allow_html=True)
-k4.markdown(kpi("Peak rate to a target", _fmt_num(float(scored["pkts_per_sec"].max()), "pkt/s"),
-                f"window {features['window_id'].max() + 1:,} s"), unsafe_allow_html=True)
-
-# ================================================================ search
-st.markdown('<div class="eyebrow">Find an incident</div>', unsafe_allow_html=True)
-st.markdown('<div class="section-title">Search incidents</div>', unsafe_allow_html=True)
-q = st.text_input("Search incidents", key="icmp_search", label_visibility="collapsed",
-                  placeholder="e.g.  192.168.0.128   pred:attack prob>0.9   srcs>=10   sev:critical   row:1532")
-st.markdown(f'<div class="search-help">{SEARCH_HELP}</div>', unsafe_allow_html=True)
-
-try:
-    hits = search_incidents(scored, q)
-except Exception as exc:
-    st.error(f"Search error: {exc}")
-    hits = scored
-cands = incident_options(hits)
-if cands.empty:
-    st.info("No incidents match this search. Clear the search box to see all incidents.")
-    st.stop()
-
-show_cols = ["row_id", "src_ip", "dst_ip", "prob", "verdict", "severity", "pkts_per_sec", "unique_src_count",
-             "src_concentration"] + (["attack_type"] if "attack_type" in cands else [])
-st.caption(f"{len(hits):,} matching packets -> {len(cands):,} incident windows (one row per target and second, "
-           "attacks first).")
-_stretch(st.dataframe, cands[show_cols].head(200).rename(columns={
-    "row_id": "row", "prob": "p(attack)", "pkts_per_sec": "pkt/s", "unique_src_count": "sources",
-    "src_concentration": "top-src share", "attack_type": "label"}),
-    hide_index=True, height=230,
-    column_config={"p(attack)": st.column_config.ProgressColumn("p(attack)", min_value=0.0, max_value=1.0,
-                                                                format="%.2f")})
-
-opt_ids = cands["row_id"].astype(int).tolist()
-lookup = cands.set_index("row_id")
-
-
-def _fmt_opt(rid: int) -> str:
-    r = lookup.loc[rid]
-    return (f"#{rid}  ·  {r['src_ip']} → {r['dst_ip']}  ·  p={r['prob']:.2f}  ·  {r['severity']}  ·  "
-            f"{r['pkts_per_sec']:,.0f} pkt/s")
-
-
-row_id = st.selectbox("Incident to explain", opt_ids, format_func=_fmt_opt, key="icmp_incident")
-
-# ================================================================ the incident
-settings = ExplainSettings(background_rows=bg_rows, compute_shap=do_shap, compute_lime=do_lime,
-                           threshold=threshold, top_k=top_k)
-bg = background_sample(X, bg_rows, settings.random_state)
-ref = benign_reference_from_scores(scored, X, threshold)
-with st.spinner("Explaining the incident (SHAP, LIME, novelty layer) ..."):
-    inc = build_incident(scored, X, adapter, int(row_id), attack_class, settings, bg, ref)
-
-row = inc["row"]
-sev = inc["severity"]
-cls = "attack" if inc["is_attack"] else "benign"
-truth = f' · ground truth: <b>{inc["true_label"]}</b>' if inc.get("true_label") is not None else ""
-
-st.markdown('<div class="eyebrow">Incident XAI</div>', unsafe_allow_html=True)
-h1, h2 = st.columns([1.7, 1])
-with h1:
-    st.markdown(f"""
-<div class="incident {cls}">
-  <div class="id">INCIDENT #{inc['row_id']} · window {int(row['window_id'])} · t = {row['timestamp']:.3f} s{truth}</div>
-  <div class="verdict" style="color:{C['attack'] if inc['is_attack'] else C['benign']}">{inc['verdict']}</div>
-  <span class="badge" style="background:{SEV_COLOR.get(sev, '#64748b')}22;color:{SEV_COLOR.get(sev, '#94a3b8')};
-     border:1px solid {SEV_COLOR.get(sev, '#64748b')}">Severity: {sev}</span>
-  <span class="badge" style="background:#22d3ee18;color:{C['icmp']};border:1px solid #22d3ee66">{inc['attribution']['type']}</span>
-  <span class="badge" style="background:{TRUST_COLOR[inc['consensus'].get('trust', 'n/a')]}18;
-     color:{TRUST_COLOR[inc['consensus'].get('trust', 'n/a')]};border:1px solid {TRUST_COLOR[inc['consensus'].get('trust', 'n/a')]}66">
-     Explanation trust: {inc['consensus'].get('trust', 'n/a')}</span>
-  <div class="flow">{row['src_ip']}<span class="arrow">──ICMP──▶</span>{row['dst_ip']}</div>
-</div>""", unsafe_allow_html=True)
-with h2:
-    if HAS_PLOTLY:
-        g = go.Figure(go.Indicator(
-            mode="gauge+number", value=inc["probability"] * 100, number={"suffix": "%", "font": {"size": 34}},
-            title={"text": "p(DDoS ICMP flood)", "font": {"size": 13, "color": C["muted"]}},
-            gauge={"axis": {"range": [0, 100], "tickcolor": C["muted"]},
-                   "bar": {"color": C["attack"] if inc["is_attack"] else C["benign"]},
-                   "bgcolor": C["panel"], "borderwidth": 0,
-                   "threshold": {"line": {"color": "#ffffff", "width": 3}, "value": threshold * 100}}))
-        _plot(_fig_layout(g, height=190))
-    else:
-        st.metric("p(DDoS ICMP flood)", f"{inc['probability']:.1%}")
-
-
-def _tag(f):
-    return STATUS_LABEL.get(report.status(f), "")
-
-
-cols = st.columns(6)
-cards = [
-    ("Packets/sec", _fmt_num(row["pkts_per_sec"]), "to target, 1 s window", _tag("pkts_per_sec")),
-    ("Bytes/sec", _fmt_num(row["bytes_per_sec"], "B/s"), "traffic volume", _tag("bytes_per_sec")),
-    ("Unique sources", f"{int(row['unique_src_count'])}", "in the window", _tag("unique_src_count")),
-    ("Top-source share", f"{row['src_concentration']:.0%}", "packet concentration", _tag("src_concentration")),
-    ("Inter-arrival", _fmt_num(row["frame_time_delta"] * 1000, "ms"), "frame.time_delta", _tag("frame_time_delta")),
-    ("ICMP type / code", f"{int(row['icmp_type'])} / {int(row['icmp_code'])}" if row["ip_proto"] == 1 else "not ICMP",
-     "8 = echo request, 0 = reply", _tag("icmp_type")),
-]
-for c, (lab, val, sub, tg) in zip(cols, cards):
-    c.markdown(kpi(lab, val, sub, tg), unsafe_allow_html=True)
-
-st.markdown('<div class="eyebrow">Analyst summary</div>', unsafe_allow_html=True)
-narr_html = "".join(f"<p>{p}</p>" for p in inc["narrative"].split("\n\n"))
-narr_html = _re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", narr_html)
-st.markdown(f'<div class="narr">{narr_html}</div>', unsafe_allow_html=True)
-for e in inc["errors"]:
-    st.warning(e)
-
-# ---------------------------------------------------------------- tabs
-tabs = st.tabs(["SHAP", "LIME", "N1 · Consensus", "N2 · Domain alignment", "N3 · Counterfactual",
-                "N4 · DDoS vs DoS", "Traffic timeline", "N5 · Report & response"])
-
-
-def _attr_bar(att, k, title, conditions=False):
-    items = att.top(k)[::-1]
-    labels = [(att.conditions.get(f) if conditions and att.conditions.get(f) else pretty(f)) for f, _ in items]
-    vals = [v for _, v in items]
-    colors = [C["attack"] if v > 0 else C["icmp"] for v in vals]
-    fig = go.Figure(go.Bar(x=vals, y=labels, orientation="h", marker_color=colors,
-                           text=[f"{v:+.3f}" for v in vals], textposition="outside",
-                           hovertemplate="%{y}<br>contribution %{x:+.4f}<extra></extra>"))
-    fig.add_vline(x=0, line_color="#475569")
-    return _fig_layout(fig, height=max(280, 34 * len(items) + 60), title=title)
-
-
-def _value_table(att):
-    rows = []
-    for f, v in att.top(top_k):
-        rows.append({"parameter": pretty(f), "group": SPEC_BY_NAME[f].group if f in SPEC_BY_NAME else "",
-                     "value": float(row[f]) if f in row else np.nan, "contribution": v,
-                     "direction": "→ attack" if v > 0 else "→ benign", "source": report.status(f)})
-    return pd.DataFrame(rows)
-
-
-with tabs[0]:
-    att = inc["shap"]
-    if att is None:
-        st.info("SHAP is switched off in the sidebar.")
-    else:
-        st.caption(f"**{att.method}** - {att.note}  Positive (red) pushes toward *{inc['attack_class']}*, "
-                   f"negative (cyan) toward benign." + (f"  Base value: {att.base_value:.3f}." if att.base_value is not None else ""))
-        if HAS_PLOTLY:
-            _plot(_attr_bar(att, top_k, f"Top {top_k} SHAP contributions"))
-        _stretch(st.dataframe, _value_table(att), hide_index=True)
-
-with tabs[1]:
-    att = inc["lime"]
-    if att is None:
-        st.info("LIME is switched off in the sidebar.")
-    else:
-        st.caption(f"**{att.method}** - {att.note}. Bars show local surrogate weights; labels are LIME's rules.")
-        if HAS_PLOTLY:
-            _plot(_attr_bar(att, top_k, f"Top {top_k} LIME weights", conditions=True))
-        _stretch(st.dataframe, _value_table(att), hide_index=True)
-
-with tabs[2]:
-    cs = inc["consensus"]
-    if not cs.get("available"):
-        st.info(cs.get("reason"))
-    else:
-        a, b, c_, d = st.columns(4)
-        a.markdown(kpi("Consensus score", f"{cs['score']:.0%}", f"{cs['trust']} trust",
-                       color=TRUST_COLOR[cs["trust"]]), unsafe_allow_html=True)
-        b.markdown(kpi(f"Top-{cs['k']} overlap", f"{cs['jaccard']:.0%}", "Jaccard of feature sets"),
-                   unsafe_allow_html=True)
-        c_.markdown(kpi("Direction agreement", f"{cs['sign_agreement']:.0%}", "same sign on shared features"),
-                    unsafe_allow_html=True)
-        d.markdown(kpi("Rank correlation", "-" if cs["rank_correlation"] is None else f"{cs['rank_correlation']:+.2f}",
-                       "Spearman on |importance|"), unsafe_allow_html=True)
-        st.caption("Score = 0.5 × overlap + 0.3 × direction agreement + 0.2 × rank agreement. "
-                   "High ≥ 70 %, Medium ≥ 45 %. A low score means the two explainers tell different stories - "
-                   "treat the explanation with care.")
-        if HAS_PLOTLY:
-            t = cs["table"].copy()
-            t["shap_n"] = t["shap"] / (t["shap"].abs().max() or 1)
-            t["lime_n"] = t["lime"] / (t["lime"].abs().max() or 1)
-            t = t.reindex(t["shap_n"].abs().sort_values().index)
-            fig = go.Figure()
-            fig.add_bar(y=t["label"], x=t["shap_n"], orientation="h", name="SHAP (normalised)", marker_color=C["blue"])
-            fig.add_bar(y=t["label"], x=t["lime_n"], orientation="h", name="LIME (normalised)", marker_color=C["warn"])
-            fig.update_layout(barmode="group")
-            _plot(_fig_layout(fig, height=max(300, 40 * len(t) + 60), title="SHAP vs LIME on the same incident"))
-        if cs["shared_features"]:
-            st.markdown("**Both explainers agree these drive the decision:** "
-                        + ", ".join(f"`{pretty(f)}`" for f in cs["shared_features"]))
-
-with tabs[3]:
-    ka = inc["alignment"]
-    if ka is None:
-        st.info("Enable SHAP or LIME to check the explanation against ICMP flood domain knowledge.")
-    else:
-        a, b = st.columns(2)
-        a.markdown(kpi("Knowledge-grounded alignment", f"{ka['alignment_score']:.0%}", ka["verdict"],
-                       color=C["benign"] if ka["alignment_score"] >= .7 else C["warn"] if ka["alignment_score"] >= .4
-                       else C["attack"]), unsafe_allow_html=True)
-        b.markdown(kpi("Domain evidence present", f"{ka['evidence_score']:.0%}",
-                       "weighted share of ICMP flood indicators that fired"), unsafe_allow_html=True)
-        rules = ka["rules"].copy()
-        rules["fired"] = rules["fired"].map({True: "✅ yes", False: "— no"})
-        rules["contribution"] = rules["contribution"].map(lambda v: "-" if v is None else f"{v:+.4f}")
-        _stretch(st.dataframe, rules[["rule", "indicator", "label", "value", "fired", "contribution", "status"]]
-                 .rename(columns={"label": "parameter"}), hide_index=True)
-        st.caption(f"Contributions from {inc['primary'].method}. Rules and thresholds come from the ICMP flood "
-                   "parameter study and live in `backend/component2_xai/DDoS_icmp/config.py` (DOMAIN_RULES).")
-
-with tabs[4]:
-    cf = inc["counterfactual"]
-    st.markdown(f"**{cf['message']}**")
-    if cf.get("steps"):
-        steps = pd.DataFrame(cf["steps"])
-        if HAS_PLOTLY:
-            ys = [cf["start_prob"]] + steps["prob_after"].tolist()
-            xs = ["incident"] + [f"set {s}" for s in steps["label"]]
-            fig = go.Figure(go.Scatter(x=xs, y=ys, mode="lines+markers+text", text=[f"{y:.2f}" for y in ys],
-                                       textposition="top center", line=dict(color=C["icmp"], width=3),
-                                       marker=dict(size=10, color=[C["attack"] if y >= threshold else C["benign"]
-                                                                   for y in ys])))
-            fig.add_hline(y=threshold, line_dash="dash", line_color=C["warn"],
-                          annotation_text=f"threshold {threshold:.2f}")
-            fig.update_yaxes(range=[0, 1.05], title="p(attack)")
-            _plot(_fig_layout(fig, height=330, title="Greedy path to a benign decision"))
-        steps["from"] = steps["from"].map(lambda v: f"{v:.4g}")
-        steps["to"] = steps["to"].map(lambda v: f"{v:.4g}")
-        _stretch(st.dataframe, steps[["label", "from", "to", "prob_after"]].rename(
-            columns={"label": "parameter", "from": "incident value", "to": "benign value", "prob_after": "p(attack) after"}),
-            hide_index=True)
-        st.caption("Each step resets one parameter to the median of traffic the model calls benign and keeps the "
-                   "change that lowers the attack probability most.")
-
-with tabs[5]:
-    at = inc["attribution"]
-    a, b, c_ = st.columns(3)
-    a.markdown(kpi("Attribution", at["type"].split(" (")[0], at["type"], color=C["icmp"]), unsafe_allow_html=True)
-    b.markdown(kpi("Distinct sources", f"{at['unique_sources']}", f"{at['window_packets']:,} packets in window"),
-               unsafe_allow_html=True)
-    c_.markdown(kpi("Source entropy", f"{at['normalised_entropy']:.0%}", "1.0 = perfectly spread"),
+def card(label: str, value: str, sub: str = "", color: str | None = None) -> None:
+    style = f"color:{color};" if color else ""
+    st.markdown(f"""<div class="xai-card"><div class="label">{label}</div>
+        <div class="value" style="{style}">{value}</div><div class="sub">{sub}</div></div>""",
                 unsafe_allow_html=True)
-    ts = at["top_sources"]
-    if HAS_PLOTLY and len(ts):
-        fig = go.Figure(go.Bar(x=ts["share"], y=ts["src_ip"], orientation="h", marker_color=C["icmp"],
-                               text=[f"{s:.1%}" for s in ts["share"]], textposition="outside"))
+
+
+def section(title: str) -> None:
+    st.markdown(f'<div class="xai-section">{title}</div>', unsafe_allow_html=True)
+
+
+# --------------------------------------------------------------------------- #
+# Data / model loading
+# --------------------------------------------------------------------------- #
+@st.cache_resource(show_spinner="Loading DDoS ICMP Flood model…")
+def load_xai() -> DDoSIcmpXAI:
+    return DDoSIcmpXAI()
+
+
+@st.cache_data(show_spinner="Loading dataset…")
+def read_csv(source: str | bytes, name: str) -> pd.DataFrame:
+    """Read a CSV from a path or uploaded bytes once and cache it."""
+    return pd.read_csv(BytesIO(source) if isinstance(source, bytes) else source, low_memory=False, dtype=str)
+
+
+def load_artifact(upload):
+    """joblib/pickle artifact from the sidebar (joblib also reads plain pickles)."""
+    return joblib.load(BytesIO(upload.getvalue()))
+
+
+def configure_xai(base: DDoSIcmpXAI, model, encoder, data: pd.DataFrame, bg_size: int,
+                  use_shap: bool, attack_class) -> DDoSIcmpXAI:
+    """Per-session copy of the cached service with the sidebar's model/settings applied."""
+    xai = copy.copy(base)
+    for cached in ("global_consensus", "_normal_baseline"):
+        xai.__dict__.pop(cached, None)          # depend on model / encoder
+    xai.model, xai.encoder = model, encoder
+    xai.use_shap, xai.attack_class = use_shap, attack_class
+    xai._shap_explainer = None
+    # Background rows for LIME: real rows from the selected dataset, like the SQLi page.
+    sample = data.sample(min(bg_size, len(data)), random_state=ddos_cfg.RANDOM_STATE)
+    xai.background = xai.encode(sample).reset_index(drop=True)
+    return xai
+
+
+@st.cache_data(show_spinner="Scoring packets…", max_entries=8)
+def score(_xai: DDoSIcmpXAI, _raw: pd.DataFrame, key: tuple) -> pd.DataFrame:
+    """Cached per (data, model, settings, threshold) so widget reruns don't re-score big files."""
+    return _xai.predict(_raw)
+
+
+# --------------------------------------------------------------------------- #
+# Tabs
+# --------------------------------------------------------------------------- #
+def tab_detection(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> None:
+    ind = xai.flood_indicators(raw, scored)
+    c1, c2, c3, c4, c5 = st.columns(5)
+    with c1:
+        card("Packets analysed", f"{ind['packets']:,}")
+    with c2:
+        card("Flagged as ICMP flood", f"{ind['flagged']:,}", f"{ind['flagged_ratio']:.1%} of traffic", THEME["attack"])
+    with c3:
+        card("ICMP packets", f"{ind['icmp_ratio']:.1%}", f"{ind['icmp_packets']:,} packets carry ICMP fields")
+    with c4:
+        card("Flagged sources", f"{ind['distinct_sources_flagged']:,}",
+             f"busiest sends {ind['source_concentration']:.1%} → "
+             f"{'distributed (DDoS)' if ind['source_concentration'] < 0.2 else 'concentrated (DoS)'}")
+    with c5:
+        acc = None
+        if "actual" in scored.columns:
+            acc = (scored["prediction"] == scored["actual"]).mean()
+        card("Agreement with labels", f"{acc:.1%}" if acc is not None else "—",
+             "dataset labels present" if acc is not None else "no labels in file", THEME["normal"])
+
+    left, right = st.columns([1, 2])
+    with left:
+        level = ind["flagged_ratio"] * 100
+        gauge = go.Figure(go.Indicator(
+            mode="gauge+number", value=level, number={"suffix": "%"},
+            title={"text": "Threat level (share of flagged packets)"},
+            gauge={"axis": {"range": [0, 100]}, "bar": {"color": THEME["attack"]},
+                   "steps": [{"range": [0, 10], "color": "rgba(46,196,182,.25)"},
+                             {"range": [10, 40], "color": "rgba(255,183,3,.25)"},
+                             {"range": [40, 100], "color": "rgba(255,77,109,.25)"}]}))
+        st.plotly_chart(style_fig(gauge, 300, legend=False), use_container_width=True)
+    with right:
+        tl = scored.reset_index(drop=True)
+        tl["packet"] = np.arange(len(tl))
+        tl["rolling"] = tl["attack_probability"].rolling(max(5, len(tl) // 100), min_periods=1).mean()
+        fig = go.Figure()
+        fig.add_trace(go.Scattergl(x=tl["packet"], y=tl["attack_probability"], mode="markers",
+                                   marker=dict(size=4, color=tl["attack_probability"],
+                                               colorscale=[[0, THEME["normal"]], [1, THEME["attack"]]]),
+                                   name="packet"))
+        fig.add_trace(go.Scatter(x=tl["packet"], y=tl["rolling"], mode="lines",
+                                 line=dict(color=THEME["accent"], width=2), name="rolling mean"))
+        fig.add_hline(y=xai.threshold, line_dash="dash", line_color=THEME["warn"],
+                      annotation_text="threshold")
+        fig.update_layout(title="Attack probability per packet", xaxis_title="packet #",
+                          yaxis_title="P(ICMP flood)", yaxis_range=[0, 1.02])
+        st.plotly_chart(style_fig(fig, 300), use_container_width=True)
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        fig = px.histogram(scored, x="attack_probability", color="prediction", nbins=40,
+                           color_discrete_map=CLASS_COLORS, title="Probability distribution")
+        st.plotly_chart(style_fig(fig, 320), use_container_width=True)
+    with c2:
+        if ind["top_flagged_sources"]:
+            src = pd.DataFrame({"source": list(ind["top_flagged_sources"].keys()),
+                                "packets": list(ind["top_flagged_sources"].values())})
+            fig = px.bar(src, x="packets", y="source", orientation="h", title="Top flagged source IPs",
+                         color_discrete_sequence=[THEME["attack"]])
+            fig.update_yaxes(categoryorder="total ascending")
+            st.plotly_chart(style_fig(fig, 320, legend=False), use_container_width=True)
+        else:
+            st.info("No packets flagged — no source IPs to rank.")
+    with c3:
+        # Bars, not a donut: one level usually dominates and tiny slices' labels collide.
+        levels = ["Low", "Elevated", "High", "Critical"]
+        mix = scored["risk_level"].value_counts().reindex(levels).fillna(0).astype(int)
+        share = mix / max(int(mix.sum()), 1)
+        fig = go.Figure(go.Bar(
+            x=mix.values, y=levels, orientation="h",
+            marker=dict(color=[THEME["normal"], THEME["accent"], THEME["warn"], THEME["attack"]],
+                        cornerradius=4),
+            text=[f"{n:,} · {s:.1%}" for n, s in zip(mix.values, share)], textposition="outside",
+            textfont=dict(color=THEME["text"]), cliponaxis=False,
+            customdata=share, hovertemplate="%{y}: %{x:,} packets (%{customdata:.2%})<extra></extra>"))
+        fig.update_layout(title="Risk levels", xaxis_title="packets",
+                          xaxis_range=[0, mix.max() * 1.35 or 1], bargap=0.35)
+        fig.update_yaxes(autorange="reversed", showgrid=False)
+        st.plotly_chart(style_fig(fig, 320, legend=False), use_container_width=True)
+
+    section("Packet verdicts")
+    only_flagged = st.toggle("Show flagged packets only", value=False, key="icmp_only_flagged")
+    view = scored[scored["is_attack"]] if only_flagged else scored
+    view = view.sort_values("attack_probability", ascending=False)
+    st.dataframe(
+        view.drop(columns=["is_attack"]),
+        use_container_width=True, height=360,
+        column_config={"attack_probability": st.column_config.ProgressColumn(
+            "P(ICMP flood)", min_value=0.0, max_value=1.0, format="%.3f")},
+    )
+    st.download_button("Download verdicts (CSV)", view.to_csv().encode(), "ddos_icmp_verdicts.csv", "text/csv")
+
+
+def waterfall(exp: dict) -> go.Figure:
+    contribs = exp["contributions"][::-1]
+    labels = [f"{c['feature']} = {c['value']}" for c in contribs]
+    values = [c["contribution"] for c in contribs]
+    if abs(exp["other_contribution"]) > 1e-6:
+        labels = ["other features"] + labels
+        values = [exp["other_contribution"]] + values
+    fig = go.Figure(go.Waterfall(
+        orientation="h", base=exp["base_value"], y=labels, x=values,
+        measure=["relative"] * len(values),
+        increasing=dict(marker=dict(color=THEME["attack"])),
+        decreasing=dict(marker=dict(color=THEME["normal"])),
+        connector=dict(line=dict(color=THEME["panel_border"])),
+        text=[f"{v:+.3f}" for v in values], textposition="outside",
+    ))
+    fig.add_vline(x=exp["base_value"], line_dash="dot", line_color=THEME["muted"],
+                  annotation_text=f"base {exp['base_value']:.2f}")
+    fig.add_vline(x=exp["probability"], line_dash="dash", line_color=THEME["warn"],
+                  annotation_text=f"output {exp['probability']:.2f}")
+    fig.update_layout(title=f"{exp['method']} — contribution to P(ICMP flood)", xaxis_title="probability")
+    return fig
+
+
+def tab_local(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: int,
+              use_lime: bool = True) -> None:
+    # Long lists freeze the browser; the highest-risk packets are the ones worth explaining.
+    MAX_PICK = 2_000
+    order = scored.sort_values("attack_probability", ascending=False).index[:MAX_PICK].tolist()
+    inc_col = next((c for c in ("Incident ID", "Incident_ID") if c in raw.columns), None)
+
+    def label(i):
+        r = scored.loc[i]
+        inc = f" · {raw.at[i, inc_col]}" if inc_col else ""
+        src = f" · {r['ip.src_host']}" if "ip.src_host" in scored.columns else ""
+        return f"#{i}{inc} · {r['prediction']} · p={r['attack_probability']:.3f}{src}"
+
+    attribution = "SHAP" if xai.capabilities["attribution_method"].startswith("SHAP") else "Tree-path"
+    methods = [attribution] + (["LIME"] if use_lime else []) + ["Surrogate rule"]
+    c1, c2 = st.columns([3, 1])
+    with c1:
+        idx = st.selectbox("Packet to explain (sorted by attack probability)", order,
+                           format_func=label, key="icmp_packet")
+        if len(scored) > MAX_PICK:
+            st.caption(f"Showing the {MAX_PICK:,} highest-probability packets of {len(scored):,}.")
+    with c2:
+        method = st.radio("Explainer", methods, key="icmp_method",
+                          help="Turn SHAP / LIME on or off in the sidebar's Explanation settings.")
+    row = raw.loc[[idx]]
+    exp = xai.explain(row, top_k=top_k)
+    is_att = exp["prediction"] == ATTACK
+    actual = scored.loc[idx, "actual"] if "actual" in scored.columns else None
+
+    v1, v2 = st.columns([1, 2])
+    with v1:
+        st.markdown(f"""<div class="xai-verdict {'attack' if is_att else 'normal'}">
+            <div class="label" style="color:{THEME['muted']}">VERDICT</div>
+            <div class="title" style="color:{THEME['attack'] if is_att else THEME['normal']}">
+              {'🚨 ' if is_att else '✅ '}{exp['prediction']}</div>
+            <div style="font-family:{THEME['mono']};font-size:1.5rem;margin-top:6px">{exp['probability']:.1%}</div>
+            <div style="color:{THEME['muted']};font-size:.85rem">attack probability · threshold {xai.threshold:.2f}</div>
+            {f"<div style='margin-top:8px;font-size:.85rem'>Dataset label: <b>{actual}</b></div>" if actual else ""}
+            </div>""", unsafe_allow_html=True)
+        section("Why?")
+        st.markdown(exp["narrative"])
+    with v2:
+        if method == attribution:
+            st.plotly_chart(style_fig(waterfall(exp), 460, legend=False), use_container_width=True)
+        elif method == "LIME":
+            if not xai.capabilities["lime"]:
+                st.warning("LIME is not installed in this environment — `pip install lime`.")
+            else:
+                with st.spinner("Fitting LIME local surrogate…"):
+                    lime = xai.explain_lime(row, num_features=top_k)
+                w = pd.DataFrame(lime["weights"])[::-1]
+                fig = go.Figure(go.Bar(x=w["weight"], y=w["rule"], orientation="h",
+                                       marker_color=[THEME["attack"] if v > 0 else THEME["normal"] for v in w["weight"]]))
+                fig.update_layout(title="LIME — local rule weights towards ICMP flood")
+                st.plotly_chart(style_fig(fig, 460, legend=False), use_container_width=True)
+        else:
+            section("Global surrogate decision path for this packet")
+            fid = xai.global_xai["surrogate"]["fidelity"]
+            st.caption(f"Depth-{xai.global_xai['surrogate']['max_depth']} decision tree that mimics the "
+                       f"Random Forest with {fid:.1%} fidelity.")
+            st.markdown('<div class="xai-path">' + "<br>".join(xai.surrogate_path(row)) + "</div>",
+                        unsafe_allow_html=True)
+
+    section("Feature values vs. typical traffic")
+    tbl = pd.DataFrame([{
+        "feature": c["feature"], "meaning": c["description"], "this packet": c["value"],
+        "typical normal": xai.encoder.decode_value(c["feature"], c["normal_median"]),
+        "typical ICMP flood": xai.encoder.decode_value(c["feature"], c["attack_median"]),
+        "contribution": c["contribution"],
+    } for c in exp["contributions"]])
+    st.dataframe(tbl, use_container_width=True, hide_index=True,
+                 column_config={"contribution": st.column_config.NumberColumn(format="%+.4f")})
+    with st.expander("Raw packet fields"):
+        st.dataframe(row.T.rename(columns={idx: "value"}), use_container_width=True)
+
+
+def tab_global(xai: DDoSIcmpXAI, top_k: int) -> None:
+    g = xai.global_xai
+    fi = pd.DataFrame(g["feature_importance"])
+    st.caption(f"Global attributions computed with **{g['attribution_method']}** on "
+               f"{len(xai.shap_sample['y'])} held-out packets.")
+
+    c1, c2 = st.columns(2)
+    with c1:
+        top = fi.head(top_k)[::-1]
+        fig = go.Figure(go.Bar(x=top["mean_abs_attribution"], y=top["feature"], orientation="h",
+                               marker_color=THEME["accent"],
+                               hovertext=top["description"]))
+        fig.update_layout(title="Mean |attribution| — overall feature impact", xaxis_title="mean |contribution|")
+        st.plotly_chart(style_fig(fig, 440, legend=False), use_container_width=True)
+    with c2:
+        s = xai.shap_sample
+        feats = fi.head(top_k)["feature"].tolist()
+        rows = []
+        for f in feats:
+            j = list(s["X"].columns).index(f)
+            x = s["X"][f].to_numpy()
+            rng = (x.max() - x.min()) or 1.0
+            rows.append(pd.DataFrame({"feature": f, "attribution": s["values"][:, j],
+                                      "feature value (scaled)": (x - x.min()) / rng}))
+        bees = pd.concat(rows)
+        fig = go.Figure()
+        for f in feats:
+            part = bees[bees["feature"] == f]
+            jitter = np.random.default_rng(0).uniform(-0.3, 0.3, len(part))
+            fig.add_trace(go.Scattergl(
+                x=part["attribution"], y=feats.index(f) + jitter, mode="markers", showlegend=False,
+                marker=dict(size=5, color=part["feature value (scaled)"], cmin=0, cmax=1,
+                            colorscale=[[0, THEME["accent"]], [1, THEME["attack"]]],
+                            colorbar=dict(title="value", thickness=10) if f == feats[0] else None,
+                            showscale=f == feats[0]),
+                hovertemplate=f"{f}<br>attribution=%{{x:.3f}}<extra></extra>"))
+        fig.update_yaxes(tickvals=list(range(len(feats))), ticktext=feats, autorange="reversed")
+        fig.add_vline(x=0, line_color=THEME["muted"])
+        fig.update_layout(title="Attribution beeswarm (each dot = one packet; colour = feature value)",
+                          xaxis_title="contribution to P(ICMP flood)")
+        st.plotly_chart(style_fig(fig, 440, legend=False), use_container_width=True)
+
+    section("Do the importance methods agree?")
+    comp = fi.head(top_k).copy()
+    for col in ["mean_abs_attribution", "gini_importance", "permutation_importance"]:
+        m = comp[col].abs().max() or 1.0
+        comp[col] = comp[col] / m
+    comp = comp.melt(id_vars="feature", value_vars=["mean_abs_attribution", "gini_importance",
+                                                    "permutation_importance"],
+                     var_name="method", value_name="normalised importance")
+    comp["method"] = comp["method"].map({"mean_abs_attribution": g["attribution_method"],
+                                         "gini_importance": "Gini (impurity)",
+                                         "permutation_importance": "Permutation (F1 drop)"})
+    fig = px.bar(comp, x="feature", y="normalised importance", color="method", barmode="group",
+                 color_discrete_sequence=[THEME["accent"], THEME["warn"], THEME["attack"]])
+    st.plotly_chart(style_fig(fig, 360), use_container_width=True)
+
+    c1, c2 = st.columns([1, 1])
+    with c1:
+        section("Dependence plot")
+        f = st.selectbox("Feature", fi["feature"].tolist(), key="icmp_dep_feature")
+        s = xai.shap_sample
+        j = list(s["X"].columns).index(f)
+        dep = pd.DataFrame({"value": s["X"][f], "attribution": s["values"][:, j],
+                            "class": np.where(s["y"] == 1, ATTACK, NORMAL)})
+        fig = px.scatter(dep, x="value", y="attribution", color="class", color_discrete_map=CLASS_COLORS,
+                         title=f"How {f} moves the prediction")
+        if f in xai.encoder.vocab:
+            inv = {v: k for k, v in xai.encoder.vocab[f].items()}
+            ticks = sorted(dep["value"].unique())
+            fig.update_xaxes(tickvals=ticks, ticktext=[inv.get(int(t), "?") for t in ticks])
+        st.plotly_chart(style_fig(fig, 360), use_container_width=True)
+    with c2:
+        section("Global surrogate rules")
+        sur = g["surrogate"]
+        st.caption(f"A depth-{sur['max_depth']} decision tree reproduces the Random Forest's decisions "
+                   f"with **{sur['fidelity']:.1%} fidelity** — a readable summary of what the model learned.")
+        rules = pd.DataFrame([{"IF": " AND ".join(r["conditions"]) or "(always)",
+                               "THEN": r["prediction"], "confidence": r["confidence"],
+                               "packets": r["support"]} for r in sur["rules"]])
+        st.dataframe(rules, use_container_width=True, hide_index=True, height=320,
+                     column_config={"confidence": st.column_config.ProgressColumn(
+                         "confidence", min_value=0.0, max_value=1.0, format="%.2f")})
+
+
+def tab_performance(xai: DDoSIcmpXAI) -> None:
+    m = xai.metrics
+    cols = st.columns(6)
+    for col, (lab, key) in zip(cols, [("Accuracy", "accuracy"), ("Precision", "precision"),
+                                      ("Recall", "recall"), ("F1-score", "f1"),
+                                      ("ROC-AUC", "roc_auc"), ("False-positive rate", "false_positive_rate")]):
+        with col:
+            card(lab, f"{m[key]:.4f}" if key != "false_positive_rate" else f"{m[key]:.2%}")
+
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        cm = np.array(m["confusion_matrix"])
+        fig = go.Figure(go.Heatmap(z=cm, x=[f"Pred {c}" for c in ddos_cfg.CLASS_NAMES],
+                                   y=[f"True {c}" for c in ddos_cfg.CLASS_NAMES],
+                                   text=cm, texttemplate="%{text:,}", showscale=False,
+                                   colorscale=[[0, THEME["panel"]], [1, THEME["accent"]]]))
         fig.update_yaxes(autorange="reversed")
-        _plot(_fig_layout(fig, height=max(240, 30 * len(ts) + 60),
-                          title=f"Top sources hitting {row['dst_ip']} in this window"))
-    st.caption("Distributed (DDoS) when ≥ 3 sources and no source carries more than 60 % of the packets; "
-               "otherwise a single/few-source (DoS) flood. This decides whether blocking IPs can work.")
+        fig.update_layout(title="Confusion matrix (test set)")
+        st.plotly_chart(style_fig(fig, 340, legend=False), use_container_width=True)
+    with c2:
+        fig = go.Figure(go.Scatter(x=m["roc_curve"]["fpr"], y=m["roc_curve"]["tpr"], mode="lines",
+                                   line=dict(color=THEME["attack"], width=3), fill="tozeroy",
+                                   name=f"AUC {m['roc_auc']:.4f}"))
+        fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", line=dict(dash="dot", color=THEME["muted"]),
+                                 name="chance"))
+        fig.update_layout(title="ROC curve", xaxis_title="False-positive rate", yaxis_title="True-positive rate")
+        st.plotly_chart(style_fig(fig, 340), use_container_width=True)
+    with c3:
+        fig = go.Figure(go.Scatter(x=m["pr_curve"]["recall"], y=m["pr_curve"]["precision"], mode="lines",
+                                   line=dict(color=THEME["accent"], width=3), name=f"AP {m['pr_auc']:.4f}"))
+        fig.update_layout(title="Precision–recall curve", xaxis_title="Recall", yaxis_title="Precision",
+                          yaxis_range=[0, 1.02])
+        st.plotly_chart(style_fig(fig, 340), use_container_width=True)
 
-with tabs[6]:
-    tl = inc["timeline"]
-    if HAS_PLOTLY and len(tl):
-        fig = make_subplots(specs=[[{"secondary_y": True}]])
-        fig.add_trace(go.Scatter(x=tl["seconds_from_incident"], y=tl["pkts_per_sec"], name="pkt/s to target",
-                                 fill="tozeroy", line=dict(color=C["icmp"])), secondary_y=False)
-        fig.add_trace(go.Scatter(x=tl["seconds_from_incident"], y=tl["attack_prob"], name="mean p(attack)",
-                                 line=dict(color=C["attack"], dash="dot")), secondary_y=True)
-        fig.add_vline(x=0, line_color="#ffffff", line_dash="dash", annotation_text="incident")
-        fig.update_xaxes(title="seconds relative to incident")
-        fig.update_yaxes(title_text="packets / s", secondary_y=False)
-        fig.update_yaxes(title_text="p(attack)", range=[0, 1.05], secondary_y=True)
-        _plot(_fig_layout(fig, height=360, title=f"Traffic to {row['dst_ip']} (±30 s)"))
-    _stretch(st.dataframe, tl, hide_index=True, height=220)
+    c1, c2 = st.columns(2)
+    with c1:
+        section("Classification report")
+        rep = pd.DataFrame(m["classification_report"]).T
+        st.dataframe(rep.style.format("{:.4f}"), use_container_width=True)
+    with c2:
+        section("Training data")
+        cc = m["class_counts"]
+        fig = go.Figure(go.Pie(labels=list(cc.keys()), values=list(cc.values()), hole=.55,
+                               marker=dict(colors=[CLASS_COLORS.get(k, THEME["accent"]) for k in cc])))
+        st.plotly_chart(style_fig(fig, 260), use_container_width=True)
+        st.caption(f"Trained {m['trained_at']} · {m['n_train']:,} train / {m['n_test']:,} test packets · "
+                   f"fit {m['fit_seconds']}s · {m['inference_ms_per_packet']} ms/packet")
 
-with tabs[7]:
-    st.markdown("**Recommended response**")
-    for i, s in enumerate(inc["mitigation"], 1):
-        st.markdown(f"{i}. {s}")
-    d1, d2, d3 = st.columns(3)
-    d1.download_button("⬇ Incident report (JSON)", incident_to_json(inc), f"icmp_incident_{inc['row_id']}.json",
-                       "application/json")
-    d2.download_button("⬇ Incident report (Markdown)", incident_to_markdown(inc), f"icmp_incident_{inc['row_id']}.md",
-                       "text/markdown")
-    if trained_bundle is not None:
-        import joblib
-        buf = io.BytesIO()
-        joblib.dump(trained_bundle, buf)
-        d3.download_button("⬇ Baseline model (.joblib)", buf.getvalue(), "ddos_icmp_model.joblib",
-                           "application/octet-stream")
-    with st.expander("Model details"):
-        st.json(adapter.describe())
-        if trained_metrics:
-            st.json({k: v for k, v in trained_metrics.items() if k != "feature_importance"})
+    with st.expander("Model & preprocessing details"):
+        st.json({"model": m["model"], "params": m["params"], "features_used": m["features"],
+                 "categorical_features": m["categorical_features"],
+                 "dropped_columns (Edge-IIoTset paper + identifiers)": m["dropped_columns"],
+                 "dropped_constant_columns": m["dropped_constant_columns"],
+                 "data_sources": m["source_counts"]})
 
-# ================================================================ provenance
-with st.expander("ICMP flood parameters used by the model (from the parameter study)"):
-    prov = pd.DataFrame([{
-        "group": s.group, "parameter": s.parameter, "feature": s.name,
-        "why important for ICMP flood": s.why,
-        "model input": "yes" if s.model_input else "context only",
-        "how obtained": report.status(s.name) if s.model_input else "column",
-        "incident value": (f"{float(row[s.name]):.4g}" if s.model_input else str(row[s.name])),
-    } for s in FEATURE_SPECS])
-    _stretch(st.dataframe, prov, hide_index=True)
-    st.caption("inferred = derived from other Edge-IIoTset columns (e.g. ip.proto from icmp.* fields, rates from "
-               "1 s windows); est. = estimated (frame.len is not exported by Edge-IIoTset); n/a = not in the CSV. "
-               "Source/Destination IP are incident context only, so the model cannot memorise lab addresses.")
-    for n in report.notes:
-        st.caption("• " + n)
+
+# --------------------------------------------------------------------------- #
+# NOVELTY — Multi-method XAI Consensus
+# --------------------------------------------------------------------------- #
+TRUST_COLORS = {"High": THEME["normal"], "Medium": THEME["warn"], "Low": THEME["attack"]}
+COMPONENT_LABELS = {"rank": "Rank agreement", "topk": "Top-k feature overlap",
+                    "direction": "Direction agreement", "verdict": "Verdict agreement"}
+
+
+def novelty_banner(xai: DDoSIcmpXAI) -> None:
+    labels = xai.method_labels
+    lime_state = "" if xai.capabilities["lime"] else " (install <code>lime</code> to enable)"
+    w = ddos_cfg.CONSENSUS_WEIGHTS
+    st.markdown(f"""<div class="xai-novelty">
+      <div class="tag">★ NOVELTY · COMPONENT 2</div>
+      <h3>Multi-method XAI Consensus</h3>
+      <p>Different XAI methods often disagree about <i>why</i> a packet was flagged, and a single
+      explanation gives the analyst no way to know whether it can be trusted. This component explains
+      every packet with <b>four independent methods</b> and measures how much they agree, producing an
+      <b>XAI Consensus Score (XCS)</b> and a trust level for each verdict. Low-consensus verdicts are
+      routed to analyst review instead of automated mitigation.</p>
+      <div class="chips">
+        <span>A · {labels['rf_attribution']}</span><span>B · LIME{lime_state}</span>
+        <span>C · Occlusion (normal-baseline substitution)</span><span>D · Global surrogate tree</span>
+      </div>
+      <div class="formula">XCS = {w['rank']:.2f}·Rank + {w['topk']:.2f}·Top-k overlap + {w['direction']:.2f}·Direction
+        + {w['verdict']:.2f}·Verdict &nbsp;→&nbsp; High ≥ {ddos_cfg.CONSENSUS_HIGH:.2f} · Medium ≥ {ddos_cfg.CONSENSUS_MEDIUM:.2f} · Low</div>
+    </div>""", unsafe_allow_html=True)
+
+
+def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use_lime: bool = True) -> None:
+    novelty_banner(xai)
+    labels = xai.method_labels
+
+    # ---------------- A. packet-level consensus ------------------------------
+    section("A · Packet-level consensus")
+    order = scored.sort_values("attack_probability", ascending=False).index[:2_000].tolist()
+    idx = st.selectbox("Packet (2,000 highest attack probability)", order, key="icmp_cons_packet",
+                       format_func=lambda i: f"#{i} · {scored.loc[i, 'prediction']} · "
+                                             f"p={scored.loc[i, 'attack_probability']:.3f}")
+    with st.spinner("Explaining with every method and measuring agreement…"):
+        cons = xai.consensus(raw.loc[[idx]], use_lime=use_lime)
+    tcol = TRUST_COLORS[cons["trust"]]
+
+    c1, c2, c3 = st.columns([1.1, 1.4, 1.2])
+    with c1:
+        g = go.Figure(go.Indicator(
+            mode="gauge+number", value=cons["score"], number={"valueformat": ".2f"},
+            title={"text": "XAI Consensus Score"},
+            gauge={"axis": {"range": [0, 1]}, "bar": {"color": tcol},
+                   "steps": [{"range": [0, ddos_cfg.CONSENSUS_MEDIUM], "color": "rgba(255,77,109,.20)"},
+                             {"range": [ddos_cfg.CONSENSUS_MEDIUM, ddos_cfg.CONSENSUS_HIGH], "color": "rgba(255,183,3,.20)"},
+                             {"range": [ddos_cfg.CONSENSUS_HIGH, 1], "color": "rgba(46,196,182,.20)"}]}))
+        st.plotly_chart(style_fig(g, 250, legend=False), use_container_width=True)
+        st.markdown(f"""<div class="xai-verdict" style="border-color:{tcol};background:rgba(0,0,0,.15)">
+            <div class="label" style="color:{THEME['muted']}">TRUST LEVEL</div>
+            <div class="title" style="color:{tcol}">{cons['trust']} consensus</div>
+            <div style="font-size:.88rem;margin-top:6px">{cons['recommendation']}</div></div>""",
+                    unsafe_allow_html=True)
+    with c2:
+        comp = cons["components"]
+        fig = go.Figure(go.Bar(
+            x=[comp[k] for k in COMPONENT_LABELS], y=list(COMPONENT_LABELS.values()), orientation="h",
+            marker_color=[TRUST_COLORS["High"] if comp[k] >= ddos_cfg.CONSENSUS_HIGH else
+                          TRUST_COLORS["Medium"] if comp[k] >= ddos_cfg.CONSENSUS_MEDIUM else
+                          TRUST_COLORS["Low"] for k in COMPONENT_LABELS],
+            text=[f"{comp[k]:.2f}" for k in COMPONENT_LABELS], textposition="outside"))
+        fig.update_layout(title="Agreement components", xaxis_range=[0, 1.15])
+        fig.update_yaxes(autorange="reversed")
+        st.plotly_chart(style_fig(fig, 250, legend=False), use_container_width=True)
+        st.caption(f"Methods compared: {', '.join(labels[m] for m in cons['methods'])}")
+    with c3:
+        section("Verdict per method")
+        for name, v in cons["verdicts"].items():
+            col = THEME["attack"] if v else THEME["normal"]
+            agree = "✔" if v == cons["verdicts"]["Random Forest"] else "✘"
+            st.markdown(f"""<div class="xai-card" style="padding:10px 14px;margin-bottom:8px">
+                <span class="label">{name}</span>
+                <span style="float:right;color:{col};font-weight:700">{ATTACK if v else NORMAL} {agree}</span>
+                </div>""", unsafe_allow_html=True)
+        st.caption(f"Random Forest P(ICMP flood) = {cons['probability']:.3f}")
+
+    rank = pd.DataFrame(cons["ranking"])
+    if not rank.empty:
+        c1, c2 = st.columns([1.3, 1])
+        with c1:
+            feats = rank["feature"].tolist()
+            z = np.array([[rank.loc[rank["feature"] == f, m].iloc[0] for f in feats] for m in cons["methods"]])
+            fig = go.Figure(go.Heatmap(
+                z=z, x=feats, y=[labels[m] for m in cons["methods"]], zmid=0, zmin=-1, zmax=1,
+                colorscale=[[0, THEME["normal"]], [0.5, THEME["panel"]], [1, THEME["attack"]]],
+                text=np.round(z, 2), texttemplate="%{text}", colorbar=dict(title="→ flood", thickness=10)))
+            fig.update_layout(title="Normalised attribution per method (red → ICMP flood, teal → Normal)")
+            st.plotly_chart(style_fig(fig, 330, legend=False), use_container_width=True)
+        with c2:
+            section("Consensus explanation")
+            tbl = rank[["feature", "value", "direction", "consensus_importance"]].copy()
+            tbl["support"] = rank["methods_supporting"].astype(str) + "/" + rank["methods_total"].astype(str)
+            st.dataframe(tbl, use_container_width=True, hide_index=True, height=300,
+                         column_config={"consensus_importance": st.column_config.ProgressColumn(
+                             "importance", min_value=0.0, max_value=1.0, format="%.2f")})
+        if cons["pairs"]:
+            with st.expander("Pairwise method agreement for this packet"):
+                st.dataframe(pd.DataFrame([{"method pair": " vs ".join(labels[m] for m in k.split("|")),
+                                            "Spearman ρ": v["spearman"], "top-k overlap": v["overlap"]}
+                                           for k, v in cons["pairs"].items()]),
+                             use_container_width=True, hide_index=True)
+
+    # ---------------- B. traffic triage --------------------------------------
+    section("B · Consensus-based triage of flagged traffic")
+    flagged = scored[scored["is_attack"]].sort_values("attack_probability", ascending=False)
+    if flagged.empty:
+        st.info("No packets are flagged at the current threshold.")
+    else:
+        sel = flagged.index[: ddos_cfg.CONSENSUS_TRIAGE_MAX]
+        with st.spinner(f"Scoring consensus for {len(sel):,} flagged packets…"):
+            tri = xai.batch_consensus(raw.loc[sel])
+        st.caption(f"Fast consensus (methods A, C, D) on the {len(sel):,} most suspicious flagged packets.")
+        counts = tri["trust"].value_counts()
+        k1, k2, k3, k4 = st.columns(4)
+        with k1:
+            card("Mean XCS", f"{tri['xcs'].mean():.2f}")
+        for col, lvl, sub in [(k2, "High", "auto-mitigation safe"), (k3, "Medium", "corroborate"),
+                              (k4, "Low", "analyst review")]:
+            with col:
+                card(f"{lvl} consensus", f"{int(counts.get(lvl, 0)):,}", sub, TRUST_COLORS[lvl])
+        c1, c2 = st.columns(2)
+        with c1:
+            fig = px.histogram(tri, x="xcs", color="trust", nbins=25, color_discrete_map=TRUST_COLORS,
+                               title="XCS distribution of flagged packets")
+            st.plotly_chart(style_fig(fig, 320), use_container_width=True)
+        with c2:
+            fig = px.scatter(tri, x="attack_probability", y="xcs", color="trust",
+                             color_discrete_map=TRUST_COLORS,
+                             title="Model confidence vs. explanation consensus")
+            fig.add_hline(y=ddos_cfg.CONSENSUS_MEDIUM, line_dash="dash", line_color=THEME["muted"])
+            st.plotly_chart(style_fig(fig, 320), use_container_width=True)
+        review = tri[tri["trust"] == "Low"].join(scored.drop(columns=["attack_probability", "prediction"]))
+        st.markdown(f"**Escalated for analyst review:** {len(review):,} packets")
+        if not review.empty:
+            st.dataframe(review.drop(columns=[c for c in review.columns if c.startswith(("pair_", "is_attack"))]),
+                         use_container_width=True, height=260)
+
+    # ---------------- C. global study ----------------------------------------
+    section("C · Does consensus reveal unreliable predictions? (held-out test packets)")
+    gc = xai.global_consensus
+    wrong = gc[~gc["correct"]]
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        card("Packets studied", f"{len(gc):,}")
+    with k2:
+        card("Mean XCS · correct", f"{gc.loc[gc['correct'], 'xcs'].mean():.2f}", "", THEME["normal"])
+    with k3:
+        card("Mean XCS · misclassified", f"{wrong['xcs'].mean():.2f}" if len(wrong) else "—",
+             f"{len(wrong)} errors", THEME["attack"])
+    with k4:
+        auc = None
+        if 0 < len(wrong) < len(gc):
+            from sklearn.metrics import roc_auc_score
+            auc = roc_auc_score(~gc["correct"], 1 - gc["xcs"])
+        card("Error-detection AUROC", f"{auc:.3f}" if auc is not None else "—",
+             "low XCS → model error" if auc is not None else "needs ≥1 error")
+    c1, c2 = st.columns(2)
+    with c1:
+        gc_plot = gc.assign(outcome=np.where(gc["correct"], "correct", "misclassified"))
+        fig = px.box(gc_plot, x="actual", y="xcs", color="outcome", points="all",
+                     color_discrete_map={"correct": THEME["normal"], "misclassified": THEME["attack"]},
+                     title="XCS by true class and prediction outcome")
+        st.plotly_chart(style_fig(fig, 340), use_container_width=True)
+    with c2:
+        pair_cols = [c for c in gc.columns if c.startswith("pair_")]
+        methods = sorted({m for c in pair_cols for m in c[5:].split("|")})
+        mat = pd.DataFrame(np.eye(len(methods)), index=methods, columns=methods)
+        for c in pair_cols:
+            a, b = c[5:].split("|")
+            mat.loc[a, b] = mat.loc[b, a] = gc[c].mean()
+        names = [labels[m] for m in methods]
+        fig = go.Figure(go.Heatmap(z=mat.values, x=names, y=names, zmin=-1, zmax=1,
+                                   colorscale=[[0, THEME["attack"]], [0.5, THEME["panel"]], [1, THEME["normal"]]],
+                                   text=np.round(mat.values, 2), texttemplate="%{text}", showscale=False))
+        fig.update_layout(title="Mean method-to-method rank agreement (Spearman ρ)")
+        st.plotly_chart(style_fig(fig, 340, legend=False), use_container_width=True)
+
+
+# --------------------------------------------------------------------------- #
+# Page
+# --------------------------------------------------------------------------- #
+# --------------------------------------------------------------------------- #
+# Incident XAI — one incident explained end-to-end (mirrors the SQLi XAI page)
+# --------------------------------------------------------------------------- #
+IDS_URL = os.environ.get("XAI_IDS_URL", "http://127.0.0.1:5000").rstrip("/")
+FLOOD_WINDOW_S = 60          # ± seconds of traffic around the incident used as flood context
+PRIORITY_COLORS = {"Critical": THEME["attack"], "High": THEME["warn"], "Medium": THEME["accent"], "Low": THEME["normal"]}
+
+
+def incident_col(raw: pd.DataFrame) -> str | None:
+    return next((c for c in ("Incident ID", "Incident_ID") if c in raw.columns), None)
+
+
+@st.cache_data(show_spinner=False, max_entries=4)
+def seconds_of_day(_raw: pd.DataFrame, key: tuple) -> pd.Series:
+    """frame.time -> seconds since midnight (Edge-IIoTset exports drop the date part)."""
+    if "frame.time" not in _raw.columns:
+        return pd.Series(np.nan, index=_raw.index)
+    hms = _raw["frame.time"].astype(str).str.extract(r"(\d{1,2}):(\d{2}):(\d{2}(?:\.\d+)?)")
+    return hms[0].astype(float) * 3600 + hms[1].astype(float) * 60 + hms[2].astype(float)
+
+
+def icmp_mask(raw: pd.DataFrame) -> pd.Series:
+    """Packets carrying ICMP fields (same rule as the backend labels)."""
+    m = pd.Series(False, index=raw.index)
+    for c in ddos_cfg.ICMP_COLS:
+        if c in raw.columns:
+            m |= ~raw[c].astype(str).str.strip().isin(["", "0", "0.0", "nan"])
+    return m
+
+
+def flood_context(raw: pd.DataFrame, scored: pd.DataFrame, secs: pd.Series, idx) -> dict:
+    """Traffic around one incident: is its target being hit by many sources at a flood-like rate?
+
+    An ICMP DDoS is many (often spoofed) sources -> one target, so the evidence is the packet
+    rate to the target, how many distinct sources send it, and how concentrated they are.
+    """
+    def col(name):
+        return raw[name].astype(str).str.strip() if name in raw.columns else pd.Series("", index=raw.index)
+
+    src, dst = col("ip.src_host"), col("ip.dst_host")
+    icmp = icmp_mask(raw)
+    if not icmp[idx]:
+        return {"icmp": False, "src": src[idx], "dst": dst[idx], "time": secs[idx], "series": pd.DataFrame(),
+                "src_flagged": float(scored.loc[src == src[idx], "is_attack"].mean())}
+    # the target is the endpoint of this packet that receives the most ICMP traffic (handles replies too)
+    received = dst[icmp].value_counts()
+    target = src[idx] if received.get(src[idx], 0) > received.get(dst[idx], 0) else dst[idx]
+    direction = "reply from target" if src[idx] == target else "request to target"
+    to_t, from_t = icmp & (dst == target), icmp & (src == target)
+    t0 = secs[idx]
+    near = ((secs - t0).abs() <= FLOOD_WINDOW_S) if pd.notna(t0) else pd.Series(False, index=raw.index)
+    win_to = to_t & near
+    win_src = src[win_to].value_counts()
+    peer = dst[idx] if src[idx] == target else src[idx]
+    return {
+        "icmp": True, "src": src[idx], "dst": dst[idx], "target": target, "direction": direction, "peer": peer,
+        "time": t0, "to_target": int(to_t.sum()), "from_target": int(from_t.sum()),
+        "sources_to_target": int(src[to_t].nunique()),
+        "peer_packets": int((to_t & (src == peer)).sum()),
+        "window_to_target": int(win_to.sum()), "window_rate_s": float(win_to.sum()) / (2 * FLOOD_WINDOW_S),
+        "window_sources": int(len(win_src)),
+        "window_concentration": float(win_src.iloc[0] / win_to.sum()) if win_to.any() else 0.0,
+        "window_flagged": float(scored.loc[win_to, "is_attack"].mean()) if win_to.any() else 0.0,
+        "src_flagged": float(scored.loc[src == src[idx], "is_attack"].mean()),
+        "series": pd.DataFrame({"t": secs[to_t | from_t], "src": src[to_t | from_t],
+                                "kind": np.where(to_t[to_t | from_t], "to target", "replies from target")}),
+    }
+
+
+def incident_priority(p: float, is_attack: bool, trust: str) -> tuple[str, str]:
+    """Analyst priority from model confidence + explanation consensus (as on the SQLi page)."""
+    if not is_attack:
+        return "Low", ""
+    if p >= 0.8 and trust == "High":
+        return "Critical", ""
+    if p >= 0.8:
+        return "High", "The model is confident but the XAI methods disagree — confirm with the traffic context before blocking."
+    return "Medium", "Borderline score — corroborate with the target's ICMP rate and source spread before acting."
+
+
+def _hhmmss(s: float) -> str:
+    return "—" if pd.isna(s) else f"{int(s // 3600):02d}:{int(s % 3600 // 60):02d}:{s % 60:06.3f}"
+
+
+def tab_incident(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: int,
+                 use_lime: bool, data_key: tuple) -> None:
+    id_col = incident_col(raw)
+    if not id_col:
+        st.error("No Incident ID column found (expected 'Incident ID' or 'Incident_ID').")
+        return
+
+    # --- the IDS opens this page as ?incident=ALR-000024 -> select it once
+    incoming = st.query_params.get("incident", "").strip()
+    if incoming and st.session_state.get("_icmp_applied_incident") != incoming:
+        st.session_state["_icmp_applied_incident"] = incoming
+        st.session_state["icmp_incident_select"] = incoming
+
+    # --- filter toggle, search box, incident dropdown
+    only_icmp = st.toggle("Show only ICMP packets", True, key="icmp_only_icmp",
+                          help="Fast pre-filter to find interesting incidents (an ICMP flood is made of ICMP "
+                               "echo packets). It is not a classifier.")
+    view = scored[icmp_mask(raw)] if only_icmp else scored
+    view = view.sort_values("attack_probability", ascending=False)
+    search = st.text_input("Search Incident ID (optional)", key="icmp_incident_search",
+                           placeholder="e.g. ALR-035871")
+    ids = raw.loc[view.index, id_col].astype(str)
+    if search:
+        ids = ids[ids.str.contains(search.strip(), case=False, regex=False)]
+    options = ids.drop_duplicates().head(5000).tolist()
+    all_ids = raw[id_col].astype(str)
+    # the incident sent by the IDS stays listed even if the filter hides it (but a search narrows it)
+    if incoming and not search and incoming not in options and (all_ids == incoming).any():
+        options = [incoming] + options
+    if not options:
+        st.warning("No Incident ID matches the search." if search else "No incidents match the filter.")
+        return
+    if st.session_state.get("icmp_incident_select") not in options:
+        st.session_state.pop("icmp_incident_select", None)
+
+    def label(i):
+        r = scored.loc[all_ids.index[all_ids == i][0]]
+        return f"{i} · {r['prediction']} · p={r['attack_probability']:.3f}"
+
+    c1, c2 = st.columns([4, 1])
+    with c1:
+        selected = st.selectbox(f"Incident ({len(options):,} shown, highest attack probability first)", options,
+                                format_func=label, key="icmp_incident_select")
+    st.query_params["incident"] = selected
+    st.session_state["_icmp_applied_incident"] = selected
+    with c2:
+        st.write("")
+        st.link_button("← Back to XAI IDS", f"{IDS_URL}/?incident={selected}", width="stretch")
+
+    idx = all_ids.index[all_ids == selected][0]
+    row = raw.loc[[idx]]
+    with st.spinner("Explaining incident (attribution, LIME, occlusion, surrogate, consensus, flood context)…"):
+        exp = xai.explain(row, top_k=top_k)
+        cons = xai.consensus(row, use_lime=use_lime)
+        ctx = flood_context(raw, scored, seconds_of_day(raw, data_key), idx)
+    is_att = exp["prediction"] == ATTACK
+    level, note = incident_priority(exp["probability"], is_att, cons["trust"])
+    actual = scored.loc[idx, "actual"] if "actual" in scored.columns else None
+
+    # --- KPI cards
+    k1, k2, k3, k4 = st.columns(4)
+    with k1:
+        card("Model prediction", exp["prediction"], f"dataset label: {actual}" if actual else "no label in file",
+             THEME["attack"] if is_att else THEME["normal"])
+    with k2:
+        card("P(ICMP flood)", f"{exp['probability']:.1%}", f"threshold {xai.threshold:.2f}")
+    with k3:
+        card("Analyst priority", level, f"source flagged {ctx['src_flagged']:.0%} of the time", PRIORITY_COLORS[level])
+    with k4:
+        card("Explanation trust", cons["trust"], f"XAI consensus score {cons['score']:.2f}", TRUST_COLORS[cons["trust"]])
+    if note:
+        st.warning(note)
+
+    # --- analyst summary
+    if ctx["icmp"]:
+        spread = ("a distributed, spoofed-source pattern typical of an ICMP DDoS"
+                  if ctx["window_concentration"] < 0.2 else "a concentrated pattern (few senders)")
+        context_txt = (f" This packet is an ICMP {ctx['direction']} **{ctx['target']}**. Within ±{FLOOD_WINDOW_S}s "
+                       f"the target received **{ctx['window_to_target']:,} ICMP packets** (≈{ctx['window_rate_s']:.1f}/s) "
+                       f"from **{ctx['window_sources']:,} distinct sources**; the busiest sent only "
+                       f"{ctx['window_concentration']:.2%} — {spread}. The peer **{ctx['peer']}** itself sent "
+                       f"{ctx['peer_packets']:,} ICMP packet(s) to the target in the dataset.")
+    else:
+        context_txt = f" This packet carries no ICMP fields ({ctx['src']} → {ctx['dst']})."
+    st.markdown(f'<div class="xai-card" style="line-height:1.6"><div class="label">ANALYST SUMMARY</div>'
+                f'<div style="margin-top:6px">{_md_bold(exp["narrative"] + context_txt)}</div>'
+                f'<div style="margin-top:8px;color:{THEME["muted"]}">{cons["recommendation"]}</div></div>',
+                unsafe_allow_html=True)
+
+    left, right = st.columns([1.15, 1], gap="large")
+    with left:
+        section("Why the model decided this")
+        st.plotly_chart(style_fig(waterfall(exp), 420, legend=False), width="stretch")
+        section("Incident fields vs. typical traffic")
+        st.dataframe(pd.DataFrame([{
+            "feature": c["feature"], "meaning": c["description"], "this incident": c["value"],
+            "typical normal": xai.encoder.decode_value(c["feature"], c["normal_median"]),
+            "typical ICMP flood": xai.encoder.decode_value(c["feature"], c["attack_median"]),
+            "contribution": c["contribution"]} for c in exp["contributions"]]),
+            width="stretch", hide_index=True,
+            column_config={"contribution": st.column_config.NumberColumn(format="%+.4f")})
+    with right:
+        section("Flood evidence — is the target hit by many sources at once?")
+        if ctx["icmp"]:
+            e1, e2, e3 = st.columns(3)
+            with e1:
+                card(f"ICMP to target ±{FLOOD_WINDOW_S}s", f"{ctx['window_to_target']:,}",
+                     f"≈{ctx['window_rate_s']:.1f} packets/s → {ctx['target']}")
+            with e2:
+                card("Distinct sources", f"{ctx['window_sources']:,}",
+                     f"in the window · {ctx['sources_to_target']:,} overall")
+            with e3:
+                card("Busiest source share", f"{ctx['window_concentration']:.2%}",
+                     "low = distributed (DDoS)", THEME["attack"] if ctx["window_concentration"] < 0.2 else THEME["warn"])
+            s = ctx["series"].dropna(subset=["t"])
+            if not s.empty:
+                s = s.assign(minute=(s["t"] // 60) * 60)
+                per_min = s.groupby(["minute", "kind"]).size().reset_index(name="packets")
+                per_min["clock"] = per_min["minute"].map(lambda m: _hhmmss(m)[:5])
+                fig = px.bar(per_min, x="clock", y="packets", color="kind",
+                             color_discrete_map={"to target": THEME["attack"], "replies from target": THEME["accent"]},
+                             title=f"ICMP packets per minute to / from {ctx['target']}")
+                if pd.notna(ctx["time"]):
+                    fig.add_vline(x=_hhmmss((ctx["time"] // 60) * 60)[:5], line_dash="dash", line_color=THEME["warn"])
+                fig.update_layout(bargap=0.15, xaxis_title="time of day (dataset is a sample, rates are approximate)")
+                st.plotly_chart(style_fig(fig, 300), width="stretch")
+        else:
+            st.info("This packet carries no ICMP fields, so there is no ICMP flood context for it.")
+
+        section("Do the XAI methods agree?")
+        comp = cons["components"]
+        fig = go.Figure(go.Bar(
+            x=[comp[k] for k in COMPONENT_LABELS], y=list(COMPONENT_LABELS.values()), orientation="h",
+            marker_color=[TRUST_COLORS["High"] if comp[k] >= ddos_cfg.CONSENSUS_HIGH else
+                          TRUST_COLORS["Medium"] if comp[k] >= ddos_cfg.CONSENSUS_MEDIUM else
+                          TRUST_COLORS["Low"] for k in COMPONENT_LABELS],
+            text=[f"{comp[k]:.2f}" for k in COMPONENT_LABELS], textposition="outside", cliponaxis=False))
+        fig.update_layout(title=f"Consensus components (XCS {cons['score']:.2f})", xaxis_range=[0, 1.15])
+        fig.update_yaxes(autorange="reversed")
+        st.plotly_chart(style_fig(fig, 230, legend=False), width="stretch")
+        st.caption("Verdicts: " + " · ".join(f"{n}: {ATTACK if v else NORMAL}" for n, v in cons["verdicts"].items()))
+        section("Global surrogate rule for this incident")
+        st.markdown('<div class="xai-path">' + "<br>".join(xai.surrogate_path(row)) + "</div>", unsafe_allow_html=True)
+
+    with st.expander("Raw incident fields"):
+        st.dataframe(row.T.rename(columns={idx: "value"}), width="stretch")
+    report = {"incident_id": selected, "prediction": exp["prediction"], "attack_probability": exp["probability"],
+              "dataset_label": actual, "analyst_priority": level, "explanation_trust": cons["trust"],
+              "xai_consensus_score": cons["score"], "consensus_components": cons["components"],
+              "method_verdicts": cons["verdicts"], "recommendation": cons["recommendation"],
+              "attribution_method": exp["method"], "base_value": exp["base_value"],
+              "top_contributions": [{k: c[k] for k in ("feature", "value", "contribution")} for c in exp["contributions"]],
+              "flood_context": {k: v for k, v in ctx.items() if k != "series"} | {"window_seconds": FLOOD_WINDOW_S},
+              "surrogate_path": xai.surrogate_path(row)}
+    st.download_button("Download incident explanation (JSON)", json.dumps(report, indent=2, default=str),
+                       f"ddos_icmp_incident_{selected}.json", "application/json")
+
+
+def _md_bold(text: str) -> str:
+    """Minimal **bold** / `code` markdown -> HTML for text placed inside custom HTML cards."""
+    import html as _html
+    import re
+    text = _html.escape(text)
+    text = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", text)
+    return re.sub(r"`(.+?)`", r"<code>\1</code>", text)
+
+
+def main() -> None:
+    try:
+        st.set_page_config(page_title="DDoS ICMP Flood XAI", page_icon="📡", layout="wide")
+    except Exception:
+        pass  # already set by the multipage app
+    inject_styles()
+
+    st.markdown("""<div class="xai-hero">
+        <span class="xai-badge">Component 2 · Attack XAI</span><span class="xai-badge">Edge-IIoTset</span>
+        <span class="xai-badge">Random Forest + SHAP · LIME · Surrogate</span>
+        <h1>📡 DDoS ICMP Flood — Explainable Detection</h1>
+        <p>Detects ICMP echo-flood packets (many spoofed sources → one target) in IIoT traffic and explains every verdict:
+           which packet features drove the decision, how they compare to normal traffic,
+           and the global rules the model learned.</p></div>""", unsafe_allow_html=True)
+
+    try:
+        xai = load_xai()
+    except ModelNotTrainedError as e:
+        st.error("The DDoS ICMP Flood model has not been trained yet.")
+        st.code(str(e).split("Run:")[-1].strip() if "Run:" in str(e) else str(e), language="bash")
+        st.markdown("Training data must include Edge-IIoTset **`DDoS_ICMP_Flood_attack.csv`** "
+                    "(or `DNN-EdgeIIoT-dataset.csv`) plus normal-traffic CSVs.")
+        st.stop()
+
+    # ----------------------------------------------------------------- sidebar
+    with st.sidebar:
+        st.header("Inputs")
+        data_up = st.file_uploader("Dataset CSV (optional)", type=["csv"], key="icmp_data")
+        model_up = st.file_uploader("Trained DDoS ICMP model (.joblib / .pkl)",
+                                    type=["joblib", "pkl", "pickle"], key="icmp_model")
+        enc_up = st.file_uploader("Feature encoder (.joblib, optional)",
+                                  type=["joblib", "pkl", "pickle"], key="icmp_encoder")
+        st.caption("Only load pickle files you trust - loading a pickle can run code.")
+        st.header("Explanation settings")
+        bg_size = st.slider("Background sample (rows)", 100, 1000, 300, 50, key="icmp_bg",
+                            help="Real dataset rows used as the LIME background distribution.")
+        use_shap = st.toggle("Compute SHAP", xai.capabilities["shap"], key="icmp_use_shap",
+                             disabled=not xai.capabilities["shap"],
+                             help="Off → exact tree-path contributions instead of SHAP.")
+        use_lime = st.toggle("Compute LIME", xai.capabilities["lime"], key="icmp_use_lime",
+                             disabled=not xai.capabilities["lime"])
+        threshold = st.slider("Decision threshold", 0.1, 0.9, 0.5, 0.05, key="icmp_threshold",
+                              help="Packets with P(ICMP flood) ≥ threshold are flagged.")
+        top_k = st.slider("Features shown in explanations", 5, 20, 10, key="icmp_topk")
+
+    # ------------------------------------------------------------ dataset
+    if data_up is not None:
+        raw, data_name = read_csv(data_up.getvalue(), data_up.name), data_up.name
+    elif ddos_cfg.DATASET_PATH.exists():
+        raw, data_name = read_csv(str(ddos_cfg.DATASET_PATH), ddos_cfg.DATASET_PATH.name), ddos_cfg.DATASET_PATH.name
+    else:
+        st.warning(f"Dataset not found at `{ddos_cfg.DATASET_PATH}` — showing the saved test sample instead.")
+        raw, data_name = xai.sample_traffic(), ddos_cfg.SAMPLE_TRAFFIC_PATH.name
+
+    # ------------------------------------------------------ model + encoder
+    try:
+        model = load_artifact(model_up) if model_up else xai.model
+        encoder = load_artifact(enc_up) if enc_up else xai.encoder
+    except Exception as exc:
+        st.error(f"Could not load model/encoder file: {type(exc).__name__}: {exc}")
+        st.stop()
+    n_in = getattr(model, "n_features_in_", len(encoder.feature_names))
+    if not hasattr(model, "predict_proba") or n_in != len(encoder.feature_names):
+        st.error(f"The model expects {n_in} features but the encoder produces {len(encoder.feature_names)}. "
+                 "Upload the encoder that was saved with this model (artifacts/feature_encoder.joblib).")
+        st.stop()
+
+    classes = list(getattr(model, "classes_", [0, 1]))
+    with st.sidebar:
+        attack_class = st.selectbox("Class that means 'DDoS ICMP flood / attack'", classes,
+                                    index=classes.index(1) if 1 in classes else len(classes) - 1,
+                                    key="icmp_attack_class")
+
+    signature = (data_name, len(raw), getattr(model_up, "name", "default-model"),
+                 getattr(enc_up, "name", "default-encoder"), bg_size, use_shap, str(attack_class))
+    if st.session_state.get("icmp_xai_sig") != signature:
+        with st.spinner("Building explanation engine and background sample…"):
+            st.session_state["icmp_xai"] = configure_xai(xai, model, encoder, raw, bg_size, use_shap, attack_class)
+        st.session_state["icmp_xai_sig"] = signature
+    xai = st.session_state["icmp_xai"]
+    xai.threshold = threshold
+
+    st.caption(f"Dataset **{data_name}** · {len(raw):,} rows · model classes: "
+               f"{', '.join(map(str, classes))} · attack class: {attack_class} · "
+               f"explainer: {xai.capabilities['attribution_method']} · LIME {'on' if use_lime else 'off'}")
+
+    MAX_ROWS = 200_000
+    if len(raw) > MAX_ROWS:
+        st.warning(f"File has {len(raw):,} rows; analysing the first {MAX_ROWS:,}.")
+        raw = raw.iloc[:MAX_ROWS]
+    raw = raw.reset_index(drop=True)
+    scored = score(xai, raw, signature + (threshold,))
+
+    t0, t1, t2, t3, t4, t5 = st.tabs(["🔎 Incident XAI", "🛡️ Live Detection", "🔍 Packet Explanation",
+                                      "★ XAI Consensus", "🌐 Global Explainability", "📊 Model Performance"])
+    with t0:
+        tab_incident(xai, raw, scored, top_k, use_lime, signature)
+    with t1:
+        tab_detection(xai, raw, scored)
+    with t2:
+        tab_local(xai, raw, scored, top_k, use_lime)
+    with t3:
+        tab_consensus(xai, raw, scored, use_lime)
+    with t4:
+        tab_global(xai, top_k)
+    with t5:
+        tab_performance(xai)
+
+
+main()

@@ -41,6 +41,7 @@ there is an error message.
 """
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -67,6 +68,17 @@ import sqli_xai_styles as S  # noqa: E402   -> colours, fonts, CSS
 st.set_page_config(page_title="SQLi Evidence-Grounded XAI", page_icon="🛡️",
                    layout="wide", initial_sidebar_state="expanded")
 S.apply_theme(st)
+
+# =============================================================================
+# [NO SCREEN] LINK FROM THE XAI-IDS DASHBOARD
+#   the IDS opens this page as  ?incident=ALR-000024  -> that incident is selected below
+# =============================================================================
+IDS_URL = os.environ.get("XAI_IDS_URL", "http://127.0.0.1:5000").rstrip("/")
+incoming_id = st.query_params.get("incident", "").strip()
+# apply it only once, so the user can still change the dropdown afterwards
+if incoming_id and st.session_state.get("_applied_incident") != incoming_id:
+    st.session_state["_applied_incident"] = incoming_id
+    st.session_state["incident_select"] = incoming_id
 
 
 # =============================================================================
@@ -181,12 +193,24 @@ ids = view_df[res.id_col].astype(str)
 if search:
     ids = ids[ids.str.contains(search, case=False, regex=False)]
 options = ids.drop_duplicates().head(5000).tolist()
+# the incident sent by the IDS is always listed, even if the filter/search would hide it
+all_ids = df[res.id_col].astype(str)
+if incoming_id and incoming_id not in options and (all_ids == incoming_id).any():
+    options = [incoming_id] + options
 if not options:
     st.warning("No Incident ID matches the search.")
     st.stop()
+# avoid an error if the remembered selection is not in the current list
+if st.session_state.get("incident_select") not in options:
+    st.session_state.pop("incident_select", None)
 # --- "Incident (N shown)" dropdown - the selected incident is explained below
-selected = st.selectbox(f"Incident ({len(options):,} shown)", options)
-record = view_df[view_df[res.id_col].astype(str) == selected].iloc[0]
+selected = st.selectbox(f"Incident ({len(options):,} shown)", options, key="incident_select")
+record = df[all_ids == selected].iloc[0]
+# keep the URL in sync (shareable, refresh-safe) without re-triggering the IDS link above
+st.query_params["incident"] = selected
+st.session_state["_applied_incident"] = selected
+# --- "Back to XAI IDS" button - opens this incident on the IDS dashboard
+st.link_button("← Back to XAI IDS", f"{IDS_URL}/?incident={selected}")
 
 # [NO SCREEN] run the explanation for the selected incident (spinner while it runs)
 with st.spinner("Explaining incident (PSS, SHAP, LIME, trust, counterfactual)..."):

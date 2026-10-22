@@ -105,6 +105,13 @@ TYPE_DISPLAY = {
     "Password": "Brute Force",
 }
 
+# SQL injection incidents get a link to the SQLi XAI page (component 2).
+# Same rule as backend/component2_xai/model/sql_model_card.json: an attack whose
+# request URI hits the DVWA SQLi page. A multi-class label in SQLI_TYPES also counts.
+SQLI_TYPES = {"sql_injection", "sqli", "sql injection"}
+SQLI_URI_CANDIDATES = ["http.request.full_uri", "http.request.uri"]
+SQLI_URI_PATTERN = "/vulnerabilities/sqli"
+
 # ---------------------------------------------------------------------------
 # Model
 # If MODEL_PATH exists it is loaded; otherwise a Random Forest is trained on a

@@ -161,6 +161,12 @@ class IncidentDataset:
         df["_severity"] = df[self.label_col].map(config.SEVERITY_MAP).fillna(config.DEFAULT_SEVERITY)
         df["_status"] = [_status_for(i, t) for i, t in zip(df[self.id_col], df[self.label_col])]
         df["_src"] = df[self.src_col].astype(str) if self.src_col else "-"
+        uri_col = _find(cols, config.SQLI_URI_CANDIDATES)
+        is_sqli = df[self.label_col].str.lower().isin(config.SQLI_TYPES)
+        if uri_col is not None:
+            hits = df[uri_col].astype(str).str.contains(config.SQLI_URI_PATTERN, case=False, regex=False)
+            is_sqli |= hits & (df[self.label_col] != "Normal")
+        df["_is_sqli"] = is_sqli.to_numpy(dtype=bool)
         df["_row"] = np.arange(len(df))
 
         self.df = df
@@ -211,6 +217,7 @@ class IncidentDataset:
             "type_display": config.TYPE_DISPLAY.get(t, t.replace("_", " ")),
             "severity": r["_severity"],
             "status": r["_status"],
+            "is_sqli": bool(r["_is_sqli"]),
         }
 
     def search(self, start=None, end=None, traffic_type="All", severity="All",

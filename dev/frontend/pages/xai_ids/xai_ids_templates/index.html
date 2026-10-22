@@ -25,6 +25,8 @@
     </div>
   </div>
   <div class="topbar-right">
+    <a class="top-link" id="sqliTopBtn" href="#" target="_blank" rel="noopener" title="Open the SQL Injection XAI page">🛡 SQLi XAI</a>
+    <div class="divider-v"></div>
     <button class="bell" id="bellBtn" title="Open incidents">
       <svg viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22zm7-6V11a7 7 0 0 0-5.5-6.84V3a1.5 1.5 0 0 0-3 0v1.16A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></svg>
       <span class="bell-count" id="bellCount" hidden>0</span>
@@ -74,6 +76,10 @@
         <svg viewBox="0 0 24 24" class="spark"><path d="M10 3l1.8 5.2L17 10l-5.2 1.8L10 17l-1.8-5.2L3 10l5.2-1.8zM18 2l.8 2.2L21 5l-2.2.8L18 8l-.8-2.2L15 5l2.2-.8zM18 15l.7 1.8 1.8.7-1.8.7L18 20l-.7-1.8-1.8-.7 1.8-.7z"/></svg>
         Explain Prediction
       </button>
+      <a class="btn btn-light btn-block sqli-dash" id="sqliDashBtn" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5z"/></svg>
+        SQL Injection XAI Dashboard
+      </a>
 
       <hr>
       <label class="side-label">Analysis Status</label>
@@ -187,7 +193,7 @@
 </div>
 
 <div class="toast" id="toast" hidden></div>
-<script>window.XAI_IDS_API = {{ api_base|tojson }};</script>
+<script>window.XAI_IDS_API = {{ api_base|tojson }}; window.SQLI_XAI_URL = {{ sqli_xai_url|tojson }};</script>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

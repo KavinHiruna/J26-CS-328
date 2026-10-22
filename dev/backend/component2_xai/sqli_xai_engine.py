@@ -102,6 +102,11 @@ def usable(value: object) -> bool:
 
 
 def find_col(columns: Iterable[str], names: list[str]) -> str | None:
+    columns = list(columns)
+    # an exact name wins: "Incident ID" and "Incident_ID" normalise to the same key
+    for name in names:
+        if name in columns:
+            return name
     lookup = {norm(c): c for c in columns}
     for name in names:
         if norm(name) in lookup:

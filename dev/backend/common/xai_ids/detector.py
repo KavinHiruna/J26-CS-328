@@ -25,7 +25,9 @@ def feature_columns(df, label_col, id_col, extra_skip=()):
     skip = set(config.NON_FEATURE_COLUMNS) | {label_col, id_col, config.BINARY_LABEL_COLUMN} | set(extra_skip)
     feats = []
     for c in df.columns:
-        if c in skip or c.startswith("_"):
+        n = "".join(ch for ch in c.lower() if ch.isalnum())
+        # identifiers would leak row order into the model: never use them as features
+        if c in skip or c.startswith("_") or "incident" in n or n.startswith("unnamed") or n in ("id", "index"):
             continue
         if pd.api.types.is_numeric_dtype(df[c]):
             feats.append(c)
@@ -77,15 +79,20 @@ class Detector:
         if n < len(df):
             # stratified sample, keeping at least a few rows of rare classes
             frac = n / len(df)
-            sample = (df.groupby(ds.label_col, group_keys=False)
-                        .apply(lambda g: g.sample(max(min(len(g), 50), int(len(g) * frac)),
-                                                  random_state=42)))
+            rng = np.random.default_rng(42)
+            picked = []
+            for _, ix in df.groupby(ds.label_col).indices.items():
+                k = min(len(ix), max(50, int(len(ix) * frac)))
+                picked.append(rng.choice(ix, size=k, replace=False))
+            sample = df.iloc[np.sort(np.concatenate(picked))]
         else:
             sample = df
         self.medians = _matrix(sample, self.features).median()
         X = _matrix(sample, self.features, self.medians)
-        y = sample[ds.label_col].values
+        # plain NumPy object array: pandas 3 + pyarrow string arrays can't be indexed by sklearn
+        y = sample[ds.label_col].astype(str).to_numpy(dtype=object)
         strat = y if pd.Series(y).value_counts().min() >= 2 else None
+        X = X.to_numpy(dtype=np.float32)
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42, stratify=strat)
         print(f"[model] training RandomForest on {len(Xtr):,} rows, {len(self.features)} features ...",
               flush=True)
@@ -105,7 +112,9 @@ class Detector:
 
     # ------------------------------------------------------------------
     def _x(self, pos):
-        return _matrix(self.ds.df.iloc[[pos]], self.features, self.medians)
+        """One record as a DataFrame if the model was fitted with column names, else NumPy."""
+        x = _matrix(self.ds.df.iloc[[pos]], self.features, self.medians)
+        return x if hasattr(self.model, "feature_names_in_") else x.to_numpy(dtype=np.float32)
 
     def predict(self, pos):
         x = self._x(pos)
@@ -127,7 +136,7 @@ class Detector:
         proba = self.model.predict_proba(x)[0]
         k = int(np.argmax(proba))
         if hasattr(self.model, "estimators_") and hasattr(self.model.estimators_[0], "tree_"):
-            base, contrib = self._tree_contrib(x.values[0], k)
+            base, contrib = self._tree_contrib(np.asarray(x, dtype=np.float32)[0], k)
             method = "Tree-path contributions (Saabas) over the Random Forest"
         else:
             base, contrib = self._perturb_contrib(x, k, proba[k])
@@ -168,9 +177,11 @@ class Detector:
         return base / len(trees), contrib / len(trees)
 
     def _perturb_contrib(self, x, k, p):
-        X = pd.concat([x] * len(self.features), ignore_index=True)
+        X = pd.concat([pd.DataFrame(x, columns=self.features)] * len(self.features), ignore_index=True)
         for i, f in enumerate(self.features):
             X.iat[i, i] = self.medians.get(f, 0.0)
+        if not hasattr(self.model, "feature_names_in_"):
+            X = X.to_numpy(dtype=np.float32)
         pk = self.model.predict_proba(X)[:, k]
         return p - (p - pk).sum(), p - pk
 

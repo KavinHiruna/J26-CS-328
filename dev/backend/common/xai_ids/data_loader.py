@@ -50,6 +50,28 @@ def _status_for(incident_id, attack_type):
     return "Open" if h < 4 else ("Investigating" if h < 7 else "Resolved")
 
 
+def _mask(series):
+    """Boolean Series -> NumPy bool array (handles pandas' nullable/arrow booleans)."""
+    return series.fillna(False).to_numpy(dtype=bool)
+
+
+def _pick_id_column(df, cols):
+    exact = _find(cols, config.INCIDENT_ID_CANDIDATES)
+    options = [c for c in cols if "incident" in _norm(c)]
+    if exact and exact not in options:
+        options.insert(0, exact)
+    if not options:
+        return None
+    if len(options) > 1:
+        # prefer a column whose values are unique, then one that isn't purely numeric
+        def score(c):
+            s = df[c]
+            return (s.is_unique, not pd.api.types.is_numeric_dtype(s))
+        options.sort(key=score, reverse=True)
+        print(f"[data] several incident ID columns {options}; using '{options[0]}'", flush=True)
+    return options[0]
+
+
 class StatusStore:
     """Analyst status changes, persisted to a small JSON file."""
 
@@ -104,8 +126,7 @@ class IncidentDataset:
             # label-encoded classes (0, 1, 2 ...) -> names
             df[self.label_col] = df[self.label_col].map(
                 lambda v: config.LABEL_NAMES.get(str(v).strip().split(".")[0], v))
-        self.id_col = _find(cols, config.INCIDENT_ID_CANDIDATES) or next(
-            (c for c in cols if "incident" in c.lower()), None)
+        self.id_col = _pick_id_column(df, cols)
         self.time_col = _find(cols, config.TIME_CANDIDATES)
         self.src_col = _find(cols, config.SRC_IP_CANDIDATES)
         self.dst_col = _find(cols, config.DST_IP_CANDIDATES)
@@ -143,8 +164,8 @@ class IncidentDataset:
         df["_row"] = np.arange(len(df))
 
         self.df = df
-        self.ts_ns = df["_ts"].values.astype("datetime64[ns]")
-        self.id_index = pd.Series(np.arange(len(df)), index=df[self.id_col].values)
+        self.ts_ns = df["_ts"].to_numpy(dtype="datetime64[ns]")
+        self.id_index = pd.Series(np.arange(len(df)), index=df[self.id_col].to_numpy(dtype=object))
         self.attack_types = sorted(df[self.label_col].unique(), key=lambda t: (t != "Normal", t))
         self.status_store = StatusStore(config.STATUS_STORE)
         status_col = df.columns.get_loc("_status")
@@ -198,9 +219,9 @@ class IncidentDataset:
         if incident_id:
             q = incident_id.strip().lower()
             ids = df[self.id_col].str.lower()
-            mask = (ids == q).values
+            mask = _mask(ids == q)
             if not mask.any():
-                mask = ids.str.contains(q, regex=False).values
+                mask = _mask(ids.str.contains(q, regex=False))
         else:
             lo = np.searchsorted(self.ts_ns, np.datetime64(start)) if start else 0
             hi = np.searchsorted(self.ts_ns, np.datetime64(end), side="right") if end else len(df)
@@ -215,11 +236,11 @@ class IncidentDataset:
                 if end:
                     mask &= ts <= np.datetime64(end)
             if traffic_type and traffic_type != "All":
-                mask &= (df[self.label_col] == traffic_type).values
+                mask &= _mask(df[self.label_col] == traffic_type)
             if severity and severity != "All":
-                mask &= (df["_severity"] == severity).values
+                mask &= _mask(df["_severity"] == severity)
             if status and status != "All":
-                mask &= (df["_status"] == status).values
+                mask &= _mask(df["_status"] == status)
 
         positions = np.flatnonzero(mask)
         total = int(len(positions))
@@ -233,7 +254,7 @@ class IncidentDataset:
             "pages": max(1, -(-total // page_size)),
             "page_size": page_size,
             "breakdown": {k: int(v) for k, v in breakdown.items()},
-            "incidents": [self.incident_row(int(p)) for p in sub["_row"].values],
+            "incidents": [self.incident_row(int(p)) for p in sub["_row"].to_numpy()],
         }
 
     @property

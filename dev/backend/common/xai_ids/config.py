@@ -79,6 +79,7 @@ SYNTHETIC_INTERVAL_SEC = 1.0
 # ---------------------------------------------------------------------------
 SEVERITY_MAP = {
     "Normal": "Low",
+    "Attack": "High",          # used when the file only has the 0/1 Attack_label
     "Ransomware": "Critical",
     "Backdoor": "Critical",
     "DDoS_UDP": "High",

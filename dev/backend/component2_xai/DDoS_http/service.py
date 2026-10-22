@@ -19,6 +19,7 @@ import pandas as pd
 from . import config
 from .data_loader import derive_attack_type
 from .features import FeatureEncoder
+from . import consensus as xcs
 from .xai_methods import HAS_LIME, HAS_SHAP, describe_split, lime_explain, local_attributions
 
 
@@ -33,6 +34,8 @@ class DDoSHttpXAI:
                 f"No trained model at {config.MODEL_PATH}. Run:\n"
                 "  python -m component2_xai.DDoS_http.train --data <Edge-IIoTset CSVs>")
         self.threshold = threshold
+        self.attack_class = 1        # model class meaning "DDoS HTTP flood"
+        self.use_shap = True         # False -> exact tree-path contributions
         self.model = joblib.load(config.MODEL_PATH)
         self.encoder: FeatureEncoder = joblib.load(config.ENCODER_PATH)
         self.surrogate = joblib.load(config.SURROGATE_PATH)
@@ -50,7 +53,12 @@ class DDoSHttpXAI:
     @property
     def capabilities(self) -> dict:
         return {"shap": HAS_SHAP, "lime": HAS_LIME,
-                "attribution_method": "SHAP (TreeExplainer)" if HAS_SHAP else "Tree-path contributions"}
+                "attribution_method": "SHAP (TreeExplainer)" if HAS_SHAP and self.use_shap
+                else "Tree-path contributions"}
+
+    @property
+    def attack_idx(self) -> int:
+        return list(self.model.classes_).index(self.attack_class)
 
     @cached_property
     def shap_sample(self) -> dict:
@@ -63,7 +71,7 @@ class DDoSHttpXAI:
         return pd.read_csv(config.SAMPLE_TRAFFIC_PATH, low_memory=False, dtype=str)
 
     def _shap(self):
-        if HAS_SHAP and self._shap_explainer is None:
+        if HAS_SHAP and self.use_shap and self._shap_explainer is None:
             import shap
             self._shap_explainer = shap.TreeExplainer(self.model)
         return self._shap_explainer
@@ -77,7 +85,7 @@ class DDoSHttpXAI:
     def predict(self, raw: pd.DataFrame) -> pd.DataFrame:
         """Score raw Edge-IIoTset rows. Returns one row per packet."""
         X = self.encode(raw)
-        proba = self.model.predict_proba(X)[:, list(self.model.classes_).index(1)]
+        proba = self.model.predict_proba(X)[:, self.attack_idx]
         out = pd.DataFrame({
             "attack_probability": proba,
             "prediction": np.where(proba >= self.threshold, config.CLASS_NAMES[1], config.CLASS_NAMES[0]),
@@ -99,9 +107,9 @@ class DDoSHttpXAI:
     def explain(self, raw_row: pd.DataFrame, top_k: int = 12) -> dict:
         """Additive explanation of one packet (SHAP, or tree-path fallback)."""
         X = self.encode(raw_row.iloc[[0]])
-        values, base, method = local_attributions(self.model, X, self._shap())
+        values, base, method = local_attributions(self.model, X, self._shap(), self.use_shap)
         values = values[0]
-        proba = float(self.model.predict_proba(X)[0, list(self.model.classes_).index(1)])
+        proba = float(self.model.predict_proba(X)[0, self.attack_idx])
         contribs = []
         for i, f in enumerate(self.feature_names):
             enc_val = float(X.iloc[0, i])
@@ -128,10 +136,10 @@ class DDoSHttpXAI:
 
     def explain_lime(self, raw_row: pd.DataFrame, num_features: int = 10) -> dict:
         X = self.encode(raw_row.iloc[[0]])
-        weights, intercept = lime_explain(self.model, self.background, X.iloc[0],
-                                          self.encoder.categorical_mask(), config.CLASS_NAMES,
-                                          num_features=num_features)
-        return {"method": "LIME", "intercept": intercept, "weights": weights}
+        weights, intercept, local_pred = lime_explain(self.model, self.background, X.iloc[0],
+                                                      self.encoder.categorical_mask(), config.CLASS_NAMES,
+                                                      num_features=num_features)
+        return {"method": "LIME", "intercept": intercept, "weights": weights, "local_pred": local_pred}
 
     def surrogate_path(self, raw_row: pd.DataFrame) -> list[str]:
         """The global surrogate's IF-THEN path for this packet."""
@@ -148,6 +156,77 @@ class DDoSHttpXAI:
         cls = self.surrogate.classes_[int(np.argmax(val))]
         steps.append(f"→ {config.CLASS_NAMES[int(cls)]}")
         return steps
+
+    # ------------------------------------------- NOVELTY: XAI consensus
+    @property
+    def method_labels(self) -> dict:
+        return {xcs.METHOD_RF: self.capabilities["attribution_method"], xcs.METHOD_LIME: "LIME",
+                xcs.METHOD_OCC: "Occlusion", xcs.METHOD_SUR: "Surrogate tree"}
+
+    @cached_property
+    def _normal_baseline(self) -> np.ndarray:
+        return np.array([self.baselines["Normal"][f]["median"] for f in self.feature_names])
+
+    def _fast_attributions(self, X: pd.DataFrame, rf_values: np.ndarray | None = None):
+        if rf_values is None:
+            rf_values, _, _ = local_attributions(self.model, X, self._shap(), self.use_shap)
+        occ = xcs.occlusion_attributions(self.model, X, self._normal_baseline)
+        sur, sur_verdict = xcs.surrogate_attributions(self.surrogate, X)
+        return rf_values, occ, sur, sur_verdict
+
+    def consensus(self, raw_row: pd.DataFrame, use_lime: bool = True) -> dict:
+        """Full multi-method consensus for one packet (adds LIME when installed)."""
+        X = self.encode(raw_row.iloc[[0]])
+        p = float(self.model.predict_proba(X)[0, self.attack_idx])
+        rf_v = int(p >= self.threshold)
+        rf, occ, sur, sur_v = self._fast_attributions(X)
+        attrs = {xcs.METHOD_RF: rf[0], xcs.METHOD_OCC: occ[0], xcs.METHOD_SUR: sur[0]}
+        verdicts = {"Surrogate tree": int(sur_v[0])}
+        if use_lime and HAS_LIME:
+            lime = self.explain_lime(raw_row, num_features=min(15, len(self.feature_names)))
+            attrs[xcs.METHOD_LIME] = xcs.lime_to_vector(lime["weights"], self.feature_names)
+            if lime["local_pred"] is not None:
+                verdicts["LIME local model"] = int(lime["local_pred"] >= 0.5)
+        out = xcs.consensus_for_packet(attrs, rf_v, verdicts, self.feature_names)
+        out.update(probability=p, prediction=config.CLASS_NAMES[rf_v],
+                   recommendation=xcs.recommendation(out, bool(rf_v)),
+                   method_labels=self.method_labels)
+        for r in out["ranking"]:
+            r["description"] = config.FEATURE_DESCRIPTIONS.get(r["feature"], r["feature"])
+            r["value"] = self.encoder.decode_value(r["feature"], float(X.iloc[0][r["feature"]]))
+        return out
+
+    def _batch(self, X: pd.DataFrame, rf_values: np.ndarray | None = None) -> pd.DataFrame:
+        proba = self.model.predict_proba(X)[:, self.attack_idx]
+        rf, occ, sur, sur_v = self._fast_attributions(X, rf_values)
+        rows = []
+        for i in range(len(X)):
+            rf_v = int(proba[i] >= self.threshold)
+            c = xcs.consensus_for_packet(
+                {xcs.METHOD_RF: rf[i], xcs.METHOD_OCC: occ[i], xcs.METHOD_SUR: sur[i]},
+                rf_v, {"Surrogate tree": int(sur_v[i])}, self.feature_names)
+            top = c["ranking"][0]["feature"] if c["ranking"] else ""
+            rows.append({"attack_probability": float(proba[i]), "prediction": config.CLASS_NAMES[rf_v],
+                         "xcs": c["score"], "trust": c["trust"], **{f"c_{k}": v for k, v in c["components"].items()},
+                         "consensus_top_feature": top,
+                         **{f"pair_{k}": v["spearman"] for k, v in c["pairs"].items()}})
+        return pd.DataFrame(rows, index=X.index)
+
+    def batch_consensus(self, raw: pd.DataFrame) -> pd.DataFrame:
+        """Fast consensus (RF attribution + occlusion + surrogate) for many packets."""
+        return self._batch(self.encode(raw))
+
+    @cached_property
+    def global_consensus(self) -> pd.DataFrame:
+        """Consensus study on held-out packets saved at training time."""
+        s = self.shap_sample
+        n = min(config.CONSENSUS_GLOBAL_SAMPLE, len(s["X"]))
+        X = s["X"].iloc[:n][self.feature_names]
+        values = s["values"][:n] if s["method"] == self.capabilities["attribution_method"] else None
+        out = self._batch(X, values)
+        out["actual"] = np.where(s["y"][:n] == 1, config.CLASS_NAMES[1], config.CLASS_NAMES[0])
+        out["correct"] = out["prediction"] == out["actual"]
+        return out
 
     # ------------------------------------------------------------ narrative
     def narrative(self, exp: dict, k: int = 3) -> str:

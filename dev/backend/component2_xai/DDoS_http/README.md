@@ -12,6 +12,29 @@ with explanations at three levels:
 | Global | Gini vs. permutation vs. SHAP importance agreement | Global Explainability |
 | Global | Depth-4 surrogate decision tree (with fidelity score) | Global Explainability |
 
+## ★ Novelty — Multi-method XAI Consensus
+
+Each packet is explained by four independent methods — SHAP (or exact
+tree-path contributions), LIME, occlusion against typical-normal values, and
+the global surrogate tree. `consensus.py` measures how much they agree and
+produces an **XAI Consensus Score (XCS)** in [0, 1]:
+
+| Component | Meaning |
+|---|---|
+| Rank agreement | mean pairwise Spearman ρ of \|attributions\| over each pair's top features |
+| Top-k overlap | mean pairwise overlap of each method's top-5 features |
+| Direction agreement | share of method votes matching the majority sign (→ flood / → normal) on the consensus top-5 |
+| Verdict agreement | share of surrogate / LIME-local verdicts matching the Random Forest |
+
+XCS = 0.25 × each component (weights in `config.CONSENSUS_WEIGHTS`).
+Trust: **High** ≥ 0.75 (safe to automate), **Medium** ≥ 0.50 (corroborate),
+**Low** < 0.50 (escalate to an analyst).
+
+The dashboard tab "🤝 XAI Consensus ★ Novelty" shows the per-packet score,
+method-by-feature heatmap and consensus explanation; triages all flagged
+traffic by trust level; and evaluates on held-out packets whether low XCS
+identifies the model's misclassifications (error-detection AUROC).
+
 ## Folder layout
 
 ```
@@ -21,6 +44,7 @@ dev/
 │   ├── data_loader.py   reads Edge-IIoTset CSVs, keeps Normal + DDoS_HTTP rows, de-duplicates
 │   ├── features.py      FeatureEncoder (numeric / hex / categorical columns)
 │   ├── xai_methods.py   SHAP, tree-path contributions, LIME, surrogate tree
+│   ├── consensus.py     ★ novelty: multi-method XAI consensus score
 │   ├── train.py         training + evaluation + global explanations -> artifacts/
 │   ├── service.py       DDoSHttpXAI class used by the dashboard
 │   └── artifacts/       created by train.py

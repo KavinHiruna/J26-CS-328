@@ -1,0 +1,296 @@
+{
+  "incident_id": "ALR-000024",
+  "predicted_label": "1",
+  "attack_class": "1",
+  "attack_probability": 0.56,
+  "confidence": 0.56,
+  "is_attack": true,
+  "probabilities": {
+    "0": 0.44,
+    "1": 0.56
+  },
+  "features": {
+    "single_quote_count": 4.0,
+    "double_quote_count": 0.0,
+    "semicolon_count": 0.0,
+    "comment_count": 0.0,
+    "parenthesis_count": 0.0,
+    "equals_count": 8.0,
+    "sql_select": 0.0,
+    "sql_union": 0.0,
+    "sql_insert": 0.0,
+    "sql_update": 0.0,
+    "sql_delete": 0.0,
+    "sql_drop": 0.0,
+    "sql_alter": 0.0,
+    "sql_create": 0.0,
+    "sql_from": 0.0,
+    "sql_where": 0.0,
+    "sql_having": 0.0,
+    "sql_group_by": 0.0,
+    "sql_order_by": 0.0,
+    "sql_sleep": 0.0,
+    "sql_benchmark": 0.0,
+    "sql_pg_sleep": 0.0,
+    "sql_extractvalue": 0.0,
+    "sql_updatexml": 0.0,
+    "sql_cast": 0.0,
+    "sql_convert": 0.0,
+    "sql_concat": 0.0,
+    "sql_substring": 0.0,
+    "sql_database": 0.0,
+    "sql_schema": 0.0,
+    "sql_information_schema": 0.0,
+    "or_condition": 1.0,
+    "and_condition": 0.0,
+    "union_select": 0.0,
+    "hex_pattern_count": 0.0,
+    "sleep_function": 0.0,
+    "database_function": 0.0,
+    "extractvalue_function": 0.0,
+    "xml_function": 0.0,
+    "percent_encoded_count": 0.0,
+    "query_length": 0.0,
+    "query_parameter_count": 0.0,
+    "uri_length": 37.0,
+    "http_get": 1.0,
+    "tcp.len": 334.0,
+    "tcp.dstport": 80.0,
+    "tcp.srcport": 50818.0,
+    "tcp.flags.ack": 1.0,
+    "tcp.connection.syn": 0.0,
+    "tcp.connection.synack": 0.0,
+    "tcp.connection.fin": 0.0,
+    "tcp.connection.rst": 0.0,
+    "http.content_length": 115.0,
+    "tcp_payload_length": 334.0
+  },
+  "view": {
+    "segments": [
+      [
+        "Request target",
+        0,
+        37
+      ],
+      [
+        "Body",
+        38,
+        153
+      ]
+    ],
+    "text": "http://192.168.0.128/DVWA/etc/reports\nmy_post_key=&keywords=' or 'a' 'a&quick_search=Search PMs&allbox=Check All&fromfid=0&fid=4&jumpto=4&action=do_stuff",
+    "decode_rounds": 1
+  },
+  "family_spans": {
+    "quote": [
+      [
+        60,
+        61
+      ],
+      [
+        65,
+        66
+      ],
+      [
+        67,
+        68
+      ],
+      [
+        69,
+        70
+      ]
+    ],
+    "syntax": [
+      [
+        49,
+        50
+      ],
+      [
+        59,
+        60
+      ],
+      [
+        84,
+        85
+      ],
+      [
+        102,
+        103
+      ],
+      [
+        120,
+        121
+      ],
+      [
+        126,
+        127
+      ],
+      [
+        135,
+        136
+      ],
+      [
+        144,
+        145
+      ]
+    ],
+    "logic": [
+      [
+        62,
+        64
+      ]
+    ]
+  },
+  "pss": {
+    "quote": 0.015000000000000012,
+    "syntax": 0.10500000000000002,
+    "logic": 0.0
+  },
+  "pss_base": 0.44,
+  "shap_values": {
+    "query_length": -0.004501230878863466,
+    "query_parameter_count": -0.0037773670100917527,
+    "uri_length": -0.003191739667429495,
+    "http_get": 0.0811218159573088,
+    "single_quote_count": 0.015006111459196602,
+    "double_quote_count": -7.633795650474113e-06,
+    "semicolon_count": -5.3785863754875276e-05,
+    "comment_count": -0.00014001109430935438,
+    "parenthesis_count": -0.0012339075651978302,
+    "equals_count": 0.07823476922366956,
+    "sql_select": -0.0006061521914168443,
+    "sql_union": -1.0184269718704669e-07,
+    "sql_insert": 0.0,
+    "sql_update": 0.0,
+    "sql_delete": 0.0,
+    "sql_drop": 0.0,
+    "sql_alter": 0.0,
+    "sql_create": 0.0,
+    "sql_from": -0.00010770183710840731,
+    "sql_where": 0.0,
+    "sql_having": 0.0,
+    "sql_group_by": 0.0,
+    "sql_order_by": -2.4920174347127876e-05,
+    "sql_sleep": -8.202792763616059e-05,
+    "sql_benchmark": 0.0,
+    "sql_pg_sleep": -6.44547568230846e-05,
+    "sql_extractvalue": 0.0,
+    "sql_updatexml": 0.0,
+    "sql_cast": 0.0,
+    "sql_convert": 0.0,
+    "sql_concat": -9.705621007943312e-06,
+    "sql_substring": 0.0,
+    "sql_database": 0.0,
+    "sql_schema": 0.0,
+    "sql_information_schema": 0.0,
+    "or_condition": 0.0,
+    "and_condition": -0.0012351608985290998,
+    "union_select": 0.0,
+    "percent_encoded_count": -0.0016239783712440996,
+    "hex_pattern_count": 0.0,
+    "sleep_function": -3.809850930163451e-05,
+    "database_function": 0.0,
+    "extractvalue_function": 0.0,
+    "xml_function": 0.0,
+    "tcp.len": -0.01361300772594212,
+    "tcp.dstport": 0.14899434887010815,
+    "tcp.srcport": -0.17616081368034522,
+    "tcp.flags.ack": -0.000913711923448713,
+    "tcp.connection.syn": -0.0027376745656047963,
+    "tcp.connection.synack": -0.002009804400139363,
+    "tcp.connection.fin": -0.0010750492431411403,
+    "tcp.connection.rst": -0.0009704623908333571,
+    "http.content_length": 0.0,
+    "tcp_payload_length": -0.04910899419964916
+  },
+  "shap_family": {
+    "size": 0.020542484201274927,
+    "quote": 0.014998477663546127,
+    "terminator": -5.3785863754875276e-05,
+    "comment": -0.00014001109430935438,
+    "syntax": 0.07700086165847174,
+    "keyword": -0.0007387742028723795,
+    "union": -1.0184269718704669e-07,
+    "time_delay": -0.0001845811937608797,
+    "error_xml": 0.0,
+    "db_recon": -9.705621007943312e-06,
+    "logic": -0.0012351608985290998,
+    "encoding": -0.0016239783712440996,
+    "network": -0.04848617505934656
+  },
+  "lime_weights": {
+    "tcp.dstport": 0.2639992442999908,
+    "tcp.srcport": -0.24708804837933288,
+    "tcp.flags.ack": 0.11836774937238247,
+    "query_parameter_count": -0.08897376061998219,
+    "sql_sleep": 0.08198177404986434,
+    "query_length": -0.08119742482445343,
+    "uri_length": 0.07215445705431602,
+    "tcp.connection.rst": -0.0687998378158962,
+    "http_get": 0.06548035373279922,
+    "tcp.connection.synack": -0.06358455298612005,
+    "tcp.len": -0.06254583896795154,
+    "equals_count": 0.0613786258129032,
+    "tcp.connection.fin": -0.05492155259685327,
+    "tcp_payload_length": -0.05383429857175686,
+    "tcp.connection.syn": -0.044800410158689574
+  },
+  "lime_family": {
+    "network": -0.1593732472324703,
+    "size": -0.08637067322907724,
+    "time_delay": 0.08198177404986434,
+    "syntax": 0.0613786258129032
+  },
+  "techniques": [
+    {
+      "key": "quote_breakout",
+      "technique": "Quote break-out",
+      "family": "quote",
+      "severity": 0.55,
+      "capec": "CAPEC-66",
+      "cwe": "CWE-89",
+      "attack": "T1190",
+      "evidence": "' or",
+      "matches": 1,
+      "recommendation": "The parameter is probably concatenated into SQL; use parameterised queries."
+    }
+  ],
+  "trust": {
+    "rule_families": [
+      "quote"
+    ],
+    "pss_top_families": [
+      "quote"
+    ],
+    "rule_pss_agreement": 1.0,
+    "pss_shap_agreement": 1.0,
+    "pss_lime_agreement": 0.0,
+    "payload_share": 0.21428571428571436,
+    "deletion_drop_top": 0.010000000000000009,
+    "deletion_drop_random": 0.0,
+    "fidelity_gain": 0.01785714285714287,
+    "components_used": 4,
+    "score": 0.5044642857142857,
+    "level": "Medium"
+  },
+  "counterfactual": {
+    "found": true,
+    "applicable": true,
+    "removed_families": [
+      "syntax"
+    ],
+    "removed_labels": [
+      "Parentheses / equals signs"
+    ],
+    "probability_after": 0.46,
+    "sanitized_preview": "http://192.168.0.128/DVWA/etc/reports\nmy_post_key &keywords ' or 'a' 'a&quick_search Search PMs&allbox Check All&fromfid 0&fid 4&jumpto 4&action do_stuff"
+  },
+  "priority": {
+    "score": 0.30800000000000005,
+    "level": "Medium",
+    "max_technique_severity": 0.55,
+    "note": ""
+  },
+  "narrative": "Incident ALR-000024: the model classified this request as an SQL injection / attack (predicted '1', P(1) = 56.0%). Payload evidence that pushed the score up most: parentheses / equals signs (+10.5%: =); quote characters (+1.5%: '). About 21% of the attack probability comes from the payload text; the rest comes from size/network features. Rule analysis identifies: Quote break-out (CWE-89, MITRE ATT&CK T1190). Explanation trust: Medium (0.50) based on 4 independent check(s). Counterfactual: removing only parentheses / equals signs would lower the attack probability to 46.0%. Suggested next step: The parameter is probably concatenated into SQL; use parameterised queries. This explains the model's behaviour for this record; it is not proof that the attack succeeded.",
+  "messages": []
+}

@@ -12,6 +12,8 @@ from pathlib import Path
 # --------------------------------------------------------------------------- #
 PACKAGE_DIR = Path(__file__).resolve().parent
 ARTIFACTS_DIR = PACKAGE_DIR / "artifacts"
+# Default dataset for the dashboard (dev/data/raw/...); the sidebar can override it.
+DATASET_PATH = PACKAGE_DIR.parents[2] / "data" / "raw" / "EdgeIIoT_train_80_with_incident_id.csv"
 
 MODEL_PATH = ARTIFACTS_DIR / "rf_ddos_http.joblib"
 ENCODER_PATH = ARTIFACTS_DIR / "feature_encoder.joblib"
@@ -132,3 +134,13 @@ SURROGATE_MAX_DEPTH = 4          # global, human-readable rule set
 SHAP_SAMPLE_SIZE = 600           # rows used for global SHAP / beeswarm
 BACKGROUND_SIZE = 200            # background rows for SHAP / LIME
 PERMUTATION_REPEATS = 5
+
+# --------------------------------------------------------------------------- #
+# NOVELTY: Multi-method XAI consensus
+# --------------------------------------------------------------------------- #
+CONSENSUS_TOP_K = 5
+CONSENSUS_WEIGHTS = {"rank": 0.25, "topk": 0.25, "direction": 0.25, "verdict": 0.25}
+CONSENSUS_HIGH = 0.75
+CONSENSUS_MEDIUM = 0.50
+CONSENSUS_TRIAGE_MAX = 300        # packets scored in the batch consensus triage
+CONSENSUS_GLOBAL_SAMPLE = 300     # held-out packets for the global consensus study

@@ -99,9 +99,9 @@ def tree_contributions(model, X: pd.DataFrame):
     return total / m, bias / m
 
 
-def local_attributions(model, X: pd.DataFrame, shap_explainer=None):
+def local_attributions(model, X: pd.DataFrame, shap_explainer=None, use_shap: bool = True):
     """Best available additive attribution. Returns (values, base, method_name)."""
-    if HAS_SHAP:
+    if HAS_SHAP and use_shap:
         vals, base = shap_values(model, X, shap_explainer)
         return vals, base, "SHAP (TreeExplainer)"
     vals, base = tree_contributions(model, X)
@@ -132,7 +132,9 @@ def lime_explain(model, background: pd.DataFrame, row: pd.Series,
 
     exp = explainer.explain_instance(row.to_numpy(dtype=float), predict_fn,
                                      num_features=num_features, labels=(1,))
-    return [{"rule": rule, "weight": float(w)} for rule, w in exp.as_list(label=1)], float(exp.intercept[1])
+    local_pred = float(np.ravel(exp.local_pred)[0]) if getattr(exp, "local_pred", None) is not None else None
+    return ([{"rule": rule, "weight": float(w)} for rule, w in exp.as_list(label=1)],
+            float(exp.intercept[1]), local_pred)
 
 
 # --------------------------------------------------------------------------- #

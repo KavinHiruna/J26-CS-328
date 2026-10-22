@@ -4,11 +4,19 @@ const state = { meta: null, page: 1, lastQuery: null, rec: { n: 1, total: 0, inc
 
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const pct = (p) => (p * 100).toFixed(p >= 0.995 || p < 0.005 ? 1 : 1) + "%";
+const API_BASE = (window.XAI_IDS_API || "").replace(/\/$/, "");
 const dataset = () => $("sbDataset").value;
 
+class BackendDown extends Error {}
+
 async function api(path, params = {}, opts = {}) {
-  const qs = new URLSearchParams({ dataset: dataset(), ...params });
-  const res = await fetch(`${path}?${qs}`, opts);
+  const qs = new URLSearchParams({ ...(dataset() ? { dataset: dataset() } : {}), ...params });
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${path}?${qs}`, opts);
+  } catch {
+    throw new BackendDown(`Cannot reach the backend API at ${API_BASE}. Start it with: python -m backend.common.xai_ids.server`);
+  }
   const body = await res.json().catch(() => ({ error: res.statusText }));
   if (!res.ok || body.error) throw new Error(body.error || res.statusText);
   return body;
@@ -40,9 +48,18 @@ const stBadge = (s) => `<span class="badge st-${esc(s)}">${esc(s)}</span>`;
 const eye = `<svg viewBox="0 0 24 24"><path d="M12 5C6.5 5 2.7 9.2 1.5 12c1.2 2.8 5 7 10.5 7s9.3-4.2 10.5-7C21.3 9.2 17.5 5 12 5zm0 11.5a4.5 4.5 0 1 1 0-9 4.5 4.5 0 0 1 0 9zm0-2.3a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z"/></svg>`;
 
 /* ---------- init ---------- */
+async function loadDatasets() {
+  const sel = $("sbDataset");
+  if (sel.options.length) return;
+  const r = await api("/api/datasets");
+  sel.innerHTML = r.datasets.map((d) => `<option value="${esc(d)}">${esc(d)}</option>`).join("");
+  sel.value = r.default;
+}
+
 async function loadMeta() {
   banner(`<span class="spinner"></span>Loading dataset and model… the first run trains the model and can take a few minutes for large files.`);
   try {
+    await loadDatasets();
     const m = await api("/api/meta");
     state.meta = m;
     banner(m.synthetic_time
@@ -73,7 +90,12 @@ async function loadMeta() {
     await searchRange(1);
     refreshBell();
   } catch (e) {
-    banner(`<b>Could not load the dataset.</b>\n${esc(e.message)}`, "error");
+    if (e instanceof BackendDown) {
+      banner(`<b>Backend not reachable.</b>\n${esc(e.message)}\nRetrying every 5 seconds…`, "error");
+      setTimeout(loadMeta, 5000);
+    } else {
+      banner(`<b>Could not load the dataset.</b>\n${esc(e.message)}`, "error");
+    }
     $("tbody").innerHTML = `<tr><td colspan="8" class="empty">No data</td></tr>`;
     $("foundSub").textContent = "Dataset not loaded";
   }
@@ -183,7 +205,7 @@ $("recPrev").onclick = () => loadRecord(Math.max(1, state.rec.n - 1));
 $("recNext").onclick = () => loadRecord(Math.min(state.rec.total, state.rec.n + 1));
 $("recInput").onchange = () => loadRecord(parseInt($("recInput").value, 10) || 1);
 $("sbType").onchange = () => loadRecord(1);
-$("sbDataset").onchange = () => location.reload();
+$("sbDataset").onchange = () => { $("resultCard").hidden = true; loadMeta(); };
 $("collapseBtn").onclick = () => $("layout").classList.toggle("collapsed");
 
 function setStatus(text, cls = "") {

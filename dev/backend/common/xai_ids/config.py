@@ -1,25 +1,40 @@
 """
-XAI-IDS configuration.
+XAI-IDS backend configuration.
 
-Edit DATASETS to point at your CSV files. The path can also be overridden
-without editing this file by setting the XAI_IDS_DATASET environment variable.
+Paths are worked out from this file's location, so the project keeps working if
+the dev folder is moved:
+    <dev>/backend/common/xai_ids/config.py   <- this file
+    <dev>/backend/model/                     <- trained models
+    <dev>/data/raw/                          <- datasets
+Override with the environment variables XAI_IDS_DATASET and XAI_IDS_MODEL_DIR.
 """
 import os
 from pathlib import Path
 
-BASE_DIR = Path(__file__).resolve().parent
+BASE_DIR = Path(__file__).resolve().parent          # .../backend/common/xai_ids
+DEV_ROOT = BASE_DIR.parents[2]                      # .../dev
+MODEL_DIR = Path(os.environ.get("XAI_IDS_MODEL_DIR", DEV_ROOT / "backend" / "model"))
+DATA_DIR = DEV_ROOT / "data" / "raw"
+
+# ---------------------------------------------------------------------------
+# API server
+# ---------------------------------------------------------------------------
+HOST = os.environ.get("XAI_IDS_BACKEND_HOST", "127.0.0.1")
+PORT = int(os.environ.get("XAI_IDS_BACKEND_PORT", 5001))
+# Origins allowed to call the API from a browser (the frontend). "*" = any.
+CORS_ORIGINS = os.environ.get("XAI_IDS_CORS_ORIGINS", "*")
 
 # ---------------------------------------------------------------------------
 # Datasets shown in the sidebar "Dataset" dropdown  (display name -> CSV path)
 # ---------------------------------------------------------------------------
 DEFAULT_DATASET = os.environ.get(
     "XAI_IDS_DATASET",
-    r"D:\4Y1S\research\J26-CS-328\dev\data\raw\EdgeIIoT_train_80_with_incident_id.csv",
+    str(DATA_DIR / "EdgeIIoT_train_80_with_incident_id.csv"),
 )
 
 DATASETS = {
     "EdgeIIoT Train (80%)": DEFAULT_DATASET,
-    # "EdgeIIoT Test (20%)": r"D:\4Y1S\research\J26-CS-328\dev\data\raw\EdgeIIoT_test_20_with_incident_id.csv",
+    # "EdgeIIoT Test (20%)": str(DATA_DIR / "EdgeIIoT_test_20_with_incident_id.csv"),
 }
 
 # ---------------------------------------------------------------------------
@@ -94,7 +109,7 @@ TYPE_DISPLAY = {
 # If MODEL_PATH exists it is loaded; otherwise a Random Forest is trained on a
 # stratified sample of the dataset at first start and saved there.
 # ---------------------------------------------------------------------------
-MODEL_PATH = BASE_DIR / "models" / "rf_edgeiiot.joblib"
+MODEL_PATH = MODEL_DIR / "rf_edgeiiot.joblib"
 TRAIN_SAMPLE_SIZE = 150_000
 RF_PARAMS = dict(n_estimators=100, max_depth=20, n_jobs=-1, random_state=42,
                  class_weight="balanced_subsample")

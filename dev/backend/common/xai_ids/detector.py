@@ -18,7 +18,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score, f1_score
 from sklearn.model_selection import train_test_split
 
-import config
+from . import config
 
 
 def feature_columns(df, label_col, id_col, extra_skip=()):
@@ -84,7 +84,7 @@ class Detector:
             sample = df
         self.medians = _matrix(sample, self.features).median()
         X = _matrix(sample, self.features, self.medians)
-        y = np.asarray(sample[ds.label_col])
+        y = sample[ds.label_col].values
         strat = y if pd.Series(y).value_counts().min() >= 2 else None
         Xtr, Xte, ytr, yte = train_test_split(X, y, test_size=0.2, random_state=42, stratify=strat)
         print(f"[model] training RandomForest on {len(Xtr):,} rows, {len(self.features)} features ...",

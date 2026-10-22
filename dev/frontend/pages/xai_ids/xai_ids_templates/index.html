@@ -55,9 +55,7 @@
       </select>
 
       <label class="side-label" for="sbDataset">Dataset</label>
-      <select id="sbDataset" class="side-select">
-        {% for d in datasets %}<option value="{{ d }}">{{ d }}</option>{% endfor %}
-      </select>
+      <select id="sbDataset" class="side-select"></select>
 
       <label class="side-label big">Traffic Record</label>
       <div class="stepper">
@@ -189,6 +187,7 @@
 </div>
 
 <div class="toast" id="toast" hidden></div>
+<script>window.XAI_IDS_API = {{ api_base|tojson }};</script>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

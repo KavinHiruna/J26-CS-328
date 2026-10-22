@@ -160,7 +160,7 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
                    "steps": [{"range": [0, 10], "color": "rgba(46,196,182,.25)"},
                              {"range": [10, 40], "color": "rgba(255,183,3,.25)"},
                              {"range": [40, 100], "color": "rgba(255,77,109,.25)"}]}))
-        st.plotly_chart(style_fig(gauge, 300, legend=False), use_container_width=True)
+        st.plotly_chart(style_fig(gauge, 300, legend=False), width="stretch")
     with right:
         tl = scored.reset_index(drop=True)
         tl["packet"] = np.arange(len(tl))
@@ -176,13 +176,13 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
                       annotation_text="threshold")
         fig.update_layout(title="Attack probability per packet", xaxis_title="packet #",
                           yaxis_title="P(HTTP flood)", yaxis_range=[0, 1.02])
-        st.plotly_chart(style_fig(fig, 300), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 300), width="stretch")
 
     c1, c2, c3 = st.columns(3)
     with c1:
         fig = px.histogram(scored, x="attack_probability", color="prediction", nbins=40,
                            color_discrete_map=CLASS_COLORS, title="Probability distribution")
-        st.plotly_chart(style_fig(fig, 320), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 320), width="stretch")
     with c2:
         if ind["top_flagged_sources"]:
             src = pd.DataFrame({"source": list(ind["top_flagged_sources"].keys()),
@@ -190,7 +190,7 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
             fig = px.bar(src, x="packets", y="source", orientation="h", title="Top flagged source IPs",
                          color_discrete_sequence=[THEME["attack"]])
             fig.update_yaxes(categoryorder="total ascending")
-            st.plotly_chart(style_fig(fig, 320, legend=False), use_container_width=True)
+            st.plotly_chart(style_fig(fig, 320, legend=False), width="stretch")
         else:
             st.info("No packets flagged — no source IPs to rank.")
     with c3:
@@ -198,7 +198,7 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
         fig = go.Figure(go.Pie(labels=mix.index, values=mix.values, hole=.55,
                                marker=dict(colors=[THEME["normal"], THEME["accent"], THEME["warn"], THEME["attack"]])))
         fig.update_layout(title="Risk levels")
-        st.plotly_chart(style_fig(fig, 320), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 320), width="stretch")
 
     section("Packet verdicts")
     only_flagged = st.toggle("Show flagged packets only", value=False, key="ddos_only_flagged")
@@ -206,7 +206,7 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
     view = view.sort_values("attack_probability", ascending=False)
     st.dataframe(
         view.drop(columns=["is_attack"]),
-        use_container_width=True, height=360,
+        width="stretch", height=360,
         column_config={"attack_probability": st.column_config.ProgressColumn(
             "P(HTTP flood)", min_value=0.0, max_value=1.0, format="%.3f")},
     )
@@ -270,7 +270,7 @@ def tab_local(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: 
         st.markdown(exp["narrative"])
     with v2:
         if method == "SHAP / tree-path":
-            st.plotly_chart(style_fig(waterfall(exp), 460, legend=False), use_container_width=True)
+            st.plotly_chart(style_fig(waterfall(exp), 460, legend=False), width="stretch")
         elif method == "LIME":
             if not xai.capabilities["lime"]:
                 st.warning("LIME is not installed in this environment — `pip install lime`.")
@@ -281,7 +281,7 @@ def tab_local(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: 
                 fig = go.Figure(go.Bar(x=w["weight"], y=w["rule"], orientation="h",
                                        marker_color=[THEME["attack"] if v > 0 else THEME["normal"] for v in w["weight"]]))
                 fig.update_layout(title="LIME — local rule weights towards HTTP flood")
-                st.plotly_chart(style_fig(fig, 460, legend=False), use_container_width=True)
+                st.plotly_chart(style_fig(fig, 460, legend=False), width="stretch")
         else:
             section("Global surrogate decision path for this packet")
             fid = xai.global_xai["surrogate"]["fidelity"]
@@ -297,10 +297,10 @@ def tab_local(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: 
         "typical HTTP flood": xai.encoder.decode_value(c["feature"], c["attack_median"]),
         "contribution": c["contribution"],
     } for c in exp["contributions"]])
-    st.dataframe(tbl, use_container_width=True, hide_index=True,
+    st.dataframe(tbl, width="stretch", hide_index=True,
                  column_config={"contribution": st.column_config.NumberColumn(format="%+.4f")})
     with st.expander("Raw packet fields"):
-        st.dataframe(row.T.rename(columns={idx: "value"}), use_container_width=True)
+        st.dataframe(row.T.rename(columns={idx: "value"}), width="stretch")
 
 
 def tab_global(xai: DDoSHttpXAI, top_k: int) -> None:
@@ -316,7 +316,7 @@ def tab_global(xai: DDoSHttpXAI, top_k: int) -> None:
                                marker_color=THEME["accent"],
                                hovertext=top["description"]))
         fig.update_layout(title="Mean |attribution| — overall feature impact", xaxis_title="mean |contribution|")
-        st.plotly_chart(style_fig(fig, 440, legend=False), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 440, legend=False), width="stretch")
     with c2:
         s = xai.shap_sample
         feats = fi.head(top_k)["feature"].tolist()
@@ -343,7 +343,7 @@ def tab_global(xai: DDoSHttpXAI, top_k: int) -> None:
         fig.add_vline(x=0, line_color=THEME["muted"])
         fig.update_layout(title="Attribution beeswarm (each dot = one packet; colour = feature value)",
                           xaxis_title="contribution to P(HTTP flood)")
-        st.plotly_chart(style_fig(fig, 440, legend=False), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 440, legend=False), width="stretch")
 
     section("Do the importance methods agree?")
     comp = fi.head(top_k).copy()
@@ -358,7 +358,7 @@ def tab_global(xai: DDoSHttpXAI, top_k: int) -> None:
                                          "permutation_importance": "Permutation (F1 drop)"})
     fig = px.bar(comp, x="feature", y="normalised importance", color="method", barmode="group",
                  color_discrete_sequence=[THEME["accent"], THEME["warn"], THEME["attack"]])
-    st.plotly_chart(style_fig(fig, 360), use_container_width=True)
+    st.plotly_chart(style_fig(fig, 360), width="stretch")
 
     c1, c2 = st.columns([1, 1])
     with c1:
@@ -374,7 +374,7 @@ def tab_global(xai: DDoSHttpXAI, top_k: int) -> None:
             inv = {v: k for k, v in xai.encoder.vocab[f].items()}
             ticks = sorted(dep["value"].unique())
             fig.update_xaxes(tickvals=ticks, ticktext=[inv.get(int(t), "?") for t in ticks])
-        st.plotly_chart(style_fig(fig, 360), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 360), width="stretch")
     with c2:
         section("Global surrogate rules")
         sur = g["surrogate"]
@@ -383,7 +383,7 @@ def tab_global(xai: DDoSHttpXAI, top_k: int) -> None:
         rules = pd.DataFrame([{"IF": " AND ".join(r["conditions"]) or "(always)",
                                "THEN": r["prediction"], "confidence": r["confidence"],
                                "packets": r["support"]} for r in sur["rules"]])
-        st.dataframe(rules, use_container_width=True, hide_index=True, height=320,
+        st.dataframe(rules, width="stretch", hide_index=True, height=320,
                      column_config={"confidence": st.column_config.ProgressColumn(
                          "confidence", min_value=0.0, max_value=1.0, format="%.2f")})
 
@@ -406,7 +406,7 @@ def tab_performance(xai: DDoSHttpXAI) -> None:
                                    colorscale=[[0, THEME["panel"]], [1, THEME["accent"]]]))
         fig.update_yaxes(autorange="reversed")
         fig.update_layout(title="Confusion matrix (test set)")
-        st.plotly_chart(style_fig(fig, 340, legend=False), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 340, legend=False), width="stretch")
     with c2:
         fig = go.Figure(go.Scatter(x=m["roc_curve"]["fpr"], y=m["roc_curve"]["tpr"], mode="lines",
                                    line=dict(color=THEME["attack"], width=3), fill="tozeroy",
@@ -414,25 +414,25 @@ def tab_performance(xai: DDoSHttpXAI) -> None:
         fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode="lines", line=dict(dash="dot", color=THEME["muted"]),
                                  name="chance"))
         fig.update_layout(title="ROC curve", xaxis_title="False-positive rate", yaxis_title="True-positive rate")
-        st.plotly_chart(style_fig(fig, 340), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
     with c3:
         fig = go.Figure(go.Scatter(x=m["pr_curve"]["recall"], y=m["pr_curve"]["precision"], mode="lines",
                                    line=dict(color=THEME["accent"], width=3), name=f"AP {m['pr_auc']:.4f}"))
         fig.update_layout(title="Precision–recall curve", xaxis_title="Recall", yaxis_title="Precision",
                           yaxis_range=[0, 1.02])
-        st.plotly_chart(style_fig(fig, 340), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
 
     c1, c2 = st.columns(2)
     with c1:
         section("Classification report")
         rep = pd.DataFrame(m["classification_report"]).T
-        st.dataframe(rep.style.format("{:.4f}"), use_container_width=True)
+        st.dataframe(rep.style.format("{:.4f}"), width="stretch")
     with c2:
         section("Training data")
         cc = m["class_counts"]
         fig = go.Figure(go.Pie(labels=list(cc.keys()), values=list(cc.values()), hole=.55,
                                marker=dict(colors=[CLASS_COLORS.get(k, THEME["accent"]) for k in cc])))
-        st.plotly_chart(style_fig(fig, 260), use_container_width=True)
+        st.plotly_chart(style_fig(fig, 260), width="stretch")
         st.caption(f"Trained {m['trained_at']} · {m['n_train']:,} train / {m['n_test']:,} test packets · "
                    f"fit {m['fit_seconds']}s · {m['inference_ms_per_packet']} ms/packet")
 

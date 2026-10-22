@@ -110,7 +110,10 @@ def build_dataset(paths: Iterable[str | Path],
     feature_cols = [c for c in data.columns if c not in config.DROP_COLUMNS and c != "__source"]
     before = len(data)
     if config.DROP_DUPLICATES:
-        data = data.drop_duplicates(subset=feature_cols + [config.LABEL_COL]).reset_index(drop=True)
+        dup = data.duplicated(subset=feature_cols + [config.LABEL_COL])
+        if not config.DROP_DUPLICATE_ATTACK_ROWS:
+            dup &= ~_is_attack(data[config.LABEL_COL])
+        data = data[~dup].reset_index(drop=True)
     if verbose:
         print(f"  removed {before - len(data):,} duplicate rows")
 

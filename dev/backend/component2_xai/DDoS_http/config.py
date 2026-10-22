@@ -114,6 +114,10 @@ MAX_ATTACK_ROWS = 120_000
 # dropped many packets become identical, so this also prevents train/test
 # leakage of identical feature vectors.
 DROP_DUPLICATES = True
+# A flood *is* the same request repeated: EdgeIIoT_train_80 has 691 flood
+# requests but only 17 distinct feature vectors, so de-duplicating them leaves
+# too few attack rows to split/evaluate. Normal rows are still de-duplicated.
+DROP_DUPLICATE_ATTACK_ROWS = False
 
 RF_PARAMS = dict(
     n_estimators=200,

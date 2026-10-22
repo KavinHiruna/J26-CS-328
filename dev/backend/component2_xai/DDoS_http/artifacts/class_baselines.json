@@ -1,0 +1,286 @@
+{
+  "Normal": {
+    "arp.opcode": {
+      "median": 0.0,
+      "mean": 0.0022150768131475526
+    },
+    "arp.hw.size": {
+      "median": 0.0,
+      "mean": 0.0013576277241872097
+    },
+    "http.request.method": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.referer": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.tls_port": {
+      "median": 52185.0,
+      "mean": 96097.60278670954
+    },
+    "tcp.ack": {
+      "median": 2154053693.0,
+      "mean": 2400370923.3607717
+    },
+    "tcp.connection.fin": {
+      "median": 0.0,
+      "mean": 0.002500893176134334
+    },
+    "tcp.connection.rst": {
+      "median": 0.0,
+      "mean": 0.00421579135405502
+    },
+    "tcp.connection.syn": {
+      "median": 0.0,
+      "mean": 0.0028581636298678098
+    },
+    "tcp.connection.synack": {
+      "median": 502.0,
+      "mean": 19599.136477313325
+    },
+    "tcp.flags": {
+      "median": 1.0,
+      "mean": 3.703108252947481
+    },
+    "tcp.flags.ack": {
+      "median": 11.0,
+      "mean": 14.464165773490532
+    },
+    "tcp.len": {
+      "median": 0.0,
+      "mean": 2.064022865309039
+    },
+    "tcp.seq": {
+      "median": 63846.0,
+      "mean": 10151407.5257592
+    },
+    "udp.stream": {
+      "median": 0.0,
+      "mean": 24.90703822793855
+    },
+    "udp.time_delta": {
+      "median": 0.0,
+      "mean": 0.5274951708467309
+    },
+    "dns.qry.name": {
+      "median": 0.0,
+      "mean": 0.15091103965702035
+    },
+    "dns.qry.name.len": {
+      "median": 0.0,
+      "mean": 0.05930689531975706
+    },
+    "dns.qry.qu": {
+      "median": 0.0,
+      "mean": 0.021078956770275097
+    },
+    "dns.qry.type": {
+      "median": 0.0,
+      "mean": 0.8240800285816363
+    },
+    "dns.retransmission": {
+      "median": 0.0,
+      "mean": 0.009503394069310467
+    },
+    "dns.retransmit_request": {
+      "median": 0.0,
+      "mean": 7.145409074669524e-05
+    },
+    "mqtt.conflag.cleansess": {
+      "median": 0.0,
+      "mean": 7.145409074669524e-05
+    },
+    "mqtt.conflags": {
+      "median": 0.0,
+      "mean": 0.0001429081814933905
+    },
+    "mqtt.hdrflags": {
+      "median": 0.0,
+      "mean": 0.3532690246516613
+    },
+    "mqtt.len": {
+      "median": 0.0,
+      "mean": 0.04015719899964273
+    },
+    "mqtt.msgtype": {
+      "median": 0.0,
+      "mean": 0.022079314040728833
+    },
+    "mqtt.proto_len": {
+      "median": 0.0,
+      "mean": 0.000285816362986781
+    },
+    "mqtt.protoname": {
+      "median": 0.0,
+      "mean": 7.145409074669524e-05
+    },
+    "mqtt.topic": {
+      "median": 0.0,
+      "mean": 0.0053590568060021436
+    },
+    "mqtt.topic_len": {
+      "median": 0.0,
+      "mean": 0.01679171132547338
+    },
+    "mqtt.ver": {
+      "median": 5.0,
+      "mean": 10.929260450160772
+    },
+    "mbtcp.len": {
+      "median": 1588.0,
+      "mean": 4300.822365130403
+    },
+    "mbtcp.trans_id": {
+      "median": 14.0,
+      "mean": 9.249017506252233
+    }
+  },
+  "DDoS HTTP Flood": {
+    "arp.opcode": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "arp.hw.size": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method": {
+      "median": 1.0,
+      "mean": 1.2820976491862568
+    },
+    "http.referer": {
+      "median": 0.0,
+      "mean": 0.2820976491862568
+    },
+    "http.request.version": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.tls_port": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.ack": {
+      "median": 1.0,
+      "mean": 63.85895117540687
+    },
+    "tcp.connection.fin": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.rst": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.syn": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.synack": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.flags": {
+      "median": 24.0,
+      "mean": 24.0
+    },
+    "tcp.flags.ack": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "tcp.len": {
+      "median": 2.0,
+      "mean": 3.8553345388788425
+    },
+    "tcp.seq": {
+      "median": 1.0,
+      "mean": 15.571428571428571
+    },
+    "udp.stream": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "udp.time_delta": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.qry.name": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.qry.name.len": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.qry.qu": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.qry.type": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.retransmission": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.retransmit_request": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.conflag.cleansess": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.conflags": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.hdrflags": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.len": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.msgtype": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.proto_len": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.protoname": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.topic": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.topic_len": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.ver": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mbtcp.len": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mbtcp.trans_id": {
+      "median": 0.0,
+      "mean": 0.0
+    }
+  }
+}

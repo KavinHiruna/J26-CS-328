@@ -1,5 +1,5 @@
 {
-  "trained_at": "2026-10-22T14:27:26+00:00",
+  "trained_at": "2026-10-22T15:30:08+00:00",
   "model": "RandomForestClassifier",
   "params": {
     "n_estimators": 200,
@@ -170,8 +170,8 @@
       "support": 3637.0
     }
   },
-  "fit_seconds": 0.44,
-  "inference_ms_per_packet": 0.015,
+  "fit_seconds": 0.92,
+  "inference_ms_per_packet": 0.0268,
   "features": [
     "arp.opcode",
     "arp.hw.size",
@@ -255,5 +255,5 @@
     "mqtt.msg_decoded_as",
     "mbtcp.unit_id"
   ],
-  "total_seconds": 29.1
+  "total_seconds": 39.7
 }

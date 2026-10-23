@@ -48,10 +48,16 @@ const stBadge = (s) => `<span class="badge st-${esc(s)}">${esc(s)}</span>`;
 // Component-2 attack XAI pages. Which incidents link where is decided by the backend
 // from the dataset (label / request URI), not the model.
 const XAI_PAGES = [
-  { key: "sqli", flag: "is_sqli", url: (window.SQLI_XAI_URL || "").replace(/\/$/, ""),
-    label: "🛡 SQLi XAI", name: "SQL Injection XAI", top: "sqliTopBtn", dash: "sqliDashBtn" },
+  { key: "sqli", flag: "is_web_injection", url: (window.SQLI_XAI_URL || "").replace(/\/$/, ""),
+    label: "🛡 Web Injection XAI", name: "Web Injection XAI", top: "sqliTopBtn", dash: "sqliDashBtn" },
   { key: "ddos", flag: "is_ddos_http", url: (window.DDOS_XAI_URL || "").replace(/\/$/, ""),
-    label: "🌊 DDoS XAI", name: "DDoS HTTP Flood XAI", top: "ddosTopBtn", dash: "ddosDashBtn" },
+    label: "🌊 HTTP Flood XAI", name: "DDoS HTTP Flood XAI", top: "ddosTopBtn", dash: "ddosDashBtn" },
+  { key: "tcp", flag: "is_ddos_tcp", url: (window.TCP_XAI_URL || "").replace(/\/$/, ""),
+    label: "⚡ SYN Flood XAI", name: "DDoS TCP SYN Flood XAI", top: "tcpTopBtn", dash: "tcpDashBtn" },
+  { key: "udp", flag: "is_ddos_udp", url: (window.UDP_XAI_URL || "").replace(/\/$/, ""),
+    label: "📨 UDP Flood XAI", name: "DDoS UDP Flood XAI", top: "udpTopBtn", dash: "udpDashBtn" },
+  { key: "icmp", flag: "is_ddos_icmp", url: (window.ICMP_XAI_URL || "").replace(/\/$/, ""),
+    label: "📡 Network Flood XAI", name: "DDoS Network Flood XAI", top: "icmpTopBtn", dash: "icmpDashBtn" },
 ];
 const pageFor = (inc) => XAI_PAGES.find((p) => p.url && inc[p.flag]);
 const xaiUrl = (p, id) => (id ? `${p.url}/?incident=${encodeURIComponent(id)}` : `${p.url}/`);

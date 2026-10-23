@@ -172,6 +172,39 @@ class IncidentDataset:
             flood = df[uri_col].astype(str).str.strip().str.match(config.DDOS_HTTP_URI_REGEX, case=False)
             is_ddos_http |= flood & (df[self.label_col] != "Normal")
         df["_is_ddos_http"] = is_ddos_http.to_numpy(dtype=bool)
+        attack = df[self.label_col] != "Normal"
+        is_web = is_sqli.copy()
+        if uri_col is not None:
+            text = df[uri_col].astype(str)
+            for c in config.WEB_TEXT_COLUMNS:
+                if c in df.columns:
+                    text = text + " " + df[c].astype(str)
+            is_web |= attack & text.str.contains(config.WEB_XSS_REGEX, case=False, regex=True)
+            is_web |= attack & df[uri_col].astype(str).str.contains(config.WEB_UPLOAD_REGEX, case=False, regex=True)
+        df["_is_web_injection"] = is_web.to_numpy(dtype=bool)
+        is_icmp = pd.Series(False, index=df.index)
+        for c in config.ICMP_COLUMNS:
+            if c in df.columns:
+                is_icmp |= ~df[c].astype(str).str.strip().isin(["", "0", "0.0", "nan"])
+        hosts = [c for c in ("ip.src_host", "ip.dst_host") if c in df.columns]
+        scanner = df[hosts].astype(str).isin(config.ICMP_SCANNER_HOSTS).any(axis=1) if hosts else False
+        valid_time = (df[self.time_col].astype(str).str.contains(":", regex=False)
+                      if self.time_col is not None else True)
+        df["_is_ddos_icmp"] = (attack & is_icmp & ~scanner & valid_time).to_numpy(dtype=bool)
+        syn = pd.Series(False, index=df.index)
+        if "tcp.connection.syn" in df.columns:
+            ack = df["tcp.flags.ack"].astype(str).str.strip().str.startswith("1") if "tcp.flags.ack" in df.columns else False
+            syn = df["tcp.connection.syn"].astype(str).str.strip().str.startswith("1") & ~ack
+        outsider = ~df["ip.src_host"].astype(str).isin(config.TESTBED_HOSTS) if "ip.src_host" in df.columns else True
+        df["_is_ddos_tcp"] = (attack & syn & outsider & valid_time).to_numpy(dtype=bool)
+        # UDP flood detection
+        is_udp = pd.Series(False, index=df.index)
+        for c in config.UDP_COLUMNS:
+            if c in df.columns:
+                is_udp |= ~df[c].astype(str).str.strip().isin(["", "0", "0.0", "nan"])
+        df["_is_ddos_udp"] = (attack & is_udp & ~scanner).to_numpy(dtype=bool)
+        # Network Flood page (ddos_icmp.py): ICMP, UDP or TCP SYN flood packets
+        df["_is_ddos_icmp"] = (df["_is_ddos_icmp"] | df["_is_ddos_udp"] | df["_is_ddos_tcp"]).to_numpy(dtype=bool)
         df["_row"] = np.arange(len(df))
 
         self.df = df
@@ -224,6 +257,10 @@ class IncidentDataset:
             "status": r["_status"],
             "is_sqli": bool(r["_is_sqli"]),
             "is_ddos_http": bool(r["_is_ddos_http"]),
+            "is_web_injection": bool(r["_is_web_injection"]),
+            "is_ddos_icmp": bool(r["_is_ddos_icmp"]),
+            "is_ddos_tcp": bool(r["_is_ddos_tcp"]),
+            "is_ddos_udp": bool(r["_is_ddos_udp"]),
         }
 
     def search(self, start=None, end=None, traffic_type="All", severity="All",

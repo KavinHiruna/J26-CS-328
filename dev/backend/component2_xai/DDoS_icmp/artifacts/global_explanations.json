@@ -1,256 +1,256 @@
 {
   "attribution_method": "SHAP (TreeExplainer)",
-  "base_value": 0.5002913778162913,
+  "base_value": 0.5000471565315315,
   "feature_importance": [
-    {
-      "feature": "icmp.seq_le",
-      "description": "ICMP echo sequence number",
-      "mean_abs_attribution": 0.18420553988520677,
-      "mean_attack_attribution": 0.10737855486102149,
-      "gini_importance": 0.2244419809521717,
-      "permutation_importance": 0.4365975603768656,
-      "permutation_std": 0.010439391252798795
-    },
     {
       "feature": "tcp.seq",
       "description": "Relative TCP sequence number",
-      "mean_abs_attribution": 0.0856455205259765,
-      "mean_attack_attribution": 0.09033790538780188,
-      "gini_importance": 0.1841877249116839,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "tcp.ack",
-      "description": "Relative TCP acknowledgement number",
-      "mean_abs_attribution": 0.06033698846223829,
-      "mean_attack_attribution": 0.0720370292837092,
-      "gini_importance": 0.14514028751088096,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
+      "mean_abs_attribution": 0.11339521463033461,
+      "mean_attack_attribution": 0.10508093471681264,
+      "gini_importance": 0.24402920945942827,
+      "permutation_importance": -0.00010973936899860703,
+      "permutation_std": 0.0001344027293707931
     },
     {
       "feature": "tcp.flags",
       "description": "TCP flag bits (SYN/ACK/PSH/FIN\u2026)",
-      "mean_abs_attribution": 0.05753871914147665,
-      "mean_attack_attribution": 0.07182837918464094,
-      "gini_importance": 0.148217943010069,
+      "mean_abs_attribution": 0.06521792612613633,
+      "mean_attack_attribution": 0.06752971088650911,
+      "gini_importance": 0.13006443591428715,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "tcp.connection.synack",
       "description": "SYN-ACK handshake reply",
-      "mean_abs_attribution": 0.04302773007048038,
-      "mean_attack_attribution": 0.03980783165820101,
-      "gini_importance": 0.07473143838318927,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
+      "mean_abs_attribution": 0.06090150646631705,
+      "mean_attack_attribution": 0.05721891097509669,
+      "gini_importance": 0.10075670263137716,
+      "permutation_importance": -0.00010973936899860703,
+      "permutation_std": 0.0001344027293707931
+    },
+    {
+      "feature": "icmp.seq_le",
+      "description": "ICMP echo sequence number",
+      "mean_abs_attribution": 0.05669149777502379,
+      "mean_attack_attribution": 0.010237268884270942,
+      "gini_importance": 0.01706776089755143,
+      "permutation_importance": 0.19162012413863466,
+      "permutation_std": 0.005396650202349797
     },
     {
       "feature": "http.tls_port",
       "description": "Plain HTTP seen on a TLS port",
-      "mean_abs_attribution": 0.026707667542701555,
-      "mean_attack_attribution": 0.0335654905463068,
-      "gini_importance": 0.062182793349744525,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
+      "mean_abs_attribution": 0.056647527337660424,
+      "mean_attack_attribution": 0.058600301879610704,
+      "gini_importance": 0.11129058147285857,
+      "permutation_importance": -0.00010973936899860703,
+      "permutation_std": 0.0001344027293707931
+    },
+    {
+      "feature": "udp.stream",
+      "description": "UDP stream index",
+      "mean_abs_attribution": 0.05538268125837986,
+      "mean_attack_attribution": 0.006072966278326942,
+      "gini_importance": 0.02211932663355125,
+      "permutation_importance": 0.17052865703893355,
+      "permutation_std": 0.002528758061859651
     },
     {
       "feature": "tcp.flags.ack",
       "description": "TCP ACK flag set",
-      "mean_abs_attribution": 0.015759710134051048,
-      "mean_attack_attribution": 0.01684221753508728,
-      "gini_importance": 0.03170422858654952,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
+      "mean_abs_attribution": 0.050556703843308244,
+      "mean_attack_attribution": 0.042643992674349,
+      "gini_importance": 0.08223453599927498,
+      "permutation_importance": -0.00010973936899860703,
+      "permutation_std": 0.0001344027293707931
+    },
+    {
+      "feature": "tcp.ack",
+      "description": "Relative TCP acknowledgement number",
+      "mean_abs_attribution": 0.04132547543278787,
+      "mean_attack_attribution": 0.05085944198260072,
+      "gini_importance": 0.08724369108313165,
+      "permutation_importance": 5.483958593404115e-05,
+      "permutation_std": 0.00010967917186808228
     },
     {
       "feature": "mqtt.ver",
       "description": "MQTT protocol version",
-      "mean_abs_attribution": 0.010623477122305285,
-      "mean_attack_attribution": 0.01415231941973762,
-      "gini_importance": 0.023636651468258506,
+      "mean_abs_attribution": 0.016763742453755424,
+      "mean_attack_attribution": 0.018768334251528525,
+      "gini_importance": 0.032196837254909884,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "mbtcp.trans_id",
       "description": "Modbus/TCP transaction id",
-      "mean_abs_attribution": 0.010501711037551502,
-      "mean_attack_attribution": 0.014249380054629527,
-      "gini_importance": 0.023619399716989203,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "mbtcp.len",
-      "description": "Modbus/TCP length",
-      "mean_abs_attribution": 0.007837165247101045,
-      "mean_attack_attribution": 0.010659175898673389,
-      "gini_importance": 0.017607726389754656,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "udp.stream",
-      "description": "UDP stream index",
-      "mean_abs_attribution": 0.007215191811881484,
-      "mean_attack_attribution": 0.005638015449473128,
-      "gini_importance": 0.013440620052428071,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "dns.qry.name.len",
-      "description": "DNS query name length",
-      "mean_abs_attribution": 0.005927340593709723,
-      "mean_attack_attribution": 0.006145431157159172,
-      "gini_importance": 0.015406909166456545,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "dns.qry.name",
-      "description": "DNS query name",
-      "mean_abs_attribution": 0.0056851324047085035,
-      "mean_attack_attribution": 0.005483444109772423,
-      "gini_importance": 0.013173728603336998,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "dns.qry.type",
-      "description": "DNS query type",
-      "mean_abs_attribution": 0.003706545120432084,
-      "mean_attack_attribution": 0.0042503738568922984,
-      "gini_importance": 0.010849631950825691,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "udp.time_delta",
-      "description": "Time since previous UDP packet",
-      "mean_abs_attribution": 0.0022791856043455415,
-      "mean_attack_attribution": 0.0027450070998872723,
-      "gini_importance": 0.006790664634291407,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "tcp.len",
-      "description": "TCP payload length (bytes)",
-      "mean_abs_attribution": 0.0016621559445057833,
-      "mean_attack_attribution": 0.0020312740016718454,
-      "gini_importance": 0.0035491796134902733,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "tcp.connection.rst",
-      "description": "Connection reset (RST)",
-      "mean_abs_attribution": 0.00010746836454228431,
-      "mean_attack_attribution": 0.00018906907328480367,
-      "gini_importance": 0.0004969419547886054,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "arp.hw.size",
-      "description": "ARP hardware size",
-      "mean_abs_attribution": 4.9446095041701e-05,
-      "mean_attack_attribution": 9.060823125123594e-05,
-      "gini_importance": 0.0002413006753293767,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "arp.opcode",
-      "description": "ARP operation code",
-      "mean_abs_attribution": 4.860927930770305e-05,
-      "mean_attack_attribution": 9.020285228817534e-05,
-      "gini_importance": 0.00024260042267029952,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "mqtt.hdrflags",
-      "description": "MQTT header flags",
-      "mean_abs_attribution": 2.0153477096629732e-05,
-      "mean_attack_attribution": 3.472494723175232e-05,
-      "gini_importance": 6.731786519357907e-05,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "dns.retransmission",
-      "description": "dns.retransmission",
-      "mean_abs_attribution": 1.8597722549690993e-05,
-      "mean_attack_attribution": 3.402335253808136e-05,
-      "gini_importance": 8.957118975963826e-05,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "dns.qry.qu",
-      "description": "dns.qry.qu",
-      "mean_abs_attribution": 1.496947433017648e-05,
-      "mean_attack_attribution": 2.680913060803463e-05,
-      "gini_importance": 7.103133257101088e-05,
+      "mean_abs_attribution": 0.01665613298886651,
+      "mean_attack_attribution": 0.018820341026568356,
+      "gini_importance": 0.032284340176741845,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "tcp.connection.syn",
       "description": "Connection-opening SYN packet",
-      "mean_abs_attribution": 1.0691547262499186e-05,
-      "mean_attack_attribution": 1.227128466660096e-05,
-      "gini_importance": 2.1008411872047924e-05,
+      "mean_abs_attribution": 0.015554166423255592,
+      "mean_attack_attribution": 0.008466265793462333,
+      "gini_importance": 0.014875601250915003,
+      "permutation_importance": -0.00021947873799721407,
+      "permutation_std": 0.00010973936899860702
+    },
+    {
+      "feature": "dns.qry.type",
+      "description": "DNS query type",
+      "mean_abs_attribution": 0.012555530292543002,
+      "mean_attack_attribution": 0.011709184730775719,
+      "gini_importance": 0.028524618711056007,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "mbtcp.len",
+      "description": "Modbus/TCP length",
+      "mean_abs_attribution": 0.01009961564153093,
+      "mean_attack_attribution": 0.011326218585196673,
+      "gini_importance": 0.018204175269808928,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "tcp.len",
+      "description": "TCP payload length (bytes)",
+      "mean_abs_attribution": 0.009832913237100909,
+      "mean_attack_attribution": 0.005330228519318836,
+      "gini_importance": 0.018939641612647332,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "dns.qry.name",
+      "description": "DNS query name",
+      "mean_abs_attribution": 0.009674874770280437,
+      "mean_attack_attribution": 0.00922129204192304,
+      "gini_importance": 0.022785916968156163,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "dns.qry.name.len",
+      "description": "DNS query name length",
+      "mean_abs_attribution": 0.00889536169999112,
+      "mean_attack_attribution": 0.008593231081566613,
+      "gini_importance": 0.02154501457644698,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "udp.time_delta",
+      "description": "Time since previous UDP packet",
+      "mean_abs_attribution": 0.0030227855269701963,
+      "mean_attack_attribution": 0.0031558950072504885,
+      "gini_importance": 0.012076638467495496,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "tcp.connection.rst",
+      "description": "Connection reset (RST)",
+      "mean_abs_attribution": 0.0010811662710332503,
+      "mean_attack_attribution": 0.0015202249912813584,
+      "gini_importance": 0.0011581125454700606,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "dns.qry.qu",
+      "description": "dns.qry.qu",
+      "mean_abs_attribution": 0.000621213922838551,
+      "mean_attack_attribution": -0.0002398203514235446,
+      "gini_importance": 0.0011800820320120634,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "arp.hw.size",
+      "description": "ARP hardware size",
+      "mean_abs_attribution": 0.00014734184140214923,
+      "mean_attack_attribution": 0.0001997947133330593,
+      "gini_importance": 0.0005183713865224045,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "arp.opcode",
+      "description": "ARP operation code",
+      "mean_abs_attribution": 0.00012934367353666394,
+      "mean_attack_attribution": 0.00016843250302650545,
+      "gini_importance": 0.00042088180490939777,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "dns.retransmission",
+      "description": "dns.retransmission",
+      "mean_abs_attribution": 6.806449512641997e-05,
+      "mean_attack_attribution": 9.154194391703955e-05,
+      "gini_importance": 0.00024561984271367123,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "mqtt.hdrflags",
+      "description": "MQTT header flags",
+      "mean_abs_attribution": 4.0256890772966926e-05,
+      "mean_attack_attribution": 5.352119029203548e-05,
+      "gini_importance": 8.502585066524397e-05,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "mqtt.msgtype",
       "description": "MQTT message type",
-      "mean_abs_attribution": 8.725491056371129e-06,
-      "mean_attack_attribution": 1.4498439021623138e-05,
-      "gini_importance": 3.303958575483352e-05,
-      "permutation_importance": 0.0,
-      "permutation_std": 0.0
-    },
-    {
-      "feature": "mqtt.topic",
-      "description": "MQTT topic",
-      "mean_abs_attribution": 4.485046746096379e-06,
-      "mean_attack_attribution": 8.793920529146592e-06,
-      "gini_importance": 1.792267125801098e-05,
+      "mean_abs_attribution": 2.8949155771571847e-05,
+      "mean_attack_attribution": 3.6571608767285184e-05,
+      "gini_importance": 4.888595539806517e-05,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "tcp.connection.fin",
       "description": "Connection-closing FIN packet",
-      "mean_abs_attribution": 3.576100622604853e-06,
-      "mean_attack_attribution": 6.383405888458959e-06,
-      "gini_importance": 1.5024904344312403e-05,
+      "mean_abs_attribution": 1.5733597508940607e-05,
+      "mean_attack_attribution": 1.9986194083804937e-05,
+      "gini_importance": 3.6893571458463944e-05,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "mqtt.len",
       "description": "MQTT message length",
-      "mean_abs_attribution": 3.086528259877322e-06,
-      "mean_attack_attribution": 5.508716965683659e-06,
-      "gini_importance": 1.2921650781202047e-05,
+      "mean_abs_attribution": 1.1740158113596437e-05,
+      "mean_attack_attribution": 1.4924730411124583e-05,
+      "gini_importance": 3.9280797858389555e-05,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
     {
       "feature": "mqtt.topic_len",
       "description": "MQTT topic length",
-      "mean_abs_attribution": 2.4205103377773828e-06,
-      "mean_attack_attribution": 4.414165564382169e-06,
-      "gini_importance": 1.0411035556973812e-05,
+      "mean_abs_attribution": 1.1702218410796862e-05,
+      "mean_attack_attribution": 1.53812592508747e-05,
+      "gini_importance": 2.656462708311588e-05,
+      "permutation_importance": 0.0,
+      "permutation_std": 0.0
+    },
+    {
+      "feature": "mqtt.topic",
+      "description": "MQTT topic",
+      "mean_abs_attribution": 3.932030841332545e-06,
+      "mean_attack_attribution": 5.127204398654004e-06,
+      "gini_importance": 1.2532062710194162e-06,
       "permutation_importance": 0.0,
       "permutation_std": 0.0
     },
@@ -302,24 +302,67 @@
   ],
   "surrogate": {
     "max_depth": 4,
-    "fidelity": 1.0,
-    "rules_text": "|--- icmp.seq_le <= 0.50\n|   |--- class: 0\n|--- icmp.seq_le >  0.50\n|   |--- class: 1\n",
+    "fidelity": 0.9993806306306307,
+    "rules_text": "|--- tcp.seq <= 4.55\n|   |--- dns.qry.type <= 0.50\n|   |   |--- tcp.flags <= 3.00\n|   |   |   |--- udp.time_delta <= 261.00\n|   |   |   |   |--- class: 1\n|   |   |   |--- udp.time_delta >  261.00\n|   |   |   |   |--- class: 0\n|   |   |--- tcp.flags >  3.00\n|   |   |   |--- class: 0\n|   |--- dns.qry.type >  0.50\n|   |   |--- class: 0\n|--- tcp.seq >  4.55\n|   |--- udp.time_delta <= 6.00\n|   |   |--- class: 0\n|   |--- udp.time_delta >  6.00\n|   |   |--- class: 1\n",
     "rules": [
       {
         "conditions": [
-          "icmp.seq_le <= 0.50"
+          "tcp.seq <= 4.55",
+          "dns.qry.type <= 0.50",
+          "tcp.flags <= 3.00",
+          "udp.time_delta <= 261.00"
         ],
-        "prediction": "Normal",
-        "confidence": 1.0,
-        "support": 13995
+        "prediction": "DDoS Network Flood",
+        "confidence": 0.998977219897722,
+        "support": 21510
       },
       {
         "conditions": [
-          "icmp.seq_le > 0.50"
+          "tcp.seq > 4.55",
+          "udp.time_delta <= 6.00"
         ],
-        "prediction": "DDoS ICMP Flood",
+        "prediction": "Normal",
         "confidence": 1.0,
-        "support": 9085
+        "support": 13152
+      },
+      {
+        "conditions": [
+          "tcp.seq <= 4.55",
+          "dns.qry.type > 0.50"
+        ],
+        "prediction": "Normal",
+        "confidence": 1.0,
+        "support": 787
+      },
+      {
+        "conditions": [
+          "tcp.seq > 4.55",
+          "udp.time_delta > 6.00"
+        ],
+        "prediction": "DDoS Network Flood",
+        "confidence": 1.0,
+        "support": 37
+      },
+      {
+        "conditions": [
+          "tcp.seq <= 4.55",
+          "dns.qry.type <= 0.50",
+          "tcp.flags > 3.00"
+        ],
+        "prediction": "Normal",
+        "confidence": 1.0,
+        "support": 18
+      },
+      {
+        "conditions": [
+          "tcp.seq <= 4.55",
+          "dns.qry.type <= 0.50",
+          "tcp.flags <= 3.00",
+          "udp.time_delta > 261.00"
+        ],
+        "prediction": "Normal",
+        "confidence": 1.0,
+        "support": 16
       }
     ]
   }

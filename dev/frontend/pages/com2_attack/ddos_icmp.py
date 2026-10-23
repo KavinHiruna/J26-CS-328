@@ -1,7 +1,13 @@
 """
-DDoS ICMP Flood — Explainable AI dashboard (Component 2, Edge-IIoTset).
-Built on the same structure as ddos_http.py; the flood evidence is ICMP-specific
-(packet rate to the target, distinct sources, source concentration).
+DDoS Network Flood — Explainable AI dashboard (Component 2, Edge-IIoTset): TCP SYN · UDP · ICMP.
+
+The Network Flood UI, merged with the former ICMP-only page (file/package names keep "icmp" so
+existing links keep working: XAI IDS, port 8511). Same architecture as ddos_tcp.py (DDoS TCP SYN
+Flood): both pages share one layout and differ only in the PAGE block below and their backend
+package (DDoS_icmp detects all three network floods / DDoS_tcp detects TCP SYN only). Tabs:
+Incident XAI · Live Detection (Network Flood view + devices) · Packet Explanation ·
+★ XAI Consensus (Component-2 novelty) · Global Explainability · Model Performance.
+Device / sensor details come from backend/component2_xai/edge_devices.py.
 
 Location : dev/frontend/pages/com2_attack/ddos_icmp.py
 Backend  : dev/backend/component2_xai/DDoS_icmp
@@ -36,6 +42,8 @@ if str(BACKEND_DIR) not in sys.path:
 
 from component2_xai.DDoS_icmp import DDoSIcmpXAI, ModelNotTrainedError  # noqa: E402
 from component2_xai.DDoS_icmp import config as ddos_cfg                  # noqa: E402
+from component2_xai.DDoS_icmp.data_loader import repair_shifted           # noqa: E402
+from component2_xai import edge_devices as devices                       # noqa: E402
 
 # --------------------------------------------------------------------------- #
 # Theme — keep every colour/style decision here so it can be aligned with the
@@ -58,6 +66,18 @@ THEME = {
     "sidebar_text": "#ffffff",
 }
 ATTACK, NORMAL = ddos_cfg.CLASS_NAMES[1], ddos_cfg.CLASS_NAMES[0]
+
+# --------------------------------------------------------------------------- #
+# PAGE — what this dashboard detects (everything else is shared with the sister page)
+# --------------------------------------------------------------------------- #
+FLOOD = ddos_cfg.CLASS_NAMES[1]                    # e.g. "DDoS ICMP Flood"
+FLOOD_PROTO = ddos_cfg.FLOOD_PROTOCOL              # short name: "TCP SYN", "network", ...
+FLOOD_SET = list(getattr(ddos_cfg, "FLOOD_PROTOCOLS", [FLOOD_PROTO]))   # protocol() values of its packets
+FLOOD_SHORT = f"{FLOOD_PROTO} flood"
+PAGE_ICON = "📡"
+HERO_TEXT = ("Detects network-level floods — TCP SYN, UDP and ICMP (many spoofed sources → one target) — in IIoT "
+             "traffic and explains every verdict: which packet features drove the decision, which protocol is "
+             "flooding, how the target and its sensors are affected, and whether independent XAI methods agree.")
 CLASS_COLORS = {ATTACK: THEME["attack"], NORMAL: THEME["normal"]}
 
 
@@ -141,7 +161,7 @@ def section(title: str) -> None:
 # --------------------------------------------------------------------------- #
 # Data / model loading
 # --------------------------------------------------------------------------- #
-@st.cache_resource(show_spinner="Loading DDoS ICMP Flood model…")
+@st.cache_resource(show_spinner=f"Loading {FLOOD} model…")
 def load_xai() -> DDoSIcmpXAI:
     return DDoSIcmpXAI()
 
@@ -149,7 +169,7 @@ def load_xai() -> DDoSIcmpXAI:
 @st.cache_data(show_spinner="Loading dataset…")
 def read_csv(source: str | bytes, name: str) -> pd.DataFrame:
     """Read a CSV from a path or uploaded bytes once and cache it."""
-    return pd.read_csv(BytesIO(source) if isinstance(source, bytes) else source, low_memory=False, dtype=str)
+    return repair_shifted(pd.read_csv(BytesIO(source) if isinstance(source, bytes) else source, low_memory=False, dtype=str))
 
 
 def load_artifact(upload):
@@ -181,19 +201,148 @@ def score(_xai: DDoSIcmpXAI, _raw: pd.DataFrame, key: tuple) -> pd.DataFrame:
 # --------------------------------------------------------------------------- #
 # Tabs
 # --------------------------------------------------------------------------- #
-def tab_detection(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> None:
+FLOOD_PROTOCOLS = ["TCP SYN", "UDP", "ICMP"]
+PROTO_COLORS = {"TCP SYN": "#ff4d6d", "UDP": "#ffb703", "ICMP": "#c77dff", "TCP": "#4cc9f0", "other": "#8a96b8"}
+
+
+def network_flood_view(raw: pd.DataFrame, scored: pd.DataFrame, secs: pd.Series, ind: dict) -> None:
+    """Spec 'Network Flood UI': live packets/s, SYN vs SYN-ACK ratio, top source IPs, protocol breakdown."""
+    section("Network flood view — packets per second, SYN vs SYN-ACK, sources and protocols")
+    proto = scored["protocol"]
+    flagged = scored["is_attack"]
+    src = raw["ip.src_host"].astype(str) if "ip.src_host" in raw.columns else pd.Series("", index=raw.index)
+    synack = (raw["tcp.connection.synack"].astype(str).str.startswith("1") if "tcp.connection.synack" in raw.columns
+              else pd.Series(False, index=raw.index))
+    minute = (secs // 60) * 60
+    no_time = int((flagged & secs.isna()).sum())
+
+    left, right = st.columns([1.6, 1])
+    with left:
+        f = pd.DataFrame({"minute": minute[flagged], "protocol": proto[flagged]}).dropna()
+        pps = f.groupby(["minute", "protocol"]).size().div(60).rename("pps").reset_index()
+        total = minute.dropna().value_counts().sort_index().div(60)
+        fig = go.Figure()
+        for p in [x for x in FLOOD_PROTOCOLS + ["TCP", "other"] if x in set(pps["protocol"])]:
+            d = pps[pps["protocol"] == p].sort_values("minute")
+            fig.add_trace(go.Scatter(x=d["minute"].map(lambda m: _hhmmss(m)[:5]), y=d["pps"], mode="lines",
+                                     stackgroup="flagged", name=f"flagged {p}", line=dict(width=0.5, color=PROTO_COLORS[p])))
+        fig.add_trace(go.Scatter(x=[_hhmmss(m)[:5] for m in total.index], y=total.values, mode="lines",
+                                 name="all traffic", line=dict(color=THEME["muted"], width=1, dash="dot")))
+        fig.update_layout(title="Live packets per second (per-minute average)", xaxis_title="time of day",
+                          yaxis_title="packets / s")
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
+        if no_time:
+            st.caption(f"{no_time:,} flagged packets have no timestamp (the export shifted those rows — "
+                       "mostly the UDP flood); they are counted in the breakdowns but not in this chart.")
+    with right:
+        sa = pd.DataFrame({"minute": minute, "SYN": proto == "TCP SYN", "SYN-ACK": synack}).dropna()
+        per = sa.groupby("minute")[["SYN", "SYN-ACK"]].sum()
+        per = per[(per["SYN"] > 0) | (per["SYN-ACK"] > 0)]
+        fig = go.Figure()
+        for name, color in (("SYN", PROTO_COLORS["TCP SYN"]), ("SYN-ACK", THEME["normal"])):
+            fig.add_trace(go.Scatter(x=[_hhmmss(m)[:5] for m in per.index], y=per[name], mode="lines", name=name,
+                                     line=dict(color=color, width=2)))
+        ratio = ind["syn_synack_ratio"]
+        fig.update_layout(title=f"SYN vs SYN-ACK per minute (overall ratio {ratio:.1f} : 1)"
+                          if np.isfinite(ratio) else "SYN vs SYN-ACK per minute", xaxis_title="time of day",
+                          yaxis_title="packets / minute")
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
+        st.caption("A healthy server answers most SYNs with a SYN-ACK; many SYNs without SYN-ACKs means "
+                   "half-open connections piling up (SYN flood).")
+
+    left, right = st.columns([1, 1])
+    with left:
+        top = src[flagged].value_counts().head(8).index
+        d = pd.DataFrame({"src": src[flagged], "protocol": proto[flagged]})
+        d = d[d["src"].isin(top)].groupby(["src", "protocol"]).size().rename("packets").reset_index()
+        fig = px.bar(d, x="packets", y="src", color="protocol", orientation="h", color_discrete_map=PROTO_COLORS,
+                     category_orders={"src": list(top)}, title="Top source IPs (flagged packets)")
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
+        st.caption(f"{ind['distinct_sources_flagged']:,} distinct sources; the busiest sends "
+                   f"{ind['source_concentration']:.1%} of flagged packets — spoofed floods spread over many sources.")
+    with right:
+        order = [p for p in FLOOD_PROTOCOLS + ["TCP", "other"] if p in set(proto)]
+        b = pd.DataFrame({"protocol": order,
+                          "all traffic": [int((proto == p).sum()) for p in order],
+                          "flagged": [int((proto[flagged] == p).sum()) for p in order]}).melt(
+            id_vars="protocol", var_name="set", value_name="packets")
+        fig = px.bar(b, x="packets", y="protocol", color="set", barmode="group", orientation="h", text="packets",
+                     color_discrete_map={"all traffic": THEME["normal"], "flagged": THEME["attack"]},
+                     category_orders={"protocol": order}, title="Protocol breakdown")
+        fig.update_traces(texttemplate="%{text:,}", textposition="outside", cliponaxis=False)
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
+
+
+def flood_targets(raw: pd.DataFrame, scored: pd.DataFrame) -> pd.Series:
+    """Victim of each packet: its destination, or its source when a known device is replying to a stranger."""
+    src = raw["ip.src_host"].astype(str).str.strip() if "ip.src_host" in raw.columns else pd.Series("", index=raw.index)
+    dst = raw["ip.dst_host"].astype(str).str.strip() if "ip.dst_host" in raw.columns else pd.Series("", index=raw.index)
+    known = set(devices.inventory()["ip"]) if len(devices.inventory()) else set()
+    reply = src.isin(known) & ~dst.isin(known)
+    return dst.where(~reply, src)
+
+
+def devices_under_attack(raw: pd.DataFrame, scored: pd.DataFrame) -> None:
+    """Which Edge-IIoT devices / sensors the flagged traffic hits (device inventory from edge_devices.py)."""
+    section("Devices & sensors under attack")
+    flagged = scored["is_attack"]
+    if not flagged.any():
+        st.info("No packets are flagged at the current threshold.")
+    else:
+        src = raw["ip.src_host"].astype(str) if "ip.src_host" in raw.columns else pd.Series("", index=raw.index)
+        tgt = flood_targets(raw, scored)
+        g = (pd.DataFrame({"target": tgt[flagged], "src": src[flagged]})
+             .groupby("target").agg(flagged_packets=("src", "size"), distinct_sources=("src", "nunique"))
+             .sort_values("flagged_packets", ascending=False).head(8).reset_index())
+        info = [devices.describe(ip) for ip in g["target"]]
+        g["device"] = [d["device"] for d in info]
+        g["layer / role"] = [d["role"] for d in info]
+        g["sensors at risk"] = [", ".join(d["dependent_sensors"]) or "—" for d in info]
+        top = info[0]
+        st.markdown(f'<div class="xai-card"><div class="label">MOST ATTACKED DEVICE</div>'
+                    f'<div class="value" style="color:{THEME["attack"]};font-size:1.25rem">{top["ip"]} — '
+                    f'{top["device"].split(" · ")[0]}</div>'
+                    f'<div class="sub">{top["protocols"] or top["role"]}'
+                    + (f' · telemetry of <b>{", ".join(top["dependent_sensors"])}</b> passes through it — a flood can '
+                       f'delay or drop those sensor readings' if top["dependent_sensors"] else "")
+                    + "</div></div>", unsafe_allow_html=True)
+        st.dataframe(g[["target", "device", "layer / role", "flagged_packets", "distinct_sources", "sensors at risk"]],
+                     width="stretch", hide_index=True)
+    with st.expander("Edge-IIoTset device / sensor inventory (learned from the per-sensor captures)"):
+        st.dataframe(devices.inventory(), width="stretch", hide_index=True)
+
+
+def device_context(ctx: dict) -> None:
+    """Device cards for one incident: who is attacked, who (claims to) send it."""
+    section("Device & sensor context")
+    tgt = devices.describe(ctx.get("target", ctx["dst"]))
+    src = devices.describe(ctx["peer"] if ctx.get("flood") else ctx["src"])
+    c1, c2 = st.columns(2)
+    with c1:
+        card("Target device", tgt["device"].split(" · ")[0], f"{tgt['ip']} · {tgt['role']}",
+             THEME["attack"] if tgt["known"] else None)
+        if tgt["dependent_sensors"]:
+            st.caption("Sensors whose MQTT telemetry goes through this device: **"
+                       + ", ".join(tgt["dependent_sensors"]) + "**")
+    with c2:
+        card("Source", src["device"].split(" · ")[0], f"{src['ip']}" + (f" · {src['role']}" if src["known"] else ""))
+
+
+def tab_detection(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, data_key: tuple) -> None:
     ind = xai.flood_indicators(raw, scored)
+    fb = ind["flagged_by_protocol"]
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         card("Packets analysed", f"{ind['packets']:,}")
     with c2:
-        card("Flagged as ICMP flood", f"{ind['flagged']:,}", f"{ind['flagged_ratio']:.1%} of traffic", THEME["attack"])
+        card(f"Flagged as {FLOOD_SHORT}", f"{ind['flagged']:,}", f"{ind['flagged_ratio']:.1%} of traffic", THEME["attack"])
     with c3:
-        card("ICMP packets", f"{ind['icmp_ratio']:.1%}", f"{ind['icmp_packets']:,} packets carry ICMP fields")
+        card("Flagged by protocol", " · ".join(f"{fb.get(p, 0):,}" for p in FLOOD_PROTOCOLS),
+             " · ".join(FLOOD_PROTOCOLS))
     with c4:
-        card("Flagged sources", f"{ind['distinct_sources_flagged']:,}",
-             f"busiest sends {ind['source_concentration']:.1%} → "
-             f"{'distributed (DDoS)' if ind['source_concentration'] < 0.2 else 'concentrated (DoS)'}")
+        r = ind["syn_synack_ratio"]
+        card("SYN : SYN-ACK", f"{r:.1f} : 1" if np.isfinite(r) else "∞",
+             f"{ind['syn']:,} SYN · {ind['synack']:,} SYN-ACK", THEME["attack"] if r > 3 else THEME["normal"])
     with c5:
         acc = None
         if "actual" in scored.columns:
@@ -201,6 +350,10 @@ def tab_detection(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
         card("Agreement with labels", f"{acc:.1%}" if acc is not None else "—",
              "dataset labels present" if acc is not None else "no labels in file", THEME["normal"])
 
+    network_flood_view(raw, scored, seconds_of_day(raw, data_key), ind)
+    devices_under_attack(raw, scored)
+
+    section("Model verdicts")
     left, right = st.columns([1, 2])
     with left:
         level = ind["flagged_ratio"] * 100
@@ -226,24 +379,14 @@ def tab_detection(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
         fig.add_hline(y=xai.threshold, line_dash="dash", line_color=THEME["warn"],
                       annotation_text="threshold")
         fig.update_layout(title="Attack probability per packet", xaxis_title="packet #",
-                          yaxis_title="P(ICMP flood)", yaxis_range=[0, 1.02])
+                          yaxis_title=f"P({FLOOD_SHORT})", yaxis_range=[0, 1.02])
         st.plotly_chart(style_fig(fig, 300), use_container_width=True)
 
-    c1, c2, c3 = st.columns(3)
+    c1, c3 = st.columns(2)
     with c1:
         fig = px.histogram(scored, x="attack_probability", color="prediction", nbins=40,
                            color_discrete_map=CLASS_COLORS, title="Probability distribution")
         st.plotly_chart(style_fig(fig, 320), use_container_width=True)
-    with c2:
-        if ind["top_flagged_sources"]:
-            src = pd.DataFrame({"source": list(ind["top_flagged_sources"].keys()),
-                                "packets": list(ind["top_flagged_sources"].values())})
-            fig = px.bar(src, x="packets", y="source", orientation="h", title="Top flagged source IPs",
-                         color_discrete_sequence=[THEME["attack"]])
-            fig.update_yaxes(categoryorder="total ascending")
-            st.plotly_chart(style_fig(fig, 320, legend=False), use_container_width=True)
-        else:
-            st.info("No packets flagged — no source IPs to rank.")
     with c3:
         # Bars, not a donut: one level usually dominates and tiny slices' labels collide.
         levels = ["Low", "Elevated", "High", "Critical"]
@@ -269,7 +412,7 @@ def tab_detection(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
         view.drop(columns=["is_attack"]),
         use_container_width=True, height=360,
         column_config={"attack_probability": st.column_config.ProgressColumn(
-            "P(ICMP flood)", min_value=0.0, max_value=1.0, format="%.3f")},
+            f"P({FLOOD_SHORT})", min_value=0.0, max_value=1.0, format="%.3f")},
     )
     st.download_button("Download verdicts (CSV)", view.to_csv().encode(), "ddos_icmp_verdicts.csv", "text/csv")
 
@@ -293,7 +436,7 @@ def waterfall(exp: dict) -> go.Figure:
                   annotation_text=f"base {exp['base_value']:.2f}")
     fig.add_vline(x=exp["probability"], line_dash="dash", line_color=THEME["warn"],
                   annotation_text=f"output {exp['probability']:.2f}")
-    fig.update_layout(title=f"{exp['method']} — contribution to P(ICMP flood)", xaxis_title="probability")
+    fig.update_layout(title=f"{exp['method']} — contribution to P({FLOOD_SHORT})", xaxis_title="probability")
     return fig
 
 
@@ -350,7 +493,7 @@ def tab_local(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: 
                 w = pd.DataFrame(lime["weights"])[::-1]
                 fig = go.Figure(go.Bar(x=w["weight"], y=w["rule"], orientation="h",
                                        marker_color=[THEME["attack"] if v > 0 else THEME["normal"] for v in w["weight"]]))
-                fig.update_layout(title="LIME — local rule weights towards ICMP flood")
+                fig.update_layout(title=f"LIME — local rule weights towards {FLOOD_SHORT}")
                 st.plotly_chart(style_fig(fig, 460, legend=False), use_container_width=True)
         else:
             section("Global surrogate decision path for this packet")
@@ -364,7 +507,7 @@ def tab_local(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_k: 
     tbl = pd.DataFrame([{
         "feature": c["feature"], "meaning": c["description"], "this packet": c["value"],
         "typical normal": xai.encoder.decode_value(c["feature"], c["normal_median"]),
-        "typical ICMP flood": xai.encoder.decode_value(c["feature"], c["attack_median"]),
+        f"typical {FLOOD_SHORT}": xai.encoder.decode_value(c["feature"], c["attack_median"]),
         "contribution": c["contribution"],
     } for c in exp["contributions"]])
     st.dataframe(tbl, use_container_width=True, hide_index=True,
@@ -412,7 +555,7 @@ def tab_global(xai: DDoSIcmpXAI, top_k: int) -> None:
         fig.update_yaxes(tickvals=list(range(len(feats))), ticktext=feats, autorange="reversed")
         fig.add_vline(x=0, line_color=THEME["muted"])
         fig.update_layout(title="Attribution beeswarm (each dot = one packet; colour = feature value)",
-                          xaxis_title="contribution to P(ICMP flood)")
+                          xaxis_title=f"contribution to P({FLOOD_SHORT})")
         st.plotly_chart(style_fig(fig, 440, legend=False), use_container_width=True)
 
     section("Do the importance methods agree?")
@@ -593,7 +736,7 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
                 <span class="label">{name}</span>
                 <span style="float:right;color:{col};font-weight:700">{ATTACK if v else NORMAL} {agree}</span>
                 </div>""", unsafe_allow_html=True)
-        st.caption(f"Random Forest P(ICMP flood) = {cons['probability']:.3f}")
+        st.caption(f"Random Forest P({FLOOD_SHORT}) = {cons['probability']:.3f}")
 
     rank = pd.DataFrame(cons["ranking"])
     if not rank.empty:
@@ -605,7 +748,7 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
                 z=z, x=feats, y=[labels[m] for m in cons["methods"]], zmid=0, zmin=-1, zmax=1,
                 colorscale=[[0, THEME["normal"]], [0.5, THEME["panel"]], [1, THEME["attack"]]],
                 text=np.round(z, 2), texttemplate="%{text}", colorbar=dict(title="→ flood", thickness=10)))
-            fig.update_layout(title="Normalised attribution per method (red → ICMP flood, teal → Normal)")
+            fig.update_layout(title=f"Normalised attribution per method (red → {FLOOD_SHORT}, teal → Normal)")
             st.plotly_chart(style_fig(fig, 330, legend=False), use_container_width=True)
         with c2:
             section("Consensus explanation")
@@ -721,51 +864,49 @@ def seconds_of_day(_raw: pd.DataFrame, key: tuple) -> pd.Series:
     return hms[0].astype(float) * 3600 + hms[1].astype(float) * 60 + hms[2].astype(float)
 
 
-def icmp_mask(raw: pd.DataFrame) -> pd.Series:
-    """Packets carrying ICMP fields (same rule as the backend labels)."""
-    m = pd.Series(False, index=raw.index)
-    for c in ddos_cfg.ICMP_COLS:
-        if c in raw.columns:
-            m |= ~raw[c].astype(str).str.strip().isin(["", "0", "0.0", "nan"])
-    return m
-
-
 def flood_context(raw: pd.DataFrame, scored: pd.DataFrame, secs: pd.Series, idx) -> dict:
     """Traffic around one incident: is its target being hit by many sources at a flood-like rate?
 
-    An ICMP DDoS is many (often spoofed) sources -> one target, so the evidence is the packet
-    rate to the target, how many distinct sources send it, and how concentrated they are.
+    A network DDoS is many (often spoofed) sources -> one target over one protocol, so the evidence
+    is the packet rate to the target, how many distinct sources send it and how concentrated they
+    are; for a TCP SYN flood also how few SYNs the target answers with SYN-ACK.
     """
     def col(name):
         return raw[name].astype(str).str.strip() if name in raw.columns else pd.Series("", index=raw.index)
 
-    src, dst = col("ip.src_host"), col("ip.dst_host")
-    icmp = icmp_mask(raw)
-    if not icmp[idx]:
-        return {"icmp": False, "src": src[idx], "dst": dst[idx], "time": secs[idx], "series": pd.DataFrame(),
-                "src_flagged": float(scored.loc[src == src[idx], "is_attack"].mean())}
-    # the target is the endpoint of this packet that receives the most ICMP traffic (handles replies too)
-    received = dst[icmp].value_counts()
+    src, dst, proto = col("ip.src_host"), col("ip.dst_host"), scored["protocol"]
+    p = proto[idx]
+    base = {"src": src[idx], "dst": dst[idx], "protocol": p, "time": secs[idx],
+            "src_flagged": float(scored.loc[src == src[idx], "is_attack"].mean())}
+    if p not in FLOOD_PROTOCOLS:
+        return {**base, "flood": False, "series": pd.DataFrame()}
+    same = proto == p
+    synack = col("tcp.connection.synack").str.startswith("1")
+    # the target is the endpoint of this packet that receives the most traffic of this protocol (handles replies)
+    received = dst[same].value_counts()
     target = src[idx] if received.get(src[idx], 0) > received.get(dst[idx], 0) else dst[idx]
-    direction = "reply from target" if src[idx] == target else "request to target"
-    to_t, from_t = icmp & (dst == target), icmp & (src == target)
+    direction = "reply from target" if src[idx] == target else "packet to target"
+    to_t = same & (dst == target)
+    from_t = (src == target) & (same | synack if p == "TCP SYN" else same)
     t0 = secs[idx]
-    near = ((secs - t0).abs() <= FLOOD_WINDOW_S) if pd.notna(t0) else pd.Series(False, index=raw.index)
+    timed = pd.notna(t0)
+    near = ((secs - t0).abs() <= FLOOD_WINDOW_S) if timed else pd.Series(True, index=raw.index)
     win_to = to_t & near
     win_src = src[win_to].value_counts()
     peer = dst[idx] if src[idx] == target else src[idx]
     return {
-        "icmp": True, "src": src[idx], "dst": dst[idx], "target": target, "direction": direction, "peer": peer,
-        "time": t0, "to_target": int(to_t.sum()), "from_target": int(from_t.sum()),
+        **base, "flood": True, "timed": timed, "target": target, "direction": direction, "peer": peer,
+        "to_target": int(to_t.sum()), "from_target": int(from_t.sum()),
         "sources_to_target": int(src[to_t].nunique()),
         "peer_packets": int((to_t & (src == peer)).sum()),
-        "window_to_target": int(win_to.sum()), "window_rate_s": float(win_to.sum()) / (2 * FLOOD_WINDOW_S),
+        "window_to_target": int(win_to.sum()),
+        "window_rate_s": float(win_to.sum()) / (2 * FLOOD_WINDOW_S) if timed else None,
         "window_sources": int(len(win_src)),
         "window_concentration": float(win_src.iloc[0] / win_to.sum()) if win_to.any() else 0.0,
         "window_flagged": float(scored.loc[win_to, "is_attack"].mean()) if win_to.any() else 0.0,
-        "src_flagged": float(scored.loc[src == src[idx], "is_attack"].mean()),
+        "window_synack": int((near & (src == target) & synack).sum()) if p == "TCP SYN" else None,
         "series": pd.DataFrame({"t": secs[to_t | from_t], "src": src[to_t | from_t],
-                                "kind": np.where(to_t[to_t | from_t], "to target", "replies from target")}),
+                                "kind": np.where(to_t[to_t | from_t], "to target", "from target")}),
     }
 
 
@@ -777,7 +918,12 @@ def incident_priority(p: float, is_attack: bool, trust: str) -> tuple[str, str]:
         return "Critical", ""
     if p >= 0.8:
         return "High", "The model is confident but the XAI methods disagree — confirm with the traffic context before blocking."
-    return "Medium", "Borderline score — corroborate with the target's ICMP rate and source spread before acting."
+    return "Medium", "Borderline score — corroborate with the target's packet rate and source spread before acting."
+
+
+def _a(word: str) -> str:
+    """English article: 'an ICMP', 'a TCP SYN', 'a UDP'."""
+    return ("an " if word[:1].upper() in "AEIO" else "a ") + word   # "a UDP" (you-sound), "an ICMP"
 
 
 def _hhmmss(s: float) -> str:
@@ -798,10 +944,10 @@ def tab_incident(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_
         st.session_state["icmp_incident_select"] = incoming
 
     # --- filter toggle, search box, incident dropdown
-    only_icmp = st.toggle("Show only ICMP packets", True, key="icmp_only_icmp",
-                          help="Fast pre-filter to find interesting incidents (an ICMP flood is made of ICMP "
-                               "echo packets). It is not a classifier.")
-    view = scored[icmp_mask(raw)] if only_icmp else scored
+    only_flood = st.toggle(f"Show only {' · '.join(FLOOD_SET)} packets", True, key="icmp_only_flood_proto",
+                           help=f"Fast pre-filter to find interesting incidents (a {FLOOD_SHORT} is made of "
+                                f"{' / '.join(FLOOD_SET)} packets). It is not a classifier.")
+    view = scored[scored["protocol"].isin(FLOOD_SET)] if only_flood else scored
     view = view.sort_values("attack_probability", ascending=False)
     search = st.text_input("Search Incident ID (optional)", key="icmp_incident_search",
                            placeholder="e.g. ALR-035871")
@@ -849,7 +995,7 @@ def tab_incident(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_
         card("Model prediction", exp["prediction"], f"dataset label: {actual}" if actual else "no label in file",
              THEME["attack"] if is_att else THEME["normal"])
     with k2:
-        card("P(ICMP flood)", f"{exp['probability']:.1%}", f"threshold {xai.threshold:.2f}")
+        card(f"P({FLOOD_SHORT})", f"{exp['probability']:.1%}", f"threshold {xai.threshold:.2f}")
     with k3:
         card("Analyst priority", level, f"source flagged {ctx['src_flagged']:.0%} of the time", PRIORITY_COLORS[level])
     with k4:
@@ -858,16 +1004,28 @@ def tab_incident(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_
         st.warning(note)
 
     # --- analyst summary
-    if ctx["icmp"]:
-        spread = ("a distributed, spoofed-source pattern typical of an ICMP DDoS"
+    if ctx["flood"]:
+        p = ctx["protocol"]
+        spread = (f"a distributed, spoofed-source pattern typical of {_a(p)} DDoS"
                   if ctx["window_concentration"] < 0.2 else "a concentrated pattern (few senders)")
-        context_txt = (f" This packet is an ICMP {ctx['direction']} **{ctx['target']}**. Within ±{FLOOD_WINDOW_S}s "
-                       f"the target received **{ctx['window_to_target']:,} ICMP packets** (≈{ctx['window_rate_s']:.1f}/s) "
-                       f"from **{ctx['window_sources']:,} distinct sources**; the busiest sent only "
-                       f"{ctx['window_concentration']:.2%} — {spread}. The peer **{ctx['peer']}** itself sent "
-                       f"{ctx['peer_packets']:,} ICMP packet(s) to the target in the dataset.")
+        where = (f"Within ±{FLOOD_WINDOW_S}s the target received **{ctx['window_to_target']:,} {p} packets** "
+                 f"(≈{ctx['window_rate_s']:.1f}/s)" if ctx["timed"] else
+                 f"This packet has no timestamp (shifted export row); over the capture the target received "
+                 f"**{ctx['window_to_target']:,} {p} packets**")
+        synack_txt = (f" It answered only **{ctx['window_synack']:,} SYN-ACKs** in that window — half-open connections "
+                      "pile up." if p == "TCP SYN" and ctx["timed"] else "")
+        context_txt = (f" This packet is {_a(p)} {ctx['direction']} **{ctx['target']}**. {where} from "
+                       f"**{ctx['window_sources']:,} distinct sources**; the busiest sent only "
+                       f"{ctx['window_concentration']:.2%} — {spread}.{synack_txt} The peer **{ctx['peer']}** itself "
+                       f"sent {ctx['peer_packets']:,} {p} packet(s) to the target.")
     else:
-        context_txt = f" This packet carries no ICMP fields ({ctx['src']} → {ctx['dst']})."
+        context_txt = (f" This packet is {ctx['protocol']} traffic ({ctx['src']} → {ctx['dst']}), "
+                       "not one of the flood protocols (TCP SYN · UDP · ICMP).")
+    tdev = devices.describe(ctx.get("target", ctx["dst"]))
+    if ctx.get("flood") and tdev["known"]:
+        context_txt += f" The target is the **{tdev['device'].split(' · ')[0]}**"
+        context_txt += (f"; telemetry of **{', '.join(tdev['dependent_sensors'])}** passes through it, so the flood "
+                        "can delay or drop those sensor readings." if tdev["dependent_sensors"] else ".")
     st.markdown(f'<div class="xai-card" style="line-height:1.6"><div class="label">ANALYST SUMMARY</div>'
                 f'<div style="margin-top:6px">{_md_bold(exp["narrative"] + context_txt)}</div>'
                 f'<div style="margin-top:8px;color:{THEME["muted"]}">{cons["recommendation"]}</div></div>',
@@ -881,37 +1039,47 @@ def tab_incident(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, top_
         st.dataframe(pd.DataFrame([{
             "feature": c["feature"], "meaning": c["description"], "this incident": c["value"],
             "typical normal": xai.encoder.decode_value(c["feature"], c["normal_median"]),
-            "typical ICMP flood": xai.encoder.decode_value(c["feature"], c["attack_median"]),
+            f"typical {FLOOD_SHORT}": xai.encoder.decode_value(c["feature"], c["attack_median"]),
             "contribution": c["contribution"]} for c in exp["contributions"]]),
             width="stretch", hide_index=True,
             column_config={"contribution": st.column_config.NumberColumn(format="%+.4f")})
     with right:
+        device_context(ctx)
         section("Flood evidence — is the target hit by many sources at once?")
-        if ctx["icmp"]:
+        if ctx["flood"]:
+            p = ctx["protocol"]
+            span = f"±{FLOOD_WINDOW_S}s" if ctx["timed"] else "in capture"
             e1, e2, e3 = st.columns(3)
             with e1:
-                card(f"ICMP to target ±{FLOOD_WINDOW_S}s", f"{ctx['window_to_target']:,}",
-                     f"≈{ctx['window_rate_s']:.1f} packets/s → {ctx['target']}")
+                card(f"{p} to target {span}", f"{ctx['window_to_target']:,}",
+                     (f"≈{ctx['window_rate_s']:.1f} packets/s → {ctx['target']}" if ctx["timed"]
+                      else f"→ {ctx['target']} (no timestamp)"))
             with e2:
-                card("Distinct sources", f"{ctx['window_sources']:,}",
-                     f"in the window · {ctx['sources_to_target']:,} overall")
+                card("Distinct sources", f"{ctx['window_sources']:,}", f"{span} · {ctx['sources_to_target']:,} overall")
             with e3:
-                card("Busiest source share", f"{ctx['window_concentration']:.2%}",
-                     "low = distributed (DDoS)", THEME["attack"] if ctx["window_concentration"] < 0.2 else THEME["warn"])
+                if p == "TCP SYN" and ctx["timed"]:
+                    card(f"SYN-ACK from target {span}", f"{ctx['window_synack']:,}",
+                         f"vs {ctx['window_to_target']:,} SYN in", THEME["attack"])
+                else:
+                    card("Busiest source share", f"{ctx['window_concentration']:.2%}", "low = distributed (DDoS)",
+                         THEME["attack"] if ctx["window_concentration"] < 0.2 else THEME["warn"])
             s = ctx["series"].dropna(subset=["t"])
             if not s.empty:
                 s = s.assign(minute=(s["t"] // 60) * 60)
                 per_min = s.groupby(["minute", "kind"]).size().reset_index(name="packets")
                 per_min["clock"] = per_min["minute"].map(lambda m: _hhmmss(m)[:5])
                 fig = px.bar(per_min, x="clock", y="packets", color="kind",
-                             color_discrete_map={"to target": THEME["attack"], "replies from target": THEME["accent"]},
-                             title=f"ICMP packets per minute to / from {ctx['target']}")
+                             color_discrete_map={"to target": THEME["attack"], "from target": THEME["accent"]},
+                             title=f"{p} packets per minute to / from {ctx['target']}"
+                                   + (" (incl. SYN-ACK replies)" if p == "TCP SYN" else ""))
                 if pd.notna(ctx["time"]):
                     fig.add_vline(x=_hhmmss((ctx["time"] // 60) * 60)[:5], line_dash="dash", line_color=THEME["warn"])
                 fig.update_layout(bargap=0.15, xaxis_title="time of day (dataset is a sample, rates are approximate)")
                 st.plotly_chart(style_fig(fig, 300), width="stretch")
+            elif not ctx["timed"]:
+                st.caption("These packets have no timestamps in the export, so no per-minute chart is possible.")
         else:
-            st.info("This packet carries no ICMP fields, so there is no ICMP flood context for it.")
+            st.info("This packet is not TCP SYN, UDP or ICMP, so there is no network-flood context for it.")
 
         section("Do the XAI methods agree?")
         comp = cons["components"]
@@ -953,25 +1121,25 @@ def _md_bold(text: str) -> str:
 
 def main() -> None:
     try:
-        st.set_page_config(page_title="DDoS ICMP Flood XAI", page_icon="📡", layout="wide")
+        st.set_page_config(page_title=f"{FLOOD} XAI (TCP SYN · UDP · ICMP)", page_icon=PAGE_ICON, layout="wide")
     except Exception:
         pass  # already set by the multipage app
     inject_styles()
 
-    st.markdown("""<div class="xai-hero">
+    st.markdown(f"""<div class="xai-hero">
         <span class="xai-badge">Component 2 · Attack XAI</span><span class="xai-badge">Edge-IIoTset</span>
+        <span class="xai-badge">Network Flood UI</span>
         <span class="xai-badge">Random Forest + SHAP · LIME · Surrogate</span>
-        <h1>📡 DDoS ICMP Flood — Explainable Detection</h1>
-        <p>Detects ICMP echo-flood packets (many spoofed sources → one target) in IIoT traffic and explains every verdict:
-           which packet features drove the decision, how they compare to normal traffic,
-           and the global rules the model learned.</p></div>""", unsafe_allow_html=True)
+        <span class="xai-badge">★ Novelty: Multi-method XAI Consensus</span>
+        <h1>{PAGE_ICON} {FLOOD} — Explainable Detection <span style="font-size:1.1rem;opacity:.75">TCP SYN · UDP · ICMP</span></h1>
+        <p>{HERO_TEXT}</p></div>""", unsafe_allow_html=True)
 
     try:
         xai = load_xai()
     except ModelNotTrainedError as e:
-        st.error("The DDoS ICMP Flood model has not been trained yet.")
+        st.error(f"The {FLOOD} model has not been trained yet.")
         st.code(str(e).split("Run:")[-1].strip() if "Run:" in str(e) else str(e), language="bash")
-        st.markdown("Training data must include Edge-IIoTset **`DDoS_ICMP_Flood_attack.csv`** "
+        st.markdown("Training data must include Edge-IIoTset network-flood CSVs (**`DDoS_TCP_SYN`**, **`DDoS_UDP`**, **`DDoS_ICMP`**) "
                     "(or `DNN-EdgeIIoT-dataset.csv`) plus normal-traffic CSVs.")
         st.stop()
 
@@ -979,7 +1147,7 @@ def main() -> None:
     with st.sidebar:
         st.header("Inputs")
         data_up = st.file_uploader("Dataset CSV (optional)", type=["csv"], key="icmp_data")
-        model_up = st.file_uploader("Trained DDoS ICMP model (.joblib / .pkl)",
+        model_up = st.file_uploader(f"Trained {FLOOD} model (.joblib / .pkl)",
                                     type=["joblib", "pkl", "pickle"], key="icmp_model")
         enc_up = st.file_uploader("Feature encoder (.joblib, optional)",
                                   type=["joblib", "pkl", "pickle"], key="icmp_encoder")
@@ -993,7 +1161,7 @@ def main() -> None:
         use_lime = st.toggle("Compute LIME", xai.capabilities["lime"], key="icmp_use_lime",
                              disabled=not xai.capabilities["lime"])
         threshold = st.slider("Decision threshold", 0.1, 0.9, 0.5, 0.05, key="icmp_threshold",
-                              help="Packets with P(ICMP flood) ≥ threshold are flagged.")
+                              help=f"Packets with P({FLOOD_SHORT}) ≥ threshold are flagged.")
         top_k = st.slider("Features shown in explanations", 5, 20, 10, key="icmp_topk")
 
     # ------------------------------------------------------------ dataset
@@ -1020,7 +1188,7 @@ def main() -> None:
 
     classes = list(getattr(model, "classes_", [0, 1]))
     with st.sidebar:
-        attack_class = st.selectbox("Class that means 'DDoS ICMP flood / attack'", classes,
+        attack_class = st.selectbox(f"Class that means '{FLOOD_SHORT} / attack'", classes,
                                     index=classes.index(1) if 1 in classes else len(classes) - 1,
                                     key="icmp_attack_class")
 
@@ -1049,7 +1217,7 @@ def main() -> None:
     with t0:
         tab_incident(xai, raw, scored, top_k, use_lime, signature)
     with t1:
-        tab_detection(xai, raw, scored)
+        tab_detection(xai, raw, scored, signature)
     with t2:
         tab_local(xai, raw, scored, top_k, use_lime)
     with t3:

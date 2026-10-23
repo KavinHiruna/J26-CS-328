@@ -1,5 +1,6 @@
 """
-Configuration for the DDoS ICMP Flood XAI component (Edge-IIoTset).
+Configuration for the DDoS Network Flood XAI component (TCP SYN · UDP · ICMP) - the package keeps the
+name DDoS_icmp so existing links (XAI IDS, port 8511) keep working (Edge-IIoTset).
 
 All paths are resolved relative to this file so the package works the same on
 Windows (D:\\4Y1S\\research\\J26-CS-328\\dev\\backend\\component2_xai\\DDoS_icmp)
@@ -31,19 +32,28 @@ BASELINE_PATH = ARTIFACTS_DIR / "class_baselines.json"
 LABEL_COL = "Attack_type"
 BINARY_LABEL_COL = "Attack_label"
 NORMAL_LABEL = "Normal"
-# Edge-IIoTset names the class "DDoS_ICMP"; matched case-insensitively.
-ATTACK_LABEL = "DDoS_ICMP"
-CLASS_NAMES = ["Normal", "DDoS ICMP Flood"]
+# Network floods (Edge-IIoTset classes DDoS_TCP, DDoS_UDP, DDoS_ICMP). This package detects the
+# floods listed in ATTACK_LABELS; the same code serves DDoS_tcp (TCP SYN) and DDoS_icmp (ICMP).
+ATTACK_LABELS = ["DDoS_TCP", "DDoS_UDP", "DDoS_ICMP"]
+ATTACK_LABEL = "DDoS_NETWORK"
+CLASS_NAMES = ["Normal", "DDoS Network Flood"]
+FLOOD_PROTOCOLS = ["TCP SYN", "UDP", "ICMP"]  # protocol() values of this flood's packets
+FLOOD_PROTOCOL = "network"                    # short name used in page text ("network flood")
+FLOOD_TYPE_NAMES = {"DDoS_TCP": "TCP SYN flood", "DDoS_UDP": "UDP flood", "DDoS_ICMP": "ICMP flood"}
 
-# Files with only the binary Attack_label (e.g. EdgeIIoT_train_80_with_incident_id.csv)
-# get Attack_type derived the same way as the HTTP-flood / SQLi labels: an attack row
-# is DDoS_ICMP when it carries ICMP fields and does not involve the scanner host.
-# In Edge-IIoTset the ICMP flood is ~10k echo packets from thousands of spoofed
-# sources to 192.168.0.128 (23:17-23:24) plus its replies; 192.168.0.170 only sends a
-# few hundred ICMP probes/timestamp requests while scanning (22:14-22:28), not a flood.
+# Files with only the binary Attack_label (e.g. EdgeIIoT_train_80_with_incident_id.csv) get
+# Attack_type derived from packet signatures, as for the HTTP-flood / SQLi labels:
+#   DDoS_ICMP : attack packet with ICMP fields, not involving the scanner host, valid timestamp
+#               (~10k spoofed echo packets to 192.168.0.128, 23:17-23:24, plus its replies)
+#   DDoS_UDP  : attack packet with UDP fields, not involving the scanner host
+#               (~11.5k spoofed packets to 192.168.0.128; the export lost their frame.time)
+#   DDoS_TCP  : attack SYN (SYN=1, ACK=0) from a host outside the testbed
+#               (4.8k spoofed one-packet sources to 192.168.0.128:80, 19:02-19:11).
+#               SYNs from 192.168.0.170 / .128 are handshakes of other traffic, not the flood.
 ICMP_COLS = ["icmp.checksum", "icmp.seq_le"]          # non-zero -> packet is ICMP
+UDP_COLS = ["udp.stream", "udp.port", "udp.time_delta"]
 SCANNER_HOSTS = {"192.168.0.170"}
-# ~1k rows of the export have shifted columns (frame.time holds an IP); they are left out.
+TESTBED_HOSTS = {"192.168.0.170", "192.168.0.128"}
 TIME_COL = "frame.time"
 OTHER_ATTACK_LABEL = "Other_attack"
 
@@ -78,6 +88,7 @@ FEATURE_DESCRIPTIONS = {
     "http.referer": "HTTP Referer header present/value",
     "http.tls_port": "Plain HTTP seen on a TLS port",
     "icmp.seq_le": "ICMP echo sequence number",
+    "udp.port": "UDP port",
     "icmp.unused": "ICMP unused/reserved field",
     "tcp.len": "TCP payload length (bytes)",
     "tcp.flags": "TCP flag bits (SYN/ACK/PSH/FIN…)",

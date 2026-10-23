@@ -1,5 +1,5 @@
 """
-Train the DDoS ICMP Flood detector and pre-compute global explanations.
+Train the DDoS Network Flood detector (TCP SYN · UDP · ICMP) and pre-compute global explanations.
 
 Usage (from dev/backend):
 
@@ -8,7 +8,7 @@ Usage (from dev/backend):
                "D:/datasets/Edge-IIoTset/Attack traffic/DDoS_ICMP_Flood_attack.csv"
 
 `--data` accepts files and/or folders (searched recursively for *.csv).
-Rows that are not Normal or DDoS_ICMP are ignored, so the combined
+Rows that are not Normal, DDoS_TCP, DDoS_UDP or DDoS_ICMP are ignored, so the combined
 DNN-EdgeIIoT-dataset.csv also works on its own.
 
 Outputs go to component2_xai/DDoS_icmp/artifacts/.
@@ -172,9 +172,9 @@ def train(data_paths: list[str], verbose: bool = True) -> dict:
 
 
 def main():
-    ap = argparse.ArgumentParser(description="Train DDoS ICMP Flood XAI model (Edge-IIoTset)")
+    ap = argparse.ArgumentParser(description="Train DDoS Network Flood XAI model (Edge-IIoTset)")
     ap.add_argument("--data", nargs="+", required=True,
-                    help="CSV files and/or folders with Normal and DDoS_ICMP rows")
+                    help="CSV files and/or folders with Normal and DDoS_TCP / DDoS_UDP / DDoS_ICMP rows")
     args = ap.parse_args()
     train(args.data)
 

@@ -43,6 +43,7 @@ SCREEN MAP - where each part of the page is in this code
 """
 from __future__ import annotations
 
+import importlib
 import json
 import os
 import re
@@ -65,6 +66,10 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 
 import sqli_xai_config as C  # noqa: E402   -> file paths + model loading
+
+# Streamlit only re-imports files next to this page; reload the (constants-only) backend
+# config each run so path changes there apply without restarting the server.
+importlib.reload(C)
 import sqli_xai_engine as X  # noqa: E402   -> SQLi evidence XAI (PSS, SHAP, LIME, trust)
 import sqli_xai_styles as S  # noqa: E402   -> colours, fonts, CSS
 import web_injection_xai as W  # noqa: E402 -> XSS / upload features, labels, inspector, techniques
@@ -92,6 +97,18 @@ RISK_COLORS = [THEME["good"], THEME["accent"], THEME["warn"], THEME["attack"]]
 TRUST_COLORS = {"High": THEME["good"], "Medium": THEME["warn"], "Low": THEME["attack"], "Not assessed": THEME["muted"]}
 IDS_URL = os.environ.get("XAI_IDS_URL", "http://127.0.0.1:5000").rstrip("/")
 
+# Tab labels: black text, no blue highlight (also when the label text gets selected).
+# Streamlit >= 1.6x renders tabs as data-testid="stTab"; older versions as data-baseweb="tab".
+TAB_CSS = """<style>
+[data-testid="stTabs"] [data-testid="stTab"], [data-testid="stTabs"] [data-testid="stTab"] *,
+[data-testid="stTabs"] [role="tab"], [data-testid="stTabs"] [role="tab"] *,
+.stTabs [data-baseweb="tab"], .stTabs [data-baseweb="tab"] * {color:#000 !important;background:transparent !important}
+[data-testid="stTabs"] [role="tab"] *::selection, .stTabs [data-baseweb="tab"] *::selection
+  {color:#000 !important;background:transparent !important}
+[data-testid="stTabs"] [role="tab"][aria-selected="true"] p, .stTabs [data-baseweb="tab"][aria-selected="true"] p
+  {font-weight:700}
+</style>"""
+
 NOVELTY_CSS = f"""<style>
 .xai-novelty {{background:{S.COLORS["card_bg"]};border:1px solid {S.COLORS["card_border"]};
   border-left:5px solid {S.COLORS["blue"]};border-radius:12px;padding:16px 20px;margin:4px 0 14px;color:{S.COLORS["text"]}}}
@@ -104,16 +121,26 @@ NOVELTY_CSS = f"""<style>
 
 
 def style_fig(fig: go.Figure, height: int = 340, legend: bool = True) -> go.Figure:
+    """Readable on the white page: dark text everywhere, legend above the plot (never over the bars)."""
+    ink = dict(color=THEME["text"])
     fig.update_layout(
-        height=height, margin=dict(l=10, r=10, t=40, b=10),
+        template="plotly_white", height=height, margin=dict(l=10, r=10, t=80 if legend else 40, b=10),
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family=THEME["font"], color=THEME["text"], size=12),
-        showlegend=legend, legend=dict(orientation="h", y=1.1, x=0, bgcolor="rgba(0,0,0,0)"),
-        title_font=dict(size=14),
+        showlegend=legend, title_font=dict(size=14, **ink),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, x=0, bgcolor="rgba(0,0,0,0)",
+                    title_text="", font=dict(size=12, **ink)),
     )
-    fig.update_xaxes(gridcolor=THEME["grid"], zerolinecolor=THEME["grid"])
-    fig.update_yaxes(gridcolor=THEME["grid"], zerolinecolor=THEME["grid"])
+    axis = dict(gridcolor=THEME["grid"], zerolinecolor=THEME["grid"], linecolor=THEME["grid"],
+                tickfont=dict(size=12, **ink), title_font=dict(size=13, **ink))
+    fig.update_xaxes(**axis)
+    fig.update_yaxes(**axis)
     return fig
+
+
+def plot(fig: go.Figure, **kwargs) -> None:
+    """st.plotly_chart without Streamlit's chart theme, which would fade the text colours set above."""
+    st.plotly_chart(fig, theme=None, **kwargs)
 
 
 def card(label: str, value: str, sub: str = "") -> None:
@@ -369,7 +396,7 @@ def tab_incident(engine: X.SQLiXAIEngine, model, df: pd.DataFrame, scored: pd.Da
         pcols = [c for c in scored.columns if c.startswith("P(")]
         names = [c[2:-1] for c in pcols]
         vals = [float(row[c]) for c in pcols]
-        st.plotly_chart(bar_h(names, vals, "Model probability per attack type",
+        plot(bar_h(names, vals, "Model probability per attack type",
                               [TYPE_COLORS.get(n, THEME["accent"]) for n in names],
                               [f"{v:.1%}" for v in vals], height=220), width="stretch")
         # [SCREEN-10] SHAP for the most likely attack type
@@ -379,7 +406,7 @@ def tab_incident(engine: X.SQLiXAIEngine, model, df: pd.DataFrame, scored: pd.Da
                                  "group": [X.feature_family(f) for f in engine.feature_names]})
                    .assign(abs=lambda d: d["SHAP value"].abs()).sort_values("abs", ascending=False).head(12))
             fig = px.bar(sdf[::-1], x="SHAP value", y="Feature", color="group", orientation="h")
-            st.plotly_chart(style_fig(fig, 380), width="stretch")
+            plot(style_fig(fig, 380), width="stretch")
         elif use_shap:
             st.info("Install `shap` to see feature-level SHAP values.")
         if e and e.pss:
@@ -446,19 +473,19 @@ def tab_detection(scored: pd.DataFrame, cand: pd.Series, threshold: float) -> No
     with c1:
         mix = scored["risk_level"].value_counts().reindex(RISK_LEVELS).fillna(0).astype(int)
         share = mix / max(int(mix.sum()), 1)
-        st.plotly_chart(bar_h(RISK_LEVELS, mix.tolist(), "Risk levels", RISK_COLORS,
+        plot(bar_h(RISK_LEVELS, mix.tolist(), "Risk levels", RISK_COLORS,
                               [f"{n:,} · {s:.1%}" for n, s in zip(mix, share)]), width="stretch")
     with c2:
         if "ip.src_host" in flagged.columns and not flagged.empty:
             top = flagged["ip.src_host"].value_counts().head(6)
-            st.plotly_chart(bar_h(top.index.tolist(), top.tolist(), "Top attacking source IPs", THEME["attack"],
+            plot(bar_h(top.index.tolist(), top.tolist(), "Top attacking source IPs", THEME["attack"],
                                   [f"{n:,}" for n in top]), width="stretch")
         else:
             st.info("No requests flagged — no source IPs to rank.")
     with c3:
         if "http.request.full_uri" in flagged.columns and not flagged.empty:
             paths = flagged["http.request.full_uri"].map(_uri_path).replace("", "(no URI)").value_counts().head(6)
-            st.plotly_chart(bar_h(paths.index.tolist(), paths.tolist(), "Most targeted endpoints", THEME["accent"],
+            plot(bar_h(paths.index.tolist(), paths.tolist(), "Most targeted endpoints", THEME["accent"],
                                   [f"{n:,}" for n in paths]), width="stretch")
 
     # content-length outlier chart (HTTP requests only)
@@ -478,7 +505,7 @@ def tab_detection(scored: pd.DataFrame, cand: pd.Series, threshold: float) -> No
             fig.add_hline(y=fence, line_dash="dash", line_color=THEME["warn"],
                           annotation_text=f"outlier fence {fence:,.0f} (Q3 + 1.5·IQR of non-attack requests)")
             fig.update_layout(xaxis_title="", yaxis_title="http.content_length (bytes)")
-            st.plotly_chart(style_fig(fig, 340, legend=False), width="stretch")
+            plot(style_fig(fig, 340, legend=False), width="stretch")
             out = req[req["outlier"]]
             st.caption(f"{len(out):,} of {len(req):,} HTTP requests exceed the fence; "
                        f"{int(out['is_attack'].sum()):,} of them are flagged as web injection.")
@@ -554,23 +581,23 @@ def tab_trust(engine: X.SQLiXAIEngine, df: pd.DataFrame, scored: pd.DataFrame, c
     with c1:
         fig = px.histogram(tri, x="trust_score", color="trust_level", nbins=20, color_discrete_map=TRUST_COLORS,
                            title="Explanation trust of flagged SQLi incidents")
-        st.plotly_chart(style_fig(fig, 320), width="stretch")
+        plot(style_fig(fig, 320), width="stretch")
     with c2:
         fig = px.scatter(tri, x="attack_probability", y="trust_score", color="trust_level",
                          color_discrete_map=TRUST_COLORS, hover_data=["incident_id", "techniques"],
                          title="Model confidence vs. explanation trust")
-        st.plotly_chart(style_fig(fig, 320), width="stretch")
+        plot(style_fig(fig, 320), width="stretch")
 
     c1, c2 = st.columns(2)
     with c1:
         tech = tri["techniques"].str.split("; ").explode().replace("", np.nan).dropna().value_counts()
         if not tech.empty:
-            st.plotly_chart(bar_h(tech.index.tolist(), tech.tolist(), "SQLi techniques detected", THEME["attack"],
+            plot(bar_h(tech.index.tolist(), tech.tolist(), "SQLi techniques detected", THEME["attack"],
                                   [f"{v:,}" for v in tech]), width="stretch")
     with c2:
         fam = tri["pss_top_family"].replace("", np.nan).dropna().map(lambda k: X.FAMILY_LABELS.get(k, k)).value_counts()
         if not fam.empty:
-            st.plotly_chart(bar_h(fam.index.tolist(), fam.tolist(), "Top Payload-Span Shapley evidence group",
+            plot(bar_h(fam.index.tolist(), fam.tolist(), "Top Payload-Span Shapley evidence group",
                                   THEME["accent"], [f"{v:,}" for v in fam]), width="stretch")
 
     section("Escalated for analyst review (low explanation trust)")
@@ -618,7 +645,7 @@ def tab_global(model, Xa: pd.DataFrame, df: pd.DataFrame, scored: pd.DataFrame, 
             fig = px.bar(gi, x="importance", y="feature", color="group", orientation="h",
                          title="Model feature importance (Gini, top 15)")
             fig.update_yaxes(autorange="reversed")
-            st.plotly_chart(style_fig(fig, 460), width="stretch")
+            plot(style_fig(fig, 460), width="stretch")
     with c2:
         explainer = tree_explainer(model, model_key) if use_shap else None
         if explainer is not None:
@@ -630,7 +657,7 @@ def tab_global(model, Xa: pd.DataFrame, df: pd.DataFrame, scored: pd.DataFrame, 
                          orientation="h", color_discrete_map=TYPE_COLORS, barmode="group",
                          category_orders={"feature": list(top)},
                          title=f"Mean |SHAP| per attack type ({len(sample):,} requests: flagged + random)")
-            st.plotly_chart(style_fig(fig, 460), width="stretch")
+            plot(style_fig(fig, 460), width="stretch")
         else:
             st.info("Turn on **Compute SHAP** in the sidebar (and install `shap`) to see global SHAP per attack type.")
 
@@ -648,7 +675,7 @@ def tab_global(model, Xa: pd.DataFrame, df: pd.DataFrame, scored: pd.DataFrame, 
     with c1:
         colors = [W.INSPECT_COLORS["sql"] if c == "CWE-89" else W.INSPECT_COLORS["xss"] if c == "CWE-79"
                   else W.INSPECT_COLORS["upload"] for c in summary["cwe"]]
-        st.plotly_chart(bar_h(summary["technique"].tolist(), summary["requests"].tolist(),
+        plot(bar_h(summary["technique"].tolist(), summary["requests"].tolist(),
                               f"Techniques in {len(flagged):,} flagged requests", colors,
                               [f"{v:,}" for v in summary["requests"]], height=420), width="stretch")
     with c2:
@@ -695,7 +722,7 @@ def tab_performance(scored: pd.DataFrame, key: tuple) -> None:
                                        colorscale=[[0, S.COLORS["soft_bg"]], [1, THEME["accent"]]]))
             fig.update_yaxes(autorange="reversed")
             fig.update_layout(title="Confusion matrix (colour = log count)")
-            st.plotly_chart(style_fig(fig, 380, legend=False), width="stretch")
+            plot(style_fig(fig, 380, legend=False), width="stretch")
         with c2:
             section("Classification report")
             st.dataframe(pd.DataFrame(rep).T.style.format("{:.4f}"), width="stretch")
@@ -711,6 +738,7 @@ def main() -> None:
     st.set_page_config(page_title="Web Injection XAI", page_icon="🛡️",
                        layout="wide", initial_sidebar_state="expanded")
     S.apply_theme(st)
+    st.markdown(TAB_CSS, unsafe_allow_html=True)
 
     # =========================================================================
     # [SCREEN-1] SIDEBAR - uploads + explanation settings (same layout as the DDoS pages)

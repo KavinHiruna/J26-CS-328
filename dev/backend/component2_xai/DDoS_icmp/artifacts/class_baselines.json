@@ -46,7 +46,7 @@
     },
     "tcp.len": {
       "median": 0.0,
-      "mean": 1.9088960342979635
+      "mean": 2.4080743122543766
     },
     "tcp.seq": {
       "median": 63846.0,
@@ -62,11 +62,11 @@
     },
     "dns.qry.name": {
       "median": 0.0,
-      "mean": 0.15091103965702035
+      "mean": 0.15205430510896747
     },
     "dns.qry.name.len": {
       "median": 0.0,
-      "mean": 0.05930689531975706
+      "mean": 0.06030725259021079
     },
     "dns.qry.qu": {
       "median": 0.0,
@@ -133,7 +133,7 @@
       "mean": 9.249017506252233
     }
   },
-  "DDoS ICMP Flood": {
+  "DDoS Network Flood": {
     "arp.opcode": {
       "median": 0.0,
       "mean": 0.0
@@ -143,8 +143,8 @@
       "mean": 0.0
     },
     "icmp.seq_le": {
-      "median": 32959.0,
-      "mean": 32863.998569069896
+      "median": 0.0,
+      "mean": 13792.578768873404
     },
     "http.tls_port": {
       "median": 0.0,
@@ -152,7 +152,7 @@
     },
     "tcp.ack": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 191549825.48706156
     },
     "tcp.connection.fin": {
       "median": 0.0,
@@ -164,7 +164,7 @@
     },
     "tcp.connection.syn": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 0.17807200929152148
     },
     "tcp.connection.synack": {
       "median": 0.0,
@@ -172,7 +172,7 @@
     },
     "tcp.flags": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 0.35614401858304295
     },
     "tcp.flags.ack": {
       "median": 0.0,
@@ -180,31 +180,31 @@
     },
     "tcp.len": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 0.38885017421602786
     },
     "tcp.seq": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 0.033058837537746806
     },
     "udp.stream": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 576597.3422996516
     },
     "udp.time_delta": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 1.1933101045296168
     },
     "dns.qry.name": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 0.0346109175377468
     },
     "dns.qry.name.len": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 0.013844367015098722
     },
     "dns.qry.qu": {
       "median": 0.0,
-      "mean": 0.0
+      "mean": 3.5727293844367014
     },
     "dns.qry.type": {
       "median": 0.0,

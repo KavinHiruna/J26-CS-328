@@ -1,0 +1,166 @@
+{
+  "Normal": {
+    "arp.opcode": {
+      "median": 0.0,
+      "mean": 0.0004828585224529213
+    },
+    "arp.hw.size": {
+      "median": 0.0,
+      "mean": 0.0028971511347175277
+    },
+    "tcp.ack": {
+      "median": 546213.0,
+      "mean": 31977423.208112024
+    },
+    "tcp.connection.fin": {
+      "median": 0.0,
+      "mean": 0.0014485755673587638
+    },
+    "tcp.connection.rst": {
+      "median": 0.0,
+      "mean": 0.0004828585224529213
+    },
+    "tcp.connection.syn": {
+      "median": 0.0,
+      "mean": 0.0004828585224529213
+    },
+    "tcp.connection.synack": {
+      "median": 0.0,
+      "mean": 0.0004828585224529213
+    },
+    "tcp.flags": {
+      "median": 16.0,
+      "mean": 18.481409946885563
+    },
+    "tcp.flags.ack": {
+      "median": 1.0,
+      "mean": 0.9908256880733946
+    },
+    "tcp.len": {
+      "median": 1309.0,
+      "mean": 778.7928536938676
+    },
+    "tcp.seq": {
+      "median": 48281216.0,
+      "mean": 67630952.64992757
+    },
+    "udp.stream": {
+      "median": 0.0,
+      "mean": 55.74794785127958
+    },
+    "udp.time_delta": {
+      "median": 0.0,
+      "mean": 2.7189763399323996
+    },
+    "dns.qry.name": {
+      "median": 0.0,
+      "mean": 0.02576853211009175
+    },
+    "dns.qry.name.len": {
+      "median": 0.0,
+      "mean": 0.017865765330758086
+    },
+    "dns.qry.qu": {
+      "median": 0.0,
+      "mean": 0.12168034765813616
+    },
+    "dns.retransmission": {
+      "median": 0.0,
+      "mean": 0.0318686624818928
+    },
+    "dns.retransmit_request": {
+      "median": 0.0,
+      "mean": 0.0004828585224529213
+    },
+    "mqtt.hdrflags": {
+      "median": 0.0,
+      "mean": 0.10816030902945437
+    },
+    "mqtt.msgtype": {
+      "median": 0.0,
+      "mean": 0.006760019314340898
+    }
+  },
+  "DDoS UDP Flood": {
+    "arp.opcode": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "arp.hw.size": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.ack": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.fin": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.rst": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.syn": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.connection.synack": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.flags": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.flags.ack": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.len": {
+      "median": 0.0,
+      "mean": 418.58774892279024
+    },
+    "tcp.seq": {
+      "median": 0.0,
+      "mean": 0.0852061030627693
+    },
+    "udp.stream": {
+      "median": 1437290.0,
+      "mean": 1421562.7548620007
+    },
+    "udp.time_delta": {
+      "median": 0.0,
+      "mean": 3.0125771515080935
+    },
+    "dns.qry.name": {
+      "median": 0.0,
+      "mean": 0.016536625131011996
+    },
+    "dns.qry.name.len": {
+      "median": 0.0,
+      "mean": 0.016536625131011996
+    },
+    "dns.qry.qu": {
+      "median": 0.0,
+      "mean": 8.599860253872132
+    },
+    "dns.retransmission": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.retransmit_request": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.hdrflags": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.msgtype": {
+      "median": 0.0,
+      "mean": 0.0
+    }
+  }
+}

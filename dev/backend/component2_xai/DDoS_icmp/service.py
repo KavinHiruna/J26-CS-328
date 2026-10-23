@@ -17,7 +17,7 @@ import numpy as np
 import pandas as pd
 
 from . import config
-from .data_loader import derive_attack_type
+from .data_loader import derive_attack_type, protocol, repair_shifted
 from .features import FeatureEncoder
 from . import consensus as xcs
 from .xai_methods import HAS_LIME, HAS_SHAP, describe_split, lime_explain, local_attributions
@@ -34,7 +34,7 @@ class DDoSIcmpXAI:
                 f"No trained model at {config.MODEL_PATH}. Run:\n"
                 "  python -m component2_xai.DDoS_icmp.train --data <Edge-IIoTset CSVs>")
         self.threshold = threshold
-        self.attack_class = 1        # model class meaning "DDoS ICMP flood"
+        self.attack_class = 1        # model class meaning "network flood"
         self.use_shap = True         # False -> exact tree-path contributions
         self.model = joblib.load(config.MODEL_PATH)
         self.encoder: FeatureEncoder = joblib.load(config.ENCODER_PATH)
@@ -84,6 +84,7 @@ class DDoSIcmpXAI:
 
     def predict(self, raw: pd.DataFrame) -> pd.DataFrame:
         """Score raw Edge-IIoTset rows. Returns one row per packet."""
+        raw = repair_shifted(raw)
         X = self.encode(raw)
         proba = self.model.predict_proba(X)[:, self.attack_idx]
         out = pd.DataFrame({
@@ -95,9 +96,10 @@ class DDoSIcmpXAI:
                                    labels=["Low", "Elevated", "High", "Critical"]).astype(str)
         labels = derive_attack_type(raw)
         if config.LABEL_COL in labels.columns:
-            truth = labels[config.LABEL_COL].astype(str).str.upper().str.contains("DDOS_ICMP")
+            truth = labels[config.LABEL_COL].astype(str).str.upper().str.contains("^(?:" + "|".join(config.ATTACK_LABELS) + ")", case=False, regex=True)
             out["actual"] = np.where(truth, config.CLASS_NAMES[1], config.CLASS_NAMES[0])
-        for col in ("frame.time", "ip.src_host", "ip.dst_host", "icmp.seq_le", "tcp.len"):
+        out["protocol"] = protocol(raw).values
+        for col in ("frame.time", "ip.src_host", "ip.dst_host", "tcp.dstport", "tcp.len"):
             if col in raw.columns:
                 out[col] = raw[col].values
         return out
@@ -241,35 +243,33 @@ class DDoSIcmpXAI:
                  f"with an attack probability of **{p:.1%}** "
                  f"(baseline {exp['base_value']:.1%})."]
         if towards:
-            lines.append("Pushing towards ICMP flood: " + "; ".join(fmt(c) for c in towards) + ".")
+            lines.append("Pushing towards network flood: " + "; ".join(fmt(c) for c in towards) + ".")
         if against:
             lines.append("Pushing towards normal traffic: " + "; ".join(fmt(c) for c in against) + ".")
         return " ".join(lines)
 
     # ---------------------------------------------------------- indicators
     def flood_indicators(self, raw: pd.DataFrame, scored: pd.DataFrame) -> dict:
-        """Traffic-level signals typical of an ICMP echo flood (see attack_parameters sheet)."""
-        def col(name):
-            return raw[name].astype(str).str.strip() if name in raw.columns else pd.Series("", index=raw.index)
-
-        is_icmp = pd.Series(False, index=raw.index)
-        for c in config.ICMP_COLS:
-            is_icmp |= ~col(c).isin(["", "0", "0.0", "nan"])
+        """Traffic-level signals of TCP SYN / UDP / ICMP floods (see attack_parameters sheets)."""
+        raw = repair_shifted(raw)
+        proto = protocol(raw)
         attack = scored["is_attack"]
-        src, dst = col("ip.src_host"), col("ip.dst_host")
+        src = raw["ip.src_host"].astype(str) if "ip.src_host" in raw.columns else pd.Series("", index=raw.index)
+        syn = int((proto == "TCP SYN").sum())
+        synack = int(raw["tcp.connection.synack"].astype(str).str.startswith("1").sum()) \
+            if "tcp.connection.synack" in raw.columns else 0
         top_src = src[attack].value_counts().head(5)
-        top_dst = dst[attack].value_counts()
         n_flag = int(attack.sum())
         return {
             "packets": int(len(raw)),
             "flagged": n_flag,
             "flagged_ratio": float(attack.mean()) if len(raw) else 0.0,
-            "icmp_ratio": float(is_icmp.mean()) if len(raw) else 0.0,
-            "icmp_packets": int(is_icmp.sum()),
+            "protocol_counts": proto.value_counts().to_dict(),
+            "flagged_by_protocol": proto[attack].value_counts().to_dict(),
+            "syn": syn, "synack": synack,
+            "syn_synack_ratio": float(syn / synack) if synack else float("inf") if syn else 0.0,
             "top_flagged_sources": top_src.to_dict(),
             "distinct_sources_flagged": int(src[attack].nunique()),
-            "top_target": top_dst.index[0] if n_flag else "",
-            "target_share": float(top_dst.iloc[0] / n_flag) if n_flag else 0.0,
             # share of flagged packets sent by the single busiest source: low = distributed (DDoS)
             "source_concentration": float(top_src.iloc[0] / n_flag) if n_flag else 0.0,
         }

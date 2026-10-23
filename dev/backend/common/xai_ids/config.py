@@ -118,6 +118,22 @@ SQLI_URI_PATTERN = "/vulnerabilities/sqli"
 DDOS_HTTP_TYPES = {"ddos_http", "ddos http", "ddos_http_flood", "ddos http flood"}
 DDOS_HTTP_URI_REGEX = r"^https?://[^/]+/dvwa/vulnerabilities/?$"
 
+# Web Injection XAI page (SQLi · XSS · Uploading): same rules as
+# backend/component2_xai/web_injection_xai.py (web_labels); SQLi incidents are included.
+WEB_XSS_REGEX = r"<\s*/?\s*script|%3c\s*script|javascript\s*:|\bon(?:error|load|mouseover)\s*=|/vulnerabilities/xss"
+WEB_UPLOAD_REGEX = r"/hackable/uploads/|/vulnerabilities/upload"
+WEB_TEXT_COLUMNS = ["http.request.uri.query", "http.file_data"]
+
+# DDoS ICMP Flood XAI page: same rule as backend/component2_xai/DDoS_icmp/config.py - an attack
+# packet with ICMP fields that does not involve a scanner host and has a valid timestamp.
+ICMP_COLUMNS = ["icmp.checksum", "icmp.seq_le"]
+UDP_COLUMNS = ["udp.stream", "udp.port", "udp.time_delta"]   # UDP flood rows (Network Flood page)
+ICMP_SCANNER_HOSTS = {"192.168.0.170"}
+
+# DDoS TCP SYN Flood XAI page: same rule as backend/component2_xai/DDoS_tcp/config.py - an attack
+# SYN (SYN=1, ACK=0) from a host outside the testbed (SYNs from these are handshakes of other traffic).
+TESTBED_HOSTS = {"192.168.0.170", "192.168.0.128"}
+
 # ---------------------------------------------------------------------------
 # Model
 # If MODEL_PATH exists it is loaded; otherwise a Random Forest is trained on a

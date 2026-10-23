@@ -1,12 +1,12 @@
 """
-Load Edge-IIoTset CSVs and build a binary Normal vs DDoS ICMP Flood dataset.
+Load Edge-IIoTset CSVs and build a binary Normal vs DDoS Network Flood dataset (TCP SYN · UDP · ICMP).
 
 Accepted inputs (any mix):
   * the per-sensor normal CSVs (Distance.csv, Heart_Rate.csv, Modbus.csv …)
-  * DDoS_ICMP_Flood_attack.csv from Edge-IIoTset "Attack traffic"
+  * DDoS_TCP_SYN_Flood / DDoS_UDP_Flood / DDoS_ICMP_Flood CSVs from Edge-IIoTset "Attack traffic"
   * the combined ML/DNN files (DNN-EdgeIIoT-dataset.csv, ML-EdgeIIoT-dataset.csv)
 
-Only rows labelled Normal or DDoS_ICMP are kept; other attacks are ignored.
+Only rows labelled Normal, DDoS_TCP, DDoS_UDP or DDoS_ICMP are kept; other attacks are ignored.
 """
 from __future__ import annotations
 
@@ -19,40 +19,85 @@ from . import config
 
 
 def _is_attack(label: pd.Series) -> pd.Series:
-    return label.astype(str).str.strip().str.upper().str.replace(" ", "_").str.contains("DDOS_ICMP")
+    """Rows of the flood type(s) this package detects (config.ATTACK_LABELS)."""
+    wanted = "|".join(a.upper() for a in config.ATTACK_LABELS)
+    return label.astype(str).str.strip().str.upper().str.replace(" ", "_").str.contains(f"^(?:{wanted})", regex=True)
 
 
 def _is_normal(label: pd.Series) -> pd.Series:
     return label.astype(str).str.strip().str.lower().eq(config.NORMAL_LABEL.lower())
 
 
-def derive_attack_type(df: pd.DataFrame) -> pd.DataFrame:
-    """Add Attack_type to a frame that only has the binary Attack_label.
+_EMPTY = ["", "0", "0.0", "nan"]
+_IPV4 = r"^\d{1,3}(?:\.\d{1,3}){3}$"
 
-    Normal = Attack_label 0; DDoS_ICMP = attack row with ICMP fields that does not
-    involve a scanner host (config.SCANNER_HOSTS); every other attack row is left out.
+
+def _col(df: pd.DataFrame, name: str) -> pd.Series:
+    return df[name].astype(str).str.strip() if name in df.columns else pd.Series("", index=df.index)
+
+
+def repair_shifted(df: pd.DataFrame) -> pd.DataFrame:
+    """Rows whose frame.time holds an IP lost their timestamp and are shifted one column left.
+
+    Puts source/destination back (ip.src_host <- frame.time, ip.dst_host <- ip.src_host) and
+    blanks frame.time; other fields are left as exported. Returns a copy only if needed.
     """
+    if config.TIME_COL not in df.columns or "ip.src_host" not in df.columns or "ip.dst_host" not in df.columns:
+        return df
+    shifted = df[config.TIME_COL].astype(str).str.strip().str.match(_IPV4)
+    if not shifted.any():
+        return df
+    df = df.copy()
+    df.loc[shifted, "ip.dst_host"] = df.loc[shifted, "ip.src_host"]
+    df.loc[shifted, "ip.src_host"] = df.loc[shifted, config.TIME_COL].astype(str).str.strip()
+    df.loc[shifted, config.TIME_COL] = ""
+    return df
+
+
+def protocol(df: pd.DataFrame) -> pd.Series:
+    """Per-packet protocol view used for flood types: ICMP / UDP / TCP SYN / TCP / other."""
+    is_icmp = pd.Series(False, index=df.index)
+    for c in config.ICMP_COLS:
+        is_icmp |= ~_col(df, c).isin(_EMPTY)
+    is_udp = pd.Series(False, index=df.index)
+    for c in config.UDP_COLS:
+        is_udp |= ~_col(df, c).isin(_EMPTY)
+    syn = _col(df, "tcp.connection.syn").str.startswith("1") & ~_col(df, "tcp.flags.ack").str.startswith("1")
+    is_tcp = ~_col(df, "tcp.flags").isin(_EMPTY) | ~_col(df, "tcp.len").isin(_EMPTY) | syn
+    out = pd.Series("other", index=df.index)
+    out[is_tcp] = "TCP"
+    out[syn] = "TCP SYN"
+    out[is_udp] = "UDP"
+    out[is_icmp] = "ICMP"
+    return out
+
+
+def derive_attack_type(df: pd.DataFrame) -> pd.DataFrame:
+    """Add Attack_type (DDoS_ICMP / DDoS_UDP / DDoS_TCP) to a frame that only has Attack_label.
+
+    Rules in config.py; Normal = Attack_label 0; every other attack row is left out of training.
+    """
+    df = repair_shifted(df)
     if config.LABEL_COL in df.columns or config.BINARY_LABEL_COL not in df.columns:
         return df
     attack = pd.to_numeric(df[config.BINARY_LABEL_COL], errors="coerce").fillna(0).astype(int) == 1
-    def col(name):
-        return df[name].astype(str).str.strip() if name in df.columns else pd.Series("", index=df.index)
-
-    is_icmp = pd.Series(False, index=df.index)
-    for c in config.ICMP_COLS:
-        is_icmp |= ~col(c).isin(["", "0", "0.0", "nan"])
-    scanner = col("ip.src_host").isin(config.SCANNER_HOSTS) | col("ip.dst_host").isin(config.SCANNER_HOSTS)
-    valid_time = col(config.TIME_COL).str.contains(":", regex=False)
-    flood = attack & is_icmp & ~scanner & valid_time
+    proto = protocol(df)
+    src, dst = _col(df, "ip.src_host"), _col(df, "ip.dst_host")
+    scanner = src.isin(config.SCANNER_HOSTS) | dst.isin(config.SCANNER_HOSTS)
+    valid_time = _col(df, config.TIME_COL).str.contains(":", regex=False)
     df = df.copy()
     df[config.LABEL_COL] = config.OTHER_ATTACK_LABEL
     df.loc[~attack, config.LABEL_COL] = config.NORMAL_LABEL
-    df.loc[flood, config.LABEL_COL] = config.ATTACK_LABEL
+    rules = {"DDoS_TCP": attack & (proto == "TCP SYN") & ~src.isin(config.TESTBED_HOSTS),
+             "DDoS_UDP": attack & (proto == "UDP") & ~scanner,
+             "DDoS_ICMP": attack & (proto == "ICMP") & ~scanner & valid_time}
+    for name, mask in rules.items():
+        df.loc[mask, config.LABEL_COL] = name     # other floods stay labelled; _is_attack picks this package's
     return df
 
 
 def read_csv(path: str | Path, chunksize: int = 200_000) -> pd.DataFrame:
-    """Read one CSV, keeping only Normal / DDoS_ICMP rows (chunked for big files)."""
+    """Read one CSV, keeping only Normal / network-flood rows (chunked for big files)."""
     frames = []
     for chunk in pd.read_csv(path, low_memory=False, chunksize=chunksize, dtype=str):
         chunk.columns = [c.strip() for c in chunk.columns]
@@ -84,7 +129,7 @@ def build_dataset(paths: Iterable[str | Path],
                   max_attack: int = config.MAX_ATTACK_ROWS,
                   seed: int = config.RANDOM_STATE,
                   verbose: bool = True) -> tuple[pd.DataFrame, pd.Series]:
-    """Return (raw feature frame, y) where y = 1 for DDoS ICMP Flood."""
+    """Return (raw feature frame, y) where y = 1 for the flood type(s) in config.ATTACK_LABELS."""
     normal_parts, attack_parts = [], []
     for path in expand_paths(paths):
         df = read_csv(path)
@@ -95,15 +140,15 @@ def build_dataset(paths: Iterable[str | Path],
         normal_parts.append(nor)
         attack_parts.append(att)
         if verbose:
-            print(f"  {path.name:<40} normal={len(nor):>7,}  ddos_icmp={len(att):>7,}")
+            print(f"  {path.name:<40} normal={len(nor):>7,}  network_flood={len(att):>7,}")
 
     normal = pd.concat(normal_parts, ignore_index=True) if normal_parts else pd.DataFrame()
     attack = pd.concat(attack_parts, ignore_index=True) if attack_parts else pd.DataFrame()
 
     if attack.empty:
         raise ValueError(
-            "No DDoS_ICMP rows found in the supplied files. Add Edge-IIoTset's "
-            "'DDoS_ICMP_Flood_attack.csv' (Attack traffic folder) or "
+            "No DDoS_TCP / DDoS_UDP / DDoS_ICMP rows found in the supplied files. Add Edge-IIoTset's "
+            "network-flood CSVs (Attack traffic folder) or "
             "'DNN-EdgeIIoT-dataset.csv'."
         )
     if normal.empty:

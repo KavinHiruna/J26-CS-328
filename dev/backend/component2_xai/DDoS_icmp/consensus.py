@@ -136,7 +136,7 @@ def consensus_for_packet(attrs: dict[str, np.ndarray], rf_verdict: int,
         ranking.append({
             "feature": feature_names[i],
             "consensus_importance": float(importance[i]),
-            "direction": "→ ICMP flood" if direction[i] > 0 else ("→ Normal" if direction[i] < 0 else "neutral"),
+            "direction": "→ network flood" if direction[i] > 0 else ("→ Normal" if direction[i] < 0 else "neutral"),
             "methods_supporting": len(supporting),
             "methods_total": len(methods),
             **{f"{m}": float(norm[m][i]) for m in methods},
@@ -172,7 +172,7 @@ def recommendation(cons: dict, is_attack: bool) -> str:
     t = cons["trust"]
     if t == "High":
         return ("Explanations agree — the verdict and its reasons are reliable. "
-                + ("Safe to act: rate-limit ICMP echo to the target or filter upstream (sources are usually spoofed, so blocking them does not help)." if is_attack else "No action needed."))
+                + ("Safe to act: rate-limit the flooded protocol at the target (SYN cookies for TCP SYN, ICMP/UDP rate limits) or filter upstream; sources are usually spoofed, so blocking them does not help." if is_attack else "No action needed."))
     if t == "Medium":
         return "Explanations partly agree — corroborate with traffic context (packet rate, distinct spoofed sources) before acting."
     return ("Explanations disagree — the model's reasoning is unstable for this packet. "

@@ -156,6 +156,31 @@ select.input { appearance: none; padding-right: 34px;
 .sqli-btn:hover { background: var(--blue); }
 .sqli-btn.xai-ddos { background: #0e7490; }
 .sqli-btn.xai-ddos:hover { background: #0891b2; }
+.sqli-btn.xai-icmp { background: #7e22ce; }
+.sqli-btn.xai-icmp:hover { background: #9333ea; }
+
+/* sidebar: Component-2 attack XAI dashboards */
+.xai-group { margin-top: 26px; }
+.xai-group-title { font-size: 13px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #c3d1ea; }
+.xai-group-sub { font-size: 12.5px; color: #93a7c8; margin: 3px 0 4px; line-height: 1.35; }
+.xai-dash { display: flex; align-items: center; gap: 12px; margin-top: 9px; padding: 9px 12px; border-radius: 6px;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.13); border-left: 4px solid var(--c);
+  color: #fff; text-decoration: none; transition: background .15s; }
+.xai-dash:hover { background: rgba(255,255,255,.15); }
+.xai-dash:focus-visible { outline: 2px solid var(--c); outline-offset: 2px; }
+.xai-dash svg { width: 22px; height: 22px; flex: none; fill: none; stroke: var(--c); stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round; }
+.xai-dash b { display: block; font-size: 15px; font-weight: 600; line-height: 1.25; }
+.xai-dash small { display: block; font-size: 12.5px; color: #b9c8e2; line-height: 1.3; }
+.xai-dash.d-web { --c: #60a5fa; }
+.xai-dash.d-http { --c: #22d3ee; }
+.xai-dash.d-icmp { --c: #c084fc; }
+.xai-dash.d-tcp { --c: #fb7185; }
+.xai-dash.d-udp { --c: #fbbf24; }
+.sqli-btn.xai-tcp { background: #be123c; }
+.sqli-btn.xai-tcp:hover { background: #e11d48; }
+.sqli-btn.xai-udp { background: #b45309; }
+.sqli-btn.xai-udp:hover { background: #d97706; }
 .id-link { color: inherit; text-decoration: underline dotted; }
 .id-link:hover { color: var(--blue); }
 .breakdown { display: flex; flex-wrap: wrap; gap: 8px; margin: -4px 0 14px; }

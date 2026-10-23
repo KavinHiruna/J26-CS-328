@@ -1,0 +1,103 @@
+{
+  "incident_id": "ALR-000010",
+  "prediction": "DDoS TCP SYN Flood",
+  "attack_probability": 0.9658104706617214,
+  "dataset_label": "DDoS TCP SYN Flood",
+  "analyst_priority": "Critical",
+  "explanation_trust": "High",
+  "xai_consensus_score": 0.8079034238296253,
+  "consensus_components": {
+    "rank": 0.46494702865183474,
+    "topk": 0.7666666666666666,
+    "direction": 1.0,
+    "verdict": 1.0
+  },
+  "method_verdicts": {
+    "Random Forest": 1,
+    "Surrogate tree": 1,
+    "LIME local model": 1
+  },
+  "recommendation": "Explanations agree \u2014 the verdict and its reasons are reliable. Safe to act: rate-limit the flooded protocol at the target (SYN cookies for TCP SYN, ICMP/UDP rate limits) or filter upstream; sources are usually spoofed, so blocking them does not help.",
+  "attribution_method": "SHAP (TreeExplainer)",
+  "base_value": 0.5000565496286293,
+  "top_contributions": [
+    {
+      "feature": "tcp.connection.syn",
+      "value": "1",
+      "contribution": 0.08976721262540291
+    },
+    {
+      "feature": "tcp.dstport",
+      "value": "80",
+      "contribution": 0.0806138648464268
+    },
+    {
+      "feature": "tcp.flags",
+      "value": "2",
+      "contribution": 0.07166598847465239
+    },
+    {
+      "feature": "tcp.flags.ack",
+      "value": "0",
+      "contribution": 0.058033001795456514
+    },
+    {
+      "feature": "tcp.payload_code",
+      "value": "5.86E+239",
+      "contribution": 0.043046555508034136
+    },
+    {
+      "feature": "tcp.seq",
+      "value": "0",
+      "contribution": 0.041902518905614417
+    },
+    {
+      "feature": "tcp.len",
+      "value": "120",
+      "contribution": 0.028423748461223093
+    },
+    {
+      "feature": "tcp.ack_raw",
+      "value": "4.5712e+07",
+      "contribution": 0.028016807850879014
+    },
+    {
+      "feature": "tcp.payload_len",
+      "value": "9",
+      "contribution": 0.025808652936628658
+    },
+    {
+      "feature": "tcp.ack",
+      "value": "4.5712e+07",
+      "contribution": -0.016192759815454212
+    }
+  ],
+  "flood_context": {
+    "src": "227.18.6.241",
+    "dst": "192.168.0.128",
+    "protocol": "TCP SYN",
+    "time": 68753.841075,
+    "src_flagged": 1.0,
+    "flood": true,
+    "timed": true,
+    "target": "192.168.0.128",
+    "direction": "packet to target",
+    "peer": "227.18.6.241",
+    "to_target": 14216,
+    "from_target": 5673,
+    "sources_to_target": 4818,
+    "peer_packets": 1,
+    "window_to_target": 1058,
+    "window_rate_s": 8.816666666666666,
+    "window_sources": 1042,
+    "window_concentration": 0.013232514177693762,
+    "window_flagged": 0.9829867674858223,
+    "window_synack": 18,
+    "window_seconds": 60
+  },
+  "surrogate_path": [
+    "tcp.connection.syn > 0.50   (this packet: 1)",
+    "tcp.ack > 435810.00   (this packet: 4.5712e+07)",
+    "\u2192 DDoS TCP SYN Flood"
+  ]
+}

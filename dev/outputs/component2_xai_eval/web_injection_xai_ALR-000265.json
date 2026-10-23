@@ -1,0 +1,57 @@
+{
+  "incident_id": "ALR-000265",
+  "prediction": "XSS",
+  "attack_type": "XSS",
+  "attack_probability": 0.999930438913854,
+  "class_probabilities": {
+    "SQL injection": 0.0,
+    "XSS": 0.999930438913854,
+    "Malicious upload": 0.0
+  },
+  "priority": {
+    "score": 0.7499478291853905,
+    "level": "High",
+    "max_technique_severity": 0.75,
+    "note": ""
+  },
+  "techniques": [
+    {
+      "key": "xss_reflected",
+      "technique": "Reflected XSS - script injection",
+      "family": "xss",
+      "severity": 0.75,
+      "cwe": "CWE-79",
+      "capec": "CAPEC-63",
+      "attack": "T1190",
+      "evidence": "<script>",
+      "matches": 1,
+      "recommendation": "Encode output for the HTML context and set a Content-Security-Policy; check whether the payload was reflected."
+    },
+    {
+      "key": "quote_breakout",
+      "technique": "Quote break-out",
+      "family": "quote",
+      "severity": 0.55,
+      "capec": "CAPEC-66",
+      "cwe": "CWE-89",
+      "attack": "T1190",
+      "evidence": "')",
+      "matches": 1,
+      "recommendation": "The parameter is probably concatenated into SQL; use parameterised queries."
+    }
+  ],
+  "shap_top": {
+    "xss_dom_sink": 0.1785119820276652,
+    "xss_script_tag": 0.09328033068028108,
+    "http.content_length": 0.08837341916538037,
+    "xss_angle_brackets": 0.06938151726180661,
+    "body_length": 0.0664312188873651,
+    "equals_count": 0.05994605330819981,
+    "tcp.srcport": 0.035929411028642444,
+    "parenthesis_count": 0.032229852874451875,
+    "uri_length": 0.02767415698888894,
+    "upload_dir": 0.027401054620446404,
+    "tcp.len": 0.020485326345000856,
+    "tcp_payload_length": 0.018512807970126555
+  }
+}

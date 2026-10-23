@@ -1,0 +1,93 @@
+{
+  "incident_id": "ALR-057241",
+  "prediction": "DDoS HTTP Flood",
+  "attack_probability": 0.997526221259012,
+  "dataset_label": "DDoS HTTP Flood",
+  "analyst_priority": "Critical",
+  "explanation_trust": "High",
+  "xai_consensus_score": 0.8978127760875603,
+  "consensus_components": {
+    "rank": 0.6579177710169078,
+    "topk": 0.9333333333333332,
+    "direction": 1.0,
+    "verdict": 1.0
+  },
+  "method_verdicts": {
+    "Random Forest": 1,
+    "Surrogate tree": 1,
+    "LIME local model": 1
+  },
+  "recommendation": "Explanations agree \u2014 the verdict and its reasons are reliable. Safe to act (e.g. rate-limit / block the source).",
+  "attribution_method": "SHAP (TreeExplainer)",
+  "base_value": 0.4999408853450647,
+  "top_contributions": [
+    {
+      "feature": "http.request.method",
+      "value": "GET",
+      "contribution": 0.08752547449952848
+    },
+    {
+      "feature": "http.request.version",
+      "value": "HTTP/1.1",
+      "contribution": 0.07766145374696602
+    },
+    {
+      "feature": "tcp.len",
+      "value": "102",
+      "contribution": 0.07533831252879565
+    },
+    {
+      "feature": "tcp.seq",
+      "value": "1",
+      "contribution": 0.07191222458643044
+    },
+    {
+      "feature": "tcp.ack",
+      "value": "1",
+      "contribution": 0.05239794750521784
+    },
+    {
+      "feature": "tcp.flags",
+      "value": "24",
+      "contribution": 0.03243393851804842
+    },
+    {
+      "feature": "http.tls_port",
+      "value": "0",
+      "contribution": 0.030990713338478425
+    },
+    {
+      "feature": "tcp.flags.ack",
+      "value": "1",
+      "contribution": 0.01785748877898786
+    },
+    {
+      "feature": "tcp.connection.synack",
+      "value": "0",
+      "contribution": 0.016242048144761333
+    },
+    {
+      "feature": "mqtt.ver",
+      "value": "0",
+      "contribution": 0.01183834128581369
+    }
+  ],
+  "flood_context": {
+    "src": "192.168.0.170",
+    "uri": "http://192.168.0.128/dvwa/vulnerabilities/",
+    "method": "GET",
+    "time": 70378.053096,
+    "src_packets": 37994,
+    "src_requests": 5792,
+    "same_request": 490,
+    "window_packets": 454,
+    "window_requests": 326,
+    "window_flagged": 0.18502202643171806,
+    "src_flagged": 0.06835289782597252,
+    "window_seconds": 60
+  },
+  "surrogate_path": [
+    "http.request.method in {GET, TRACE}   (this packet: GET)",
+    "\u2192 DDoS HTTP Flood"
+  ]
+}

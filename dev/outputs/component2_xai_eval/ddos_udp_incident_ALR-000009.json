@@ -1,0 +1,103 @@
+{
+  "incident_id": "ALR-000009",
+  "prediction": "DDoS UDP Flood",
+  "attack_probability": 0.9628655165336759,
+  "dataset_label": "DDoS UDP Flood",
+  "analyst_priority": "Critical",
+  "explanation_trust": "High",
+  "xai_consensus_score": 0.7706182688796814,
+  "consensus_components": {
+    "rank": 0.4158064088520592,
+    "topk": 0.6666666666666666,
+    "direction": 1.0,
+    "verdict": 1.0
+  },
+  "method_verdicts": {
+    "Random Forest": 1,
+    "Surrogate tree": 1,
+    "LIME local model": 1
+  },
+  "recommendation": "Explanations agree \u2014 the verdict and its reasons are reliable. Safe to act: rate-limit the flooded protocol at the target (SYN cookies for TCP SYN, ICMP/UDP rate limits) or filter upstream; sources are usually spoofed, so blocking them does not help.",
+  "attribution_method": "SHAP (TreeExplainer)",
+  "base_value": 0.49941030212047294,
+  "top_contributions": [
+    {
+      "feature": "tcp.dstport",
+      "value": "0",
+      "contribution": 0.08076593557904774
+    },
+    {
+      "feature": "tcp.flags",
+      "value": "0",
+      "contribution": 0.0668042123150613
+    },
+    {
+      "feature": "tcp.checksum",
+      "value": "0",
+      "contribution": 0.06080574241439169
+    },
+    {
+      "feature": "tcp.flags.ack",
+      "value": "0",
+      "contribution": 0.052191009517336906
+    },
+    {
+      "feature": "tcp.ack",
+      "value": "0",
+      "contribution": 0.05104214245111184
+    },
+    {
+      "feature": "tcp.ack_raw",
+      "value": "0",
+      "contribution": 0.04041817348116558
+    },
+    {
+      "feature": "udp.stream",
+      "value": "2.26955e+06",
+      "contribution": 0.03358352665073675
+    },
+    {
+      "feature": "tcp.seq",
+      "value": "0",
+      "contribution": 0.021122803852156126
+    },
+    {
+      "feature": "tcp.payload_len",
+      "value": "1",
+      "contribution": 0.020861091944930722
+    },
+    {
+      "feature": "tcp.srcport",
+      "value": "35494",
+      "contribution": 0.013289638633816174
+    }
+  ],
+  "flood_context": {
+    "src": "252.38.177.189",
+    "dst": "192.168.0.128",
+    "protocol": "UDP",
+    "time": NaN,
+    "src_flagged": 1.0,
+    "flood": true,
+    "timed": false,
+    "target": "192.168.0.128",
+    "direction": "packet to target",
+    "peer": "252.38.177.189",
+    "to_target": 10443,
+    "from_target": 20,
+    "sources_to_target": 10440,
+    "peer_packets": 1,
+    "window_to_target": 10443,
+    "window_rate_s": null,
+    "window_sources": 10440,
+    "window_concentration": 0.00038303169587283346,
+    "window_flagged": 0.9992339366082543,
+    "window_synack": null,
+    "window_seconds": 60
+  },
+  "surrogate_path": [
+    "tcp.dstport <= 251.00   (this packet: 0)",
+    "tcp.srcport in {100, 10001, 10027 \u2026}   (this packet: 35494)",
+    "\u2192 DDoS UDP Flood"
+  ]
+}

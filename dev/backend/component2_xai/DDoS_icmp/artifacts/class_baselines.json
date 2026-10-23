@@ -2,135 +2,287 @@
   "Normal": {
     "arp.opcode": {
       "median": 0.0,
-      "mean": 0.0022150768131475526
+      "mean": 0.00048285853699781
     },
     "arp.hw.size": {
       "median": 0.0,
-      "mean": 0.0013576277241872097
+      "mean": 0.0028971510473638773
+    },
+    "icmp.checksum": {
+      "median": 0.0,
+      "mean": 0.0
     },
     "icmp.seq_le": {
       "median": 0.0,
       "mean": 0.0
     },
+    "icmp.transmit_timestamp": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "icmp.unused": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.content_length": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.response": {
+      "median": 0.0,
+      "mean": 0.0
+    },
     "http.tls_port": {
-      "median": 52185.0,
-      "mean": 96097.60278670954
+      "median": 0.0,
+      "mean": 0.0
     },
     "tcp.ack": {
-      "median": 2154053693.0,
-      "mean": 2400370923.3607717
+      "median": 546213.0,
+      "mean": 31977422.0
+    },
+    "tcp.ack_raw": {
+      "median": 2371821056.0,
+      "mean": 1975104896.0
+    },
+    "tcp.checksum": {
+      "median": 32587.0,
+      "mean": 32534.2265625
     },
     "tcp.connection.fin": {
       "median": 0.0,
-      "mean": 0.002500893176134334
+      "mean": 0.0014485755236819386
     },
     "tcp.connection.rst": {
       "median": 0.0,
-      "mean": 0.00421579135405502
+      "mean": 0.00048285853699781
     },
     "tcp.connection.syn": {
       "median": 0.0,
-      "mean": 0.0028581636298678098
+      "mean": 0.00048285853699781
     },
     "tcp.connection.synack": {
-      "median": 502.0,
-      "mean": 19599.136477313325
+      "median": 0.0,
+      "mean": 0.00048285853699781
+    },
+    "tcp.dstport": {
+      "median": 60944.0,
+      "mean": 43146.375
     },
     "tcp.flags": {
-      "median": 1.0,
-      "mean": 3.703108252947481
+      "median": 16.0,
+      "mean": 18.481409072875977
     },
     "tcp.flags.ack": {
-      "median": 11.0,
-      "mean": 14.464165773490532
+      "median": 1.0,
+      "mean": 0.9908257126808167
     },
     "tcp.len": {
+      "median": 1309.0,
+      "mean": 778.7928466796875
+    },
+    "tcp.options": {
       "median": 0.0,
-      "mean": 2.4080743122543766
+      "mean": 0.0
     },
     "tcp.seq": {
-      "median": 63846.0,
-      "mean": 10151407.5257592
+      "median": 48281216.0,
+      "mean": 67630952.0
+    },
+    "tcp.srcport": {
+      "median": 9205.0,
+      "mean": 9216.6005859375
+    },
+    "udp.port": {
+      "median": 0.0,
+      "mean": 282.1670837402344
     },
     "udp.stream": {
       "median": 0.0,
-      "mean": 24.90703822793855
+      "mean": 55.747947692871094
     },
     "udp.time_delta": {
       "median": 0.0,
-      "mean": 0.527495170846731
+      "mean": 2.7189762592315674
     },
     "dns.qry.name": {
       "median": 0.0,
-      "mean": 0.15205430510896747
+      "mean": 0.02576853148639202
     },
     "dns.qry.name.len": {
       "median": 0.0,
-      "mean": 0.06030725259021079
+      "mean": 0.0
     },
     "dns.qry.qu": {
       "median": 0.0,
-      "mean": 0.021078956770275097
+      "mean": 0.121680349111557
     },
     "dns.qry.type": {
       "median": 0.0,
-      "mean": 0.8240800285816363
+      "mean": 0.0
     },
     "dns.retransmission": {
       "median": 0.0,
-      "mean": 0.009503394069310467
+      "mean": 0.03186866268515587
     },
     "dns.retransmit_request": {
       "median": 0.0,
-      "mean": 7.145409074669524e-05
+      "mean": 0.00048285853699781
+    },
+    "dns.retransmit_request_in": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.conack.flags": {
+      "median": 0.0,
+      "mean": 0.0
     },
     "mqtt.conflag.cleansess": {
       "median": 0.0,
-      "mean": 7.145409074669524e-05
+      "mean": 0.0
     },
     "mqtt.conflags": {
       "median": 0.0,
-      "mean": 0.0001429081814933905
+      "mean": 0.0
     },
     "mqtt.hdrflags": {
       "median": 0.0,
-      "mean": 0.3532690246516613
+      "mean": 0.10816030949354172
     },
     "mqtt.len": {
       "median": 0.0,
-      "mean": 0.04015719899964273
+      "mean": 0.0
+    },
+    "mqtt.msg_decoded_as": {
+      "median": 0.0,
+      "mean": 0.0
     },
     "mqtt.msgtype": {
       "median": 0.0,
-      "mean": 0.022079314040728833
+      "mean": 0.006760019343346357
     },
     "mqtt.proto_len": {
       "median": 0.0,
-      "mean": 0.000285816362986781
+      "mean": 0.0
     },
     "mqtt.protoname": {
       "median": 0.0,
-      "mean": 7.145409074669524e-05
+      "mean": 0.0
     },
     "mqtt.topic": {
       "median": 0.0,
-      "mean": 0.0053590568060021436
+      "mean": 0.0
     },
     "mqtt.topic_len": {
       "median": 0.0,
-      "mean": 0.01679171132547338
+      "mean": 0.0
     },
     "mqtt.ver": {
-      "median": 5.0,
-      "mean": 10.929260450160772
+      "median": 0.0,
+      "mean": 0.0
     },
     "mbtcp.len": {
-      "median": 1588.0,
-      "mean": 4300.822365130403
+      "median": 0.0,
+      "mean": 0.0
     },
     "mbtcp.trans_id": {
-      "median": 14.0,
-      "mean": 9.249017506252233
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mbtcp.unit_id": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_0": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.method_0.0": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_GET": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_POST": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_TRACE": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_0": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.version_0.0": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_By Dr HTTP/1.1": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_HTTP/1.0": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_HTTP/1.1": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_Src=javascript:alert('Vulnerable')__Img Src=\\\" HTTP/1.1": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.file_data_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.file_data_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.uri.query_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.uri.query_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.referer_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.referer_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.full_uri_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.full_uri_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.payload_len": {
+      "median": 2618.0,
+      "mean": 1557.886962890625
+    },
+    "tcp.payload_code": {
+      "median": -1.0,
+      "mean": -0.6986962556838989
+    },
+    "mqtt.msg_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "mqtt.msg_code": {
+      "median": 0.0,
+      "mean": 0.0
     }
   },
   "DDoS Network Flood": {
@@ -142,9 +294,29 @@
       "median": 0.0,
       "mean": 0.0
     },
+    "icmp.checksum": {
+      "median": 0.0,
+      "mean": 13835.0634765625
+    },
     "icmp.seq_le": {
       "median": 0.0,
-      "mean": 13792.578768873404
+      "mean": 14029.2666015625
+    },
+    "icmp.transmit_timestamp": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "icmp.unused": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.content_length": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.response": {
+      "median": 0.0,
+      "mean": 0.0
     },
     "http.tls_port": {
       "median": 0.0,
@@ -152,7 +324,15 @@
     },
     "tcp.ack": {
       "median": 0.0,
-      "mean": 191549825.48706156
+      "mean": 191048176.0
+    },
+    "tcp.ack_raw": {
+      "median": 0.0,
+      "mean": 191048176.0
+    },
+    "tcp.checksum": {
+      "median": 0.0,
+      "mean": 5791.95703125
     },
     "tcp.connection.fin": {
       "median": 0.0,
@@ -164,15 +344,19 @@
     },
     "tcp.connection.syn": {
       "median": 0.0,
-      "mean": 0.17807200929152148
+      "mean": 0.17751452326774597
     },
     "tcp.connection.synack": {
       "median": 0.0,
       "mean": 0.0
     },
+    "tcp.dstport": {
+      "median": 0.0,
+      "mean": 14.20116138458252
+    },
     "tcp.flags": {
       "median": 0.0,
-      "mean": 0.35614401858304295
+      "mean": 0.35502904653549194
     },
     "tcp.flags.ack": {
       "median": 0.0,
@@ -180,31 +364,43 @@
     },
     "tcp.len": {
       "median": 0.0,
-      "mean": 0.38885017421602786
+      "mean": 205.02647399902344
+    },
+    "tcp.options": {
+      "median": 0.0,
+      "mean": 61.67916488647461
     },
     "tcp.seq": {
       "median": 0.0,
-      "mean": 0.033058837537746806
+      "mean": 0.03086150996387005
+    },
+    "tcp.srcport": {
+      "median": 1459.0,
+      "mean": 3238.39697265625
+    },
+    "udp.port": {
+      "median": 0.0,
+      "mean": 0.2348432093858719
     },
     "udp.stream": {
       "median": 0.0,
-      "mean": 576597.3422996516
+      "mean": 566577.6875
     },
     "udp.time_delta": {
       "median": 0.0,
-      "mean": 1.1933101045296168
+      "mean": 1.2784669399261475
     },
     "dns.qry.name": {
       "median": 0.0,
-      "mean": 0.0346109175377468
+      "mean": 0.007386759389191866
     },
     "dns.qry.name.len": {
       "median": 0.0,
-      "mean": 0.013844367015098722
+      "mean": 0.007386759389191866
     },
     "dns.qry.qu": {
       "median": 0.0,
-      "mean": 3.5727293844367014
+      "mean": 3.8606271743774414
     },
     "dns.qry.type": {
       "median": 0.0,
@@ -215,6 +411,14 @@
       "mean": 0.0
     },
     "dns.retransmit_request": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "dns.retransmit_request_in": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.conack.flags": {
       "median": 0.0,
       "mean": 0.0
     },
@@ -231,6 +435,10 @@
       "mean": 0.0
     },
     "mqtt.len": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mqtt.msg_decoded_as": {
       "median": 0.0,
       "mean": 0.0
     },
@@ -263,6 +471,102 @@
       "mean": 0.0
     },
     "mbtcp.trans_id": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "mbtcp.unit_id": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_0": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.method_0.0": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_GET": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_POST": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.method_TRACE": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_0": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.version_0.0": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_By Dr HTTP/1.1": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_HTTP/1.0": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_HTTP/1.1": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.version_Src=javascript:alert('Vulnerable')__Img Src=\\\" HTTP/1.1": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.file_data_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.file_data_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.uri.query_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.uri.query_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.referer_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.referer_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "http.request.full_uri_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "http.request.full_uri_code": {
+      "median": 0.0,
+      "mean": 0.0
+    },
+    "tcp.payload_len": {
+      "median": 1.0,
+      "mean": 2.42229962348938
+    },
+    "tcp.payload_code": {
+      "median": 0.0,
+      "mean": 0.19786295294761658
+    },
+    "mqtt.msg_len": {
+      "median": 1.0,
+      "mean": 1.0
+    },
+    "mqtt.msg_code": {
       "median": 0.0,
       "mean": 0.0
     }

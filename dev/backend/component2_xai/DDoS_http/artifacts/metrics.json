@@ -1,5 +1,5 @@
 {
-  "trained_at": "2026-10-22T15:30:08+00:00",
+  "trained_at": "2026-10-23T12:14:40+00:00",
   "model": "RandomForestClassifier",
   "params": {
     "n_estimators": 200,
@@ -9,36 +9,16 @@
     "random_state": 42
   },
   "data_sources": [
-    "Distance_15MB.csv",
-    "EdgeIIoT_train_80_with_incident_id.csv",
-    "Flame_Sensor_15MB.csv",
-    "Heart_Rate_15MB.csv",
-    "IR_Receiver_15MB.csv",
-    "Modbus_15MB.csv",
-    "Soil_Moisture_15MB.csv",
-    "Sound_Sensor_15MB.csv",
-    "Temperature_and_Humidity_15MB.csv",
-    "Water_Level_15MB.csv",
-    "phValue_15MB.csv"
+    "EdgeIIoT_train_80_with_incident_id.csv"
   ],
-  "n_train": 14548,
-  "n_test": 3637,
+  "n_train": 2624,
+  "n_test": 656,
   "class_counts": {
-    "Normal": 17494,
+    "Normal": 2589,
     "DDoS HTTP Flood": 691
   },
   "source_counts": {
-    "Distance_15MB.csv": 33,
-    "EdgeIIoT_train_80_with_incident_id.csv": 3280,
-    "Flame_Sensor_15MB.csv": 31,
-    "Heart_Rate_15MB.csv": 25,
-    "IR_Receiver_15MB.csv": 38,
-    "Modbus_15MB.csv": 14737,
-    "Soil_Moisture_15MB.csv": 8,
-    "Sound_Sensor_15MB.csv": 3,
-    "Temperature_and_Humidity_15MB.csv": 21,
-    "Water_Level_15MB.csv": 5,
-    "phValue_15MB.csv": 4
+    "EdgeIIoT_train_80_with_incident_id.csv": 3280
   },
   "accuracy": 1.0,
   "precision": 1.0,
@@ -49,7 +29,7 @@
   "false_positive_rate": 0.0,
   "confusion_matrix": [
     [
-      3499,
+      518,
       0
     ],
     [
@@ -65,32 +45,16 @@
       0.0,
       0.0,
       0.0,
-      0.0005715918833952558,
-      0.0011431837667905116,
-      0.008288082309231209,
-      0.00943126607602172,
-      0.009717062017719349,
-      0.010288653901114605,
-      0.05573020863103744,
-      0.058016576164618465,
-      0.15518719634181194,
-      0.3778222349242641,
+      0.007722007722007722,
+      0.015444015444015444,
       1.0
     ],
     "tpr": [
       0.0,
-      0.2971014492753623,
-      0.8188405797101449,
-      0.9710144927536232,
+      0.13768115942028986,
+      0.5217391304347826,
+      0.9637681159420289,
       0.9855072463768116,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
       1.0,
       1.0,
       1.0,
@@ -100,17 +64,10 @@
   "pr_curve": {
     "recall": [
       0.0,
-      0.2971014492753623,
-      0.8188405797101449,
-      0.9710144927536232,
+      0.13768115942028986,
+      0.5217391304347826,
+      0.9637681159420289,
       0.9855072463768116,
-      0.9927536231884058,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
-      1.0,
       1.0,
       1.0,
       1.0,
@@ -127,20 +84,13 @@
       1.0,
       1.0,
       1.0,
-      1.0,
+      0.9928057553956835,
       0.9857142857142858,
       0.9787234042553191,
       0.971830985915493,
-      0.8263473053892215,
-      0.8165680473372781,
-      0.8070175438596491,
-      0.8023255813953488,
-      0.7931034482758621,
-      0.4144144144144144,
-      0.4046920821114369,
-      0.2026431718061674,
-      0.09452054794520548,
-      0.0379433599120154
+      0.9583333333333334,
+      0.9452054794520548,
+      0.21036585365853658
     ]
   },
   "classification_report": {
@@ -148,7 +98,7 @@
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 3499.0
+      "support": 518.0
     },
     "DDoS HTTP Flood": {
       "precision": 1.0,
@@ -161,33 +111,42 @@
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 3637.0
+      "support": 656.0
     },
     "weighted avg": {
       "precision": 1.0,
       "recall": 1.0,
       "f1-score": 1.0,
-      "support": 3637.0
+      "support": 656.0
     }
   },
-  "fit_seconds": 0.92,
-  "inference_ms_per_packet": 0.0268,
+  "fit_seconds": 0.72,
+  "inference_ms_per_packet": 0.1441,
   "features": [
     "arp.opcode",
     "arp.hw.size",
-    "http.request.method",
-    "http.referer",
-    "http.request.version",
+    "icmp.checksum",
+    "icmp.seq_le",
+    "icmp.transmit_timestamp",
+    "icmp.unused",
+    "http.content_length",
+    "http.response",
     "http.tls_port",
     "tcp.ack",
+    "tcp.ack_raw",
+    "tcp.checksum",
     "tcp.connection.fin",
     "tcp.connection.rst",
     "tcp.connection.syn",
     "tcp.connection.synack",
+    "tcp.dstport",
     "tcp.flags",
     "tcp.flags.ack",
     "tcp.len",
+    "tcp.options",
     "tcp.seq",
+    "tcp.srcport",
+    "udp.port",
     "udp.stream",
     "udp.time_delta",
     "dns.qry.name",
@@ -196,10 +155,13 @@
     "dns.qry.type",
     "dns.retransmission",
     "dns.retransmit_request",
+    "dns.retransmit_request_in",
+    "mqtt.conack.flags",
     "mqtt.conflag.cleansess",
     "mqtt.conflags",
     "mqtt.hdrflags",
     "mqtt.len",
+    "mqtt.msg_decoded_as",
     "mqtt.msgtype",
     "mqtt.proto_len",
     "mqtt.protoname",
@@ -207,18 +169,40 @@
     "mqtt.topic_len",
     "mqtt.ver",
     "mbtcp.len",
-    "mbtcp.trans_id"
+    "mbtcp.trans_id",
+    "mbtcp.unit_id",
+    "http.request.method_0",
+    "http.request.method_0.0",
+    "http.request.method_GET",
+    "http.request.method_POST",
+    "http.request.method_TRACE",
+    "http.request.version_0",
+    "http.request.version_0.0",
+    "http.request.version_By Dr HTTP/1.1",
+    "http.request.version_HTTP/1.0",
+    "http.request.version_HTTP/1.1",
+    "http.request.version_Src=javascript:alert('Vulnerable')__Img Src=\\\" HTTP/1.1",
+    "http.file_data_len",
+    "http.file_data_code",
+    "http.request.uri.query_len",
+    "http.request.uri.query_code",
+    "http.referer_len",
+    "http.referer_code",
+    "http.request.full_uri_len",
+    "http.request.full_uri_code",
+    "tcp.payload_len",
+    "tcp.payload_code",
+    "mqtt.msg_len",
+    "mqtt.msg_code"
   ],
   "categorical_features": [
-    "arp.hw.size",
-    "http.request.method",
-    "http.referer",
-    "http.request.version",
-    "tcp.len",
-    "dns.qry.name",
-    "dns.qry.name.len",
-    "mqtt.protoname",
-    "mqtt.topic"
+    "tcp.options",
+    "http.file_data_code",
+    "http.request.uri.query_code",
+    "http.referer_code",
+    "http.request.full_uri_code",
+    "tcp.payload_code",
+    "mqtt.msg_code"
   ],
   "dropped_columns": [
     "frame.time",
@@ -245,15 +229,6 @@
     "Attack_label",
     "__source"
   ],
-  "dropped_constant_columns": [
-    "icmp.seq_le",
-    "icmp.unused",
-    "http.content_length",
-    "http.response",
-    "dns.retransmit_request_in",
-    "mqtt.conack.flags",
-    "mqtt.msg_decoded_as",
-    "mbtcp.unit_id"
-  ],
-  "total_seconds": 39.7
+  "dropped_constant_columns": [],
+  "total_seconds": 24.7
 }

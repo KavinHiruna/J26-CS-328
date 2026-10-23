@@ -1,0 +1,371 @@
+{
+  "incident_id": "ALR-000327",
+  "predicted_label": "SQL injection",
+  "attack_class": "SQL injection",
+  "attack_probability": 0.9999998422414338,
+  "confidence": 0.9999998422414338,
+  "is_attack": true,
+  "probabilities": {
+    "Not SQL injection": 1.5775856621047524e-07,
+    "SQL injection": 0.9999998422414338
+  },
+  "features": {
+    "single_quote_count": 0.0,
+    "double_quote_count": 0.0,
+    "semicolon_count": 0.0,
+    "comment_count": 0.0,
+    "parenthesis_count": 12.0,
+    "equals_count": 5.0,
+    "sql_select": 0.0,
+    "sql_union": 0.0,
+    "sql_insert": 0.0,
+    "sql_update": 0.0,
+    "sql_delete": 0.0,
+    "sql_drop": 0.0,
+    "sql_alter": 0.0,
+    "sql_create": 0.0,
+    "sql_from": 0.0,
+    "sql_where": 0.0,
+    "sql_having": 0.0,
+    "sql_group_by": 0.0,
+    "sql_order_by": 0.0,
+    "sql_sleep": 0.0,
+    "sql_benchmark": 0.0,
+    "sql_pg_sleep": 0.0,
+    "sql_extractvalue": 0.0,
+    "sql_updatexml": 0.0,
+    "sql_cast": 0.0,
+    "sql_convert": 0.0,
+    "sql_concat": 0.0,
+    "sql_substring": 0.0,
+    "sql_database": 0.0,
+    "sql_schema": 0.0,
+    "sql_information_schema": 0.0,
+    "or_condition": 0.0,
+    "and_condition": 1.0,
+    "union_select": 0.0,
+    "hex_pattern_count": 0.0,
+    "sleep_function": 0.0,
+    "database_function": 0.0,
+    "extractvalue_function": 0.0,
+    "xml_function": 0.0,
+    "percent_encoded_count": 25.0,
+    "query_length": 166.0,
+    "query_parameter_count": 2.0,
+    "uri_length": 220.0,
+    "http_get": 1.0,
+    "tcp.len": 428.0,
+    "tcp.dstport": 80.0,
+    "tcp.srcport": 44762.0,
+    "tcp.flags.ack": 1.0,
+    "tcp.connection.syn": 0.0,
+    "tcp.connection.synack": 0.0,
+    "tcp.connection.fin": 0.0,
+    "tcp.connection.rst": 0.0,
+    "http.content_length": 0.0,
+    "tcp_payload_length": 428.0,
+    "xss_script_tag": 0.0,
+    "xss_event_handler": 0.0,
+    "xss_js_uri": 0.0,
+    "xss_html_tag": 0.0,
+    "xss_dom_sink": 0.0,
+    "xss_angle_brackets": 0.0,
+    "upload_dir": 0.0,
+    "exec_extension": 0.0,
+    "multipart_body": 0.0,
+    "server_code_in_body": 0.0,
+    "body_length": 0.0
+  },
+  "view": {
+    "segments": [
+      [
+        "Request target",
+        0,
+        170
+      ]
+    ],
+    "text": "http://192.168.0.128/DVWA/vulnerabilities/sqli_blind/?id=9) AND 6722=DBMS_PIPE.RECEIVE_MESSAGE(CHR(118)||CHR(116)||CHR(118)||CHR(122),5) AND (4473=4473&Submit=Submitid=59",
+    "decode_rounds": 1
+  },
+  "family_spans": {
+    "syntax": [
+      [
+        58,
+        59
+      ],
+      [
+        94,
+        95
+      ],
+      [
+        98,
+        99
+      ],
+      [
+        102,
+        103
+      ],
+      [
+        108,
+        109
+      ],
+      [
+        112,
+        113
+      ],
+      [
+        118,
+        119
+      ],
+      [
+        122,
+        123
+      ],
+      [
+        128,
+        129
+      ],
+      [
+        132,
+        133
+      ],
+      [
+        135,
+        136
+      ],
+      [
+        141,
+        142
+      ],
+      [
+        56,
+        57
+      ],
+      [
+        68,
+        69
+      ],
+      [
+        146,
+        147
+      ],
+      [
+        158,
+        159
+      ],
+      [
+        167,
+        168
+      ]
+    ],
+    "logic": [
+      [
+        60,
+        63
+      ],
+      [
+        137,
+        140
+      ]
+    ],
+    "encoding": []
+  },
+  "pss": {
+    "syntax": 0.314788329001366,
+    "logic": 0.025804506061339088,
+    "encoding": 0.08040889193730569
+  },
+  "pss_base": 0.578998115241423,
+  "shap_values": {
+    "query_length": 0.05852890281813916,
+    "query_parameter_count": 0.07267192090160475,
+    "uri_length": 0.06081792079730469,
+    "http_get": 0.022009278864580026,
+    "single_quote_count": -0.0017577970384582604,
+    "double_quote_count": 0.0021957058706476135,
+    "semicolon_count": 2.4756810916791515e-05,
+    "comment_count": 0.0013431937892896117,
+    "parenthesis_count": 0.0161629877839951,
+    "equals_count": 0.08581383304893173,
+    "sql_select": -0.0030533090508342827,
+    "sql_union": -5.803033378394119e-06,
+    "sql_insert": 0.0,
+    "sql_update": 0.0,
+    "sql_delete": 0.0,
+    "sql_drop": 0.0,
+    "sql_alter": 0.0,
+    "sql_create": 0.0,
+    "sql_from": -0.0009927726171711103,
+    "sql_where": 0.0,
+    "sql_having": 0.0,
+    "sql_group_by": 0.0,
+    "sql_order_by": -0.0003575705443564389,
+    "sql_sleep": -5.1431840840401974e-05,
+    "sql_benchmark": 0.0,
+    "sql_pg_sleep": -0.00021976954930315483,
+    "sql_extractvalue": -8.759931653890213e-10,
+    "sql_updatexml": 0.0,
+    "sql_cast": -3.565183030141165e-05,
+    "sql_convert": 0.0,
+    "sql_concat": -3.252361919785983e-05,
+    "sql_substring": 0.0,
+    "sql_database": 0.0,
+    "sql_schema": 0.0,
+    "sql_information_schema": 0.0,
+    "or_condition": 4.0147005134358725e-06,
+    "and_condition": 0.017808409218589023,
+    "union_select": -6.82176507822577e-09,
+    "percent_encoded_count": 0.05331763513623524,
+    "hex_pattern_count": -2.6663711466796158e-05,
+    "sleep_function": -0.00021390792218432494,
+    "database_function": 0.0,
+    "extractvalue_function": -1.4006772232950005e-06,
+    "xml_function": -6.883625823957389e-07,
+    "tcp.len": 0.03140202062804345,
+    "tcp.dstport": 0.004761528825154777,
+    "tcp.srcport": 0.034103544648871276,
+    "tcp.flags.ack": 0.002940847918757357,
+    "tcp.connection.syn": 0.0005969361403570046,
+    "tcp.connection.synack": 2.119924288241737e-06,
+    "tcp.connection.fin": 4.1421780667125896e-05,
+    "tcp.connection.rst": 0.0002844263452925814,
+    "http.content_length": 0.04261213093861033,
+    "tcp_payload_length": 0.038285321689233376,
+    "xss_script_tag": 0.02603607252802416,
+    "xss_event_handler": 0.0,
+    "xss_js_uri": 2.9061880673064095e-05,
+    "xss_html_tag": 1.0450423932177365e-05,
+    "xss_dom_sink": 0.053261513305999666,
+    "xss_angle_brackets": 0.027262142578260797,
+    "upload_dir": 0.04248562724192738,
+    "exec_extension": 0.027476734413635132,
+    "multipart_body": 0.0,
+    "server_code_in_body": 7.801407473685695e-08,
+    "body_length": 0.03450965431873626
+  },
+  "shap_family": {
+    "size": 0.29492547600947233,
+    "quote": 0.0004379088321893531,
+    "terminator": 2.4756810916791515e-05,
+    "comment": 0.0013431937892896117,
+    "syntax": 0.10197682083292683,
+    "keyword": -0.004403652212361832,
+    "union": -5.809855143472345e-06,
+    "time_delay": -0.0004851093123278817,
+    "error_xml": -3.774174610026778e-05,
+    "db_recon": -3.252361919785983e-05,
+    "logic": 0.017812423919102458,
+    "encoding": 0.05329097142476844,
+    "network": 0.07413284621143182,
+    "xss": 0.10659924071688986,
+    "upload": 0.10447209398837351
+  },
+  "lime_weights": {
+    "percent_encoded_count": 0.08799038442959797,
+    "equals_count": 0.08153867927510126,
+    "query_parameter_count": 0.08048630636393941,
+    "query_length": 0.07959793542489467,
+    "and_condition": 0.0793261930349642,
+    "uri_length": 0.04749754890908162,
+    "sql_select": -0.025962169041441874,
+    "parenthesis_count": 0.021830768476921916,
+    "single_quote_count": -0.018648284507991403,
+    "http_get": 0.01660075324953741,
+    "sql_from": -0.01375819406844885,
+    "comment_count": -0.013676523850153275,
+    "sql_sleep": -0.00913507758943015,
+    "http.content_length": 0.007190539943387087,
+    "sleep_function": -0.004304139658680191
+  },
+  "lime_family": {
+    "encoding": 0.08799038442959797,
+    "syntax": 0.10336944775202318,
+    "size": 0.2313730838908402,
+    "logic": 0.0793261930349642,
+    "keyword": -0.03972036310989072,
+    "quote": -0.018648284507991403,
+    "comment": -0.013676523850153275,
+    "time_delay": -0.013439217248110341
+  },
+  "techniques": [
+    {
+      "key": "boolean_blind",
+      "technique": "Boolean-based blind / tautology",
+      "family": "logic",
+      "severity": 0.7,
+      "capec": "CAPEC-7",
+      "cwe": "CWE-89",
+      "attack": "T1190",
+      "evidence": "AND 6722=",
+      "matches": 2,
+      "recommendation": "Look for paired TRUE/FALSE requests from the same source that differ only in the condition."
+    },
+    {
+      "key": "obfuscation",
+      "technique": "Obfuscation / encoding",
+      "family": "encoding",
+      "severity": 0.45,
+      "capec": "CAPEC-66",
+      "cwe": "CWE-89",
+      "attack": "T1190",
+      "evidence": "CHR(118)||",
+      "matches": 3,
+      "recommendation": "Attacker is evading simple filters; signature-based WAF rules may have missed this."
+    }
+  ],
+  "trust": {
+    "rule_families": [
+      "encoding",
+      "logic"
+    ],
+    "pss_top_families": [
+      "encoding",
+      "logic"
+    ],
+    "rule_pss_agreement": 1.0,
+    "pss_shap_agreement": 1.0,
+    "pss_lime_agreement": 1.0,
+    "payload_share": 0.4210017934166501,
+    "deletion_drop_top": 0.10605172913687899,
+    "deletion_drop_random": 0.0,
+    "fidelity_gain": 0.10605174586745036,
+    "components_used": 4,
+    "score": 0.7765129364668626,
+    "level": "High"
+  },
+  "counterfactual": {
+    "found": false,
+    "applicable": true,
+    "reason": "Removing every payload evidence group does not drop the attack probability below the threshold - the decision is driven by non-payload (network/size) features.",
+    "probability_all_removed": 0.578998115241423
+  },
+  "priority": {
+    "score": 0.6999998895690036,
+    "level": "High",
+    "max_technique_severity": 0.7,
+    "note": ""
+  },
+  "narrative": "Incident ALR-000327: the model classified this request as an SQL injection / attack (predicted 'SQL injection', P(SQL injection) = 100.0%). Payload evidence that pushed the score up most: parentheses / equals signs (+31.5%: (, )); hex / encoded content (+8.0%); and / or logic (+2.6%: AND). About 42% of the attack probability comes from the payload text; the rest comes from size/network features. Rule analysis identifies: Boolean-based blind / tautology, Obfuscation / encoding (CWE-89, MITRE ATT&CK T1190). Explanation trust: High (0.78) based on 4 independent check(s). Counterfactual: Removing every payload evidence group does not drop the attack probability below the threshold - the decision is driven by non-payload (network/size) features. Suggested next step: Look for paired TRUE/FALSE requests from the same source that differ only in the condition. This explains the model's behaviour for this record; it is not proof that the attack succeeded.",
+  "messages": [],
+  "prediction": "SQL injection",
+  "attack_type": "SQL injection",
+  "class_probabilities": {
+    "SQL injection": 0.9999998422414338,
+    "XSS": 0.0,
+    "Malicious upload": 0.0
+  },
+  "shap_top": {
+    "equals_count": 0.08581383304893173,
+    "query_parameter_count": 0.07267192090160475,
+    "uri_length": 0.06081792079730469,
+    "query_length": 0.05852890281813916,
+    "percent_encoded_count": 0.05331763513623524,
+    "xss_dom_sink": 0.053261513305999666,
+    "http.content_length": 0.04261213093861033,
+    "upload_dir": 0.04248562724192738,
+    "tcp_payload_length": 0.038285321689233376,
+    "body_length": 0.03450965431873626,
+    "tcp.srcport": 0.034103544648871276,
+    "tcp.len": 0.03140202062804345
+  }
+}

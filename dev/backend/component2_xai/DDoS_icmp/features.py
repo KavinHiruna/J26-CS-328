@@ -1,11 +1,9 @@
 """
 Feature encoding for raw Edge-IIoTset packet rows.
 
-Edge-IIoTset columns are messy: the same column can hold floats in one sensor's
-CSV, hex strings ("0x00000018") in another, and text ("GET", "HTTP/1.1") in the
-attack CSVs. `FeatureEncoder` learns, per column, whether it is numeric or
-categorical and applies exactly the same mapping at inference time, so raw
-uploaded CSVs can be scored without manual cleaning.
+Uses the Component 1 V2 feature set (71 features from feature_names_15class_v2.json)
+for consistency across all XAI dashboards. Falls back to the original per-column
+auto-detection when the V2 feature names file is unavailable.
 """
 from __future__ import annotations
 
@@ -17,12 +15,24 @@ import pandas as pd
 
 from . import config
 
+try:
+    from backend.common.v2_features import V2FeatureEncoder
+    _HAS_V2 = True
+except ImportError:
+    try:
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+        from common.v2_features import V2FeatureEncoder
+        _HAS_V2 = True
+    except ImportError:
+        _HAS_V2 = False
+
 _HEX_RE = re.compile(r"^0x[0-9a-fA-F]+$")
 UNKNOWN_CODE = -1
 
 
 def _to_number(value) -> float | None:
-    """Parse a cell as a number (decimal or hex). Returns None if not numeric."""
     if value is None:
         return 0.0
     if isinstance(value, (int, float, np.integer, np.floating)):
@@ -39,11 +49,6 @@ def _to_number(value) -> float | None:
 
 
 def _parse_series(series: pd.Series) -> tuple[pd.Series, pd.Series]:
-    """Vectorised `_to_number` for a whole column.
-
-    Returns (numbers, is_text): numbers is float with NaN where the cell is
-    genuine text; empty/missing cells become 0 as in the Edge-IIoTset CSVs.
-    """
     num = pd.to_numeric(series, errors="coerce")
     missing = series.isna()
     pending = num.isna() & ~missing
@@ -61,7 +66,6 @@ def _parse_series(series: pd.Series) -> tuple[pd.Series, pd.Series]:
 
 
 def _normalise_token(value) -> str:
-    """Canonical string form for categorical vocabularies ("0.0" -> "0")."""
     num = _to_number(value)
     if num is not None:
         return str(int(num)) if float(num).is_integer() else repr(num)
@@ -69,7 +73,6 @@ def _normalise_token(value) -> str:
 
 
 def _tokens(series: pd.Series) -> pd.Series:
-    """Vectorised `_normalise_token`: numbers -> canonical text, text stripped."""
     num, is_text = _parse_series(series)
     out = pd.Series(index=series.index, dtype=object)
     nums = num[~is_text]
@@ -82,16 +85,31 @@ def _tokens(series: pd.Series) -> pd.Series:
 
 @dataclass
 class FeatureEncoder:
-    """Learns numeric/categorical handling for every kept column."""
+    """Wraps the V2FeatureEncoder to produce the canonical 71-feature space.
+
+    Falls back to the original per-column auto-detection if V2 is unavailable.
+    """
 
     feature_names: list[str] = field(default_factory=list)
     numeric_cols: list[str] = field(default_factory=list)
     categorical_cols: list[str] = field(default_factory=list)
     vocab: dict[str, dict[str, int]] = field(default_factory=dict)
     dropped_constant: list[str] = field(default_factory=list)
+    _v2: V2FeatureEncoder | None = field(default=None, repr=False)
 
     # ------------------------------------------------------------------ fit
     def fit(self, df: pd.DataFrame) -> "FeatureEncoder":
+        if _HAS_V2:
+            self._v2 = V2FeatureEncoder()
+            self._v2.fit(df)
+            self.feature_names = self._v2.feature_names
+            self.categorical_cols = self._v2.categorical_cols
+            self.vocab = self._v2.vocab
+            self.numeric_cols = [f for f in self.feature_names if f not in set(self.categorical_cols)]
+            self.dropped_constant = []
+            return self
+
+        # Fallback: original auto-detection
         cols = [c for c in df.columns if c not in config.DROP_COLUMNS]
         self.numeric_cols, self.categorical_cols, self.vocab = [], [], {}
         self.dropped_constant = []
@@ -99,7 +117,7 @@ class FeatureEncoder:
         for col in cols:
             series = df[col]
             parsed, is_text = _parse_series(series)
-            if is_text.any():                            # some text values
+            if is_text.any():
                 tokens = _tokens(series)
                 counts = tokens.value_counts()
                 if len(counts) <= 1:
@@ -113,13 +131,15 @@ class FeatureEncoder:
                     continue
                 self.numeric_cols.append(col)
 
-        # Keep the original dataset column order for readability.
         keep = set(self.numeric_cols) | set(self.categorical_cols)
         self.feature_names = [c for c in cols if c in keep]
         return self
 
     # ------------------------------------------------------------ transform
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        if self._v2 is not None:
+            return self._v2.transform(df)
+
         out = {}
         for col in self.feature_names:
             if col not in df.columns:
@@ -142,7 +162,8 @@ class FeatureEncoder:
 
     # -------------------------------------------------------------- helpers
     def decode_value(self, col: str, code: float) -> str:
-        """Turn an encoded value back into something a human can read."""
+        if self._v2 is not None:
+            return self._v2.decode_value(col, code)
         if col in self.vocab:
             inverse = {v: k for k, v in self.vocab[col].items()}
             return inverse.get(int(code), "<unseen>")

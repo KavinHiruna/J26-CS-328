@@ -2,6 +2,7 @@
 Detection model + explanations.
 
 Prediction: Random Forest (scikit-learn) trained on the dataset's numeric features.
+Uses the Component 1 V2 feature set (71 features) when config.USE_V2_FEATURES is True.
 Explanation: per-record feature contributions using the tree-path decomposition
 (Saabas method): for each tree, every split on the record's decision path moves
 the predicted-class probability up or down; that change is credited to the split
@@ -20,18 +21,25 @@ from sklearn.model_selection import train_test_split
 
 from . import config
 
+try:
+    from backend.common.v2_features import V2FeatureEncoder
+except ImportError:
+    import sys
+    from pathlib import Path
+    sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+    from common.v2_features import V2FeatureEncoder
+
 
 def feature_columns(df, label_col, id_col, extra_skip=()):
     skip = set(config.NON_FEATURE_COLUMNS) | {label_col, id_col, config.BINARY_LABEL_COLUMN} | set(extra_skip)
     feats = []
     for c in df.columns:
         n = "".join(ch for ch in c.lower() if ch.isalnum())
-        # identifiers would leak row order into the model: never use them as features
         if c in skip or c.startswith("_") or "incident" in n or n.startswith("unnamed") or n in ("id", "index"):
             continue
         if pd.api.types.is_numeric_dtype(df[c]):
             feats.append(c)
-        else:  # numbers stored as text are kept; real text columns are dropped
+        else:
             conv = pd.to_numeric(df[c].head(5000), errors="coerce")
             if conv.notna().mean() > 0.95:
                 feats.append(c)
@@ -49,6 +57,7 @@ class Detector:
     def __init__(self, dataset):
         self.ds = dataset
         self.info = {}
+        self._v2_encoder = None
         path = config.MODEL_PATH
         if path.exists():
             bundle = joblib.load(path)
@@ -56,28 +65,30 @@ class Detector:
                 self.model, self.features = bundle["model"], bundle["features"]
                 self.medians = pd.Series(bundle.get("medians", {}))
                 self.info = bundle.get("info", {})
-            else:  # a bare sklearn estimator
+                if "v2_encoder" in bundle:
+                    self._v2_encoder = bundle["v2_encoder"]
+            else:
                 self.model = bundle
                 self.features = list(getattr(bundle, "feature_names_in_", []))
                 self.medians = pd.Series(dtype=float)
-            missing = [f for f in self.features if f not in dataset.df.columns]
-            if missing:
-                raise ValueError(f"Saved model expects columns missing from dataset: {missing[:10]}")
-            print(f"[model] loaded {path}", flush=True)
+            if self._v2_encoder is None:
+                missing = [f for f in self.features if f not in dataset.df.columns]
+                if missing:
+                    raise ValueError(f"Saved model expects columns missing from dataset: {missing[:10]}")
+            print(f"[model] loaded {path} ({len(self.features)} features)", flush=True)
         else:
             self._train()
-        if self.medians.empty:
+        if self._v2_encoder is None and self.medians.empty:
             self.medians = _matrix(dataset.df[self.features].head(50000), self.features).median()
         self.classes = [str(c) for c in self.model.classes_]
 
     def _train(self):
         ds = self.ds
         df = ds.df
-        self.features = feature_columns(df, ds.label_col, ds.id_col, ds.exclude_cols)
+        use_v2 = getattr(config, "USE_V2_FEATURES", False)
         n = min(config.TRAIN_SAMPLE_SIZE, len(df))
         y_all = df[ds.label_col]
         if n < len(df):
-            # stratified sample, keeping at least a few rows of rare classes
             frac = n / len(df)
             rng = np.random.default_rng(42)
             picked = []
@@ -87,9 +98,20 @@ class Detector:
             sample = df.iloc[np.sort(np.concatenate(picked))]
         else:
             sample = df
-        self.medians = _matrix(sample, self.features).median()
-        X = _matrix(sample, self.features, self.medians)
-        # plain NumPy object array: pandas 3 + pyarrow string arrays can't be indexed by sklearn
+
+        if use_v2:
+            print("[model] using Component 1 V2 feature set (71 features)", flush=True)
+            enc = V2FeatureEncoder()
+            enc.fit(sample)
+            self._v2_encoder = enc
+            self.features = enc.feature_names
+            X = enc.transform(sample)
+            self.medians = X.median()
+        else:
+            self.features = feature_columns(df, ds.label_col, ds.id_col, ds.exclude_cols)
+            self.medians = _matrix(sample, self.features).median()
+            X = _matrix(sample, self.features, self.medians)
+
         y = sample[ds.label_col].astype(str).to_numpy(dtype=object)
         strat = y if pd.Series(y).value_counts().min() >= 2 else None
         X = X.to_numpy(dtype=np.float32)
@@ -107,13 +129,19 @@ class Detector:
         }
         print(f"[model] {self.info}", flush=True)
         config.MODEL_PATH.parent.mkdir(parents=True, exist_ok=True)
-        joblib.dump({"model": self.model, "features": self.features,
-                     "medians": self.medians.to_dict(), "info": self.info}, config.MODEL_PATH)
+        bundle = {"model": self.model, "features": self.features,
+                  "medians": self.medians.to_dict(), "info": self.info}
+        if self._v2_encoder is not None:
+            bundle["v2_encoder"] = self._v2_encoder
+        joblib.dump(bundle, config.MODEL_PATH)
 
     # ------------------------------------------------------------------
     def _x(self, pos):
         """One record as a DataFrame if the model was fitted with column names, else NumPy."""
-        x = _matrix(self.ds.df.iloc[[pos]], self.features, self.medians)
+        if self._v2_encoder is not None:
+            x = self._v2_encoder.transform(self.ds.df.iloc[[pos]])
+        else:
+            x = _matrix(self.ds.df.iloc[[pos]], self.features, self.medians)
         return x if hasattr(self.model, "feature_names_in_") else x.to_numpy(dtype=np.float32)
 
     def predict(self, pos):

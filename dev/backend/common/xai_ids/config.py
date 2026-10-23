@@ -138,11 +138,13 @@ TESTBED_HOSTS = {"192.168.0.170", "192.168.0.128"}
 # Model
 # If MODEL_PATH exists it is loaded; otherwise a Random Forest is trained on a
 # stratified sample of the dataset at first start and saved there.
+# Uses the Component 1 V2 feature set (71 features from feature_names_15class_v2.json).
 # ---------------------------------------------------------------------------
 MODEL_PATH = MODEL_DIR / "rf_edgeiiot.joblib"
 TRAIN_SAMPLE_SIZE = 150_000
 RF_PARAMS = dict(n_estimators=100, max_depth=20, n_jobs=-1, random_state=42,
                  class_weight="balanced_subsample")
+USE_V2_FEATURES = True
 
 # Incident statuses changed in the UI are saved here
 STATUS_STORE = BASE_DIR / "status_overrides.json"

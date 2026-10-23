@@ -1,0 +1,7 @@
+asset_id,asset_name,scenario,asset_role,criticality,criticality_reason,data_source,ip_address
+OT-001,Control endpoint (Modbus/TCP + MQTT + HTTP),Edge-IIoTset testbed,Process control / edge server,5.0,Role: Edge-IIoTset paper Table VI (edge server). Criticality: survey 2 median.,Ferrag et al. 2022 Edge-IIoTset (TechRxiv doi 10.36227/techrxiv.18857336.v1); see component3_evidence/evidence/ip_role_evidence.csv,192.168.0.128
+OT-002,Sensor/monitor client (MQTT),Edge-IIoTset testbed,Monitoring / sensor node,4.0,Role: Edge-IIoTset paper Table VI (IoT sensor node). Criticality: survey 2 median.,Ferrag et al. 2022 Edge-IIoTset (TechRxiv doi 10.36227/techrxiv.18857336.v1); see component3_evidence/evidence/ip_role_evidence.csv,192.168.0.101
+OT-003,Attack-source host (sends only attack flows),Edge-IIoTset testbed,No registered device,4.0,Role: Edge-IIoTset paper Table V (attacker host). Criticality: survey 2 median for an unlisted device.,Ferrag et al. 2022 Edge-IIoTset (TechRxiv doi 10.36227/techrxiv.18857336.v1); see component3_evidence/evidence/ip_role_evidence.csv,192.168.0.170
+OT-004,Renewable Energy Controller (what-if only),Solar Farm (what-if only),Process control / edge server,5.0,Demo what-if device; no dataset traffic,Assumption / policy,
+OT-005,Monitoring Server (what-if only),Solar Farm (what-if only),Monitoring / sensor node,4.0,Demo what-if device; no dataset traffic,Assumption / policy,
+OT-000,Unregistered / unidentified destination,Unknown,No registered device,4.0,Fallback policy: destination not in registry,Assumption / policy,

@@ -1,0 +1,9 @@
+{
+  "collected_at": "2026-10-23 23:58:56",
+  "files": {
+    "firewall.log": "02384239e7bdf7defa5ce5ac1c5c60522dacdd130eeb1126c639f223854c4bd6",
+    "ids_alerts.log": "b1e0e2648a574d946b0ecf9e9a3588867e8dfd391d464b8fef4b557a5cd213ee",
+    "device.log": "2dc372e924f3c75c5964560fbb378eea42626faa9e1ef0b846b53dc604b24056",
+    "incident.json": "c1b8b3cc57ca458a2bf86f6feb522693dce5b11447b117c7b790e77750120b1f"
+  }
+}

@@ -1,0 +1,9 @@
+timestamp,signature,severity,src_ip,dst_ip,category,label,true_stage
+2026-09-10 09:02:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-10 09:03:45,ET SCAN Nmap Scripting Engine User-Agent Detected,Medium,203.0.113.55,10.10.0.0/24,Reconnaissance,ATTACK,Reconnaissance
+2026-09-10 09:03:50,ET SCAN Suspicious Multi-Port Connection Attempt,Medium,203.0.113.55,10.10.0.0/24,Reconnaissance,ATTACK,Reconnaissance
+2026-09-10 09:05:10,ET POLICY SSH Brute Force Login Attempt,High,203.0.113.55,10.10.0.10,Credential-Access,ATTACK,Credential Access
+2026-09-10 09:07:30,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-10 09:08:05,ET MALWARE Possible Malicious Payload Upload via SMB,Critical,203.0.113.55,10.10.0.10,Malware,ATTACK,Malware Delivery
+2026-09-10 09:10:05,ET SCADA Modbus Write Function Code Anomaly - Breaker Control Register,Critical,10.10.0.10,10.10.0.50,ICS-Attack,ATTACK,Impact
+2026-09-10 09:12:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,

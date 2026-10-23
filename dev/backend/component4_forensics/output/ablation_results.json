@@ -1,0 +1,255 @@
+[
+ {
+  "config": "Full method (all rules on)",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.8162726317790509,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8899205903936253,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "No reverse-seed rule (C2 address as destination)",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 0.9038461538461539,
+   "corr_f1": 0.9404761904761905,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 0.75,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.8001511102201891,
+   "corr_recall": 0.9060971667221667,
+   "corr_f1": 0.8356501796234874,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 0.75,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "No flow-history rule (routine flows of pivoted hosts)",
+  "fixed": {
+   "corr_precision": 0.9821428571428572,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9907407407407407,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.6554177991976188,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7680468835439739,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "No policy-alert filter",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.8162726317790509,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8899205903936253,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "Single failed login counted as evidence",
+  "fixed": {
+   "corr_precision": 0.9551542207792207,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9768622711233365,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.7903049736762041,
+   "corr_recall": 0.9985714285714286,
+   "corr_f1": 0.8731508340797398,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 0.99,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "Login counted without actor link",
+  "fixed": {
+   "corr_precision": 0.9551542207792207,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9768622711233365,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.7766507481217907,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8648564772094255,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 0.97,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "Routine device events counted",
+  "fixed": {
+   "corr_precision": 0.9115604575163399,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9530024509803922,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.7530608388535539,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8491361132317377,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 0.97,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "Chain split by pauses (old group rule)",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.8156920040734231,
+   "corr_recall": 0.9852162698412699,
+   "corr_f1": 0.8827045167106585,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "No IT-OT corroboration requirement",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.8162726317790509,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8899205903936253,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 1.0,
+   "rca_vector_ok": 1.0,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "Keyword stage classifier (old)",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 0.642701048951049,
+   "rca_assets_f1": 0.8809523809523809,
+   "rca_vector_ok": 0.25,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  },
+  "heldout": {
+   "corr_precision": 0.8162726317790509,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8899205903936253,
+   "stage_accuracy": 0.6335567765567766,
+   "rca_assets_f1": 0.9270873015873016,
+   "rca_vector_ok": 0.33,
+   "rca_entry_ok": 1.0,
+   "rca_origin_ok": 1.0
+  }
+ },
+ {
+  "config": "First-event root cause (old)",
+  "fixed": {
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 0.8666666666666667,
+   "rca_vector_ok": 0.0,
+   "rca_entry_ok": 0.5,
+   "rca_origin_ok": 0.0
+  },
+  "heldout": {
+   "corr_precision": 0.8162726317790509,
+   "corr_recall": 0.9979464285714286,
+   "corr_f1": 0.8899205903936253,
+   "stage_accuracy": 1.0,
+   "rca_assets_f1": 0.798,
+   "rca_vector_ok": 0.0,
+   "rca_entry_ok": 0.5,
+   "rca_origin_ok": 0.0
+  }
+ }
+]

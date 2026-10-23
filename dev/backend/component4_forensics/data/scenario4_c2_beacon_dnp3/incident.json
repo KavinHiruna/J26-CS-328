@@ -1,0 +1,43 @@
+{
+  "incident_id": "INC-2026-0912-01",
+  "source_component": "SOC Alert Prioritization (Component 3)",
+  "priority": "Critical",
+  "seed_ips": [
+    "198.51.100.77"
+  ],
+  "window_start": "2026-09-12 10:10:00",
+  "window_end": "2026-09-12 10:30:00",
+  "flagged_assets": [
+    "10.10.0.70"
+  ],
+  "upstream": {
+    "illustrative_sample": true,
+    "detection": {
+      "model": "Random Forest (sample)",
+      "predicted_class": "C2 beaconing",
+      "confidence": 0.91,
+      "detected_at": "2026-09-12 10:12:09",
+      "alert_count": 3
+    },
+    "explanation": {
+      "method": "SHAP (sample)",
+      "top_features": [
+        {
+          "feature": "periodic_outbound_interval",
+          "contribution": 0.38,
+          "direction": "raises risk"
+        },
+        {
+          "feature": "dst_ip_is_external_rare",
+          "contribution": 0.29,
+          "direction": "raises risk"
+        }
+      ],
+      "summary": "Regular outbound connections from an engineering workstation to a rarely seen external address."
+    },
+    "prioritization": {
+      "priority_score": 0.95,
+      "reason": "Engineering workstation with a path to protection relays"
+    }
+  }
+}

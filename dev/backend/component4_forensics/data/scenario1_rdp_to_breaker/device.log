@@ -1,0 +1,19 @@
+timestamp,device,event_type,user,description,label,true_stage
+2026-09-10 08:50:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-10 08:55:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-10 09:00:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-10 09:00:15,SCADA-EWS-10.10.0.10,LOGIN,unknown_admin,Remote desktop login succeeded from 203.0.113.55,ATTACK,Initial Access
+2026-09-10 09:02:20,SCADA-EWS-10.10.0.10,LOGIN,engineer_a,Local login from 10.10.0.31,BENIGN,
+2026-09-10 09:04:00,HISTORIAN-10.10.0.30,BACKUP_JOB,svc_backup,Nightly historian backup started,BENIGN,
+2026-09-10 09:05:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-10 09:05:12,SCADA-EWS-10.10.0.10,AUTH_FAIL,root,SSH authentication failed (4 attempts),ATTACK,Credential Access
+2026-09-10 09:05:28,SCADA-EWS-10.10.0.10,AUTH_SUCCESS,root,SSH authentication succeeded after brute force,ATTACK,Credential Access
+2026-09-10 09:06:40,SCADA-EWS-10.10.0.10,AUTH_FAIL,engineer_b,Mistyped password (1 attempt),BENIGN,
+2026-09-10 09:08:10,SCADA-EWS-10.10.0.10,FILE_WRITE,root,New executable written to /tmp/update_agent.bin,ATTACK,Malware Delivery
+2026-09-10 09:08:12,SCADA-EWS-10.10.0.10,PROCESS_START,root,Process update_agent.bin started,ATTACK,Execution
+2026-09-10 09:09:50,SCADA-EWS-10.10.0.10,CONFIG_ACCESS,root,"SCADA engineering software opened, substation project file loaded",ATTACK,Discovery
+2026-09-10 09:10:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-10 09:10:00,Substation-Breaker-PLC-10.10.0.50,LOGIC_CHANGE,SCADA-EWS-10.10.0.10,"Breaker control logic modified via Modbus write, trip setpoint register altered",ATTACK,Impact
+2026-09-10 09:10:05,Substation-Breaker-PLC-10.10.0.50,STATE_CHANGE,SCADA-EWS-10.10.0.10,Breaker entered unexpected operational state (output override) - risk of unplanned trip,ATTACK,Impact
+2026-09-10 09:15:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-10 09:20:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,

@@ -1,0 +1,5 @@
+timestamp,signature,severity,src_ip,dst_ip,category,label,true_stage
+2026-09-12 22:38:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-12 22:40:05,ET SCAN Internal Host Sweep on Modbus Port,Medium,10.10.0.99,10.10.0.0/24,Reconnaissance,ATTACK,Reconnaissance
+2026-09-12 22:41:35,ET SCADA Modbus Write Function Code Anomaly - Unauthorized Source,Critical,10.10.0.99,10.10.0.50,ICS-Attack,ATTACK,Impact
+2026-09-12 22:44:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,

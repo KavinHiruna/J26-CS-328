@@ -1,0 +1,13 @@
+{
+  "incident_id": "INC-2026-0912-03",
+  "source_component": "SOC Alert Prioritization (Component 3)",
+  "priority": "Critical",
+  "seed_ips": [
+    "10.10.0.99"
+  ],
+  "window_start": "2026-09-12 22:38:00",
+  "window_end": "2026-09-12 22:45:00",
+  "flagged_assets": [
+    "10.10.0.50"
+  ]
+}

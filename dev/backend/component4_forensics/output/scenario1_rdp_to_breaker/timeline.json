@@ -1,0 +1,212 @@
+[
+  {
+    "timestamp": "09:00:12",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.10",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.10:3389",
+    "evidence_id": "255b77ba8a72",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.10"
+  },
+  {
+    "timestamp": "09:00:15",
+    "stage": "Initial Access",
+    "source": "device",
+    "asset": "SCADA-EWS-10.10.0.10",
+    "description": "[SCADA-EWS-10.10.0.10] LOGIN by unknown_admin: Remote desktop login succeeded from 203.0.113.55",
+    "evidence_id": "a5ef6b913198",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:03:40",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.10",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.10:22",
+    "evidence_id": "264d78b0f878",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.10"
+  },
+  {
+    "timestamp": "09:03:41",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.11",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.11:22",
+    "evidence_id": "a1f144d651be",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.11"
+  },
+  {
+    "timestamp": "09:03:42",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.12",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.12:22",
+    "evidence_id": "dacd3e870373",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.12"
+  },
+  {
+    "timestamp": "09:03:43",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.50",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.50:502",
+    "evidence_id": "30bdd4b3d9ad",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.50"
+  },
+  {
+    "timestamp": "09:03:45",
+    "stage": "Reconnaissance",
+    "source": "ids",
+    "asset": "10.10.0.0/24",
+    "description": "ET SCAN Nmap Scripting Engine User-Agent Detected (Reconnaissance)",
+    "evidence_id": "c8e5ec215cf0",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.0/24"
+  },
+  {
+    "timestamp": "09:03:50",
+    "stage": "Reconnaissance",
+    "source": "ids",
+    "asset": "10.10.0.0/24",
+    "description": "ET SCAN Suspicious Multi-Port Connection Attempt (Reconnaissance)",
+    "evidence_id": "5bf45545e2ab",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.0/24"
+  },
+  {
+    "timestamp": "09:05:02",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.10",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.10:22",
+    "evidence_id": "76faf313ee73",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.10"
+  },
+  {
+    "timestamp": "09:05:10",
+    "stage": "Credential Access",
+    "source": "ids",
+    "asset": "10.10.0.10",
+    "description": "ET POLICY SSH Brute Force Login Attempt (Credential-Access)",
+    "evidence_id": "d6331c1b7e8e",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.10"
+  },
+  {
+    "timestamp": "09:05:12",
+    "stage": "Credential Access",
+    "source": "device",
+    "asset": "SCADA-EWS-10.10.0.10",
+    "description": "[SCADA-EWS-10.10.0.10] AUTH_FAIL by root: SSH authentication failed (4 attempts)",
+    "evidence_id": "d1dc9b15223c",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:05:28",
+    "stage": "Credential Access",
+    "source": "device",
+    "asset": "SCADA-EWS-10.10.0.10",
+    "description": "[SCADA-EWS-10.10.0.10] AUTH_SUCCESS by root: SSH authentication succeeded after brute force",
+    "evidence_id": "5d93379c12a4",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:08:01",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.10",
+    "description": "ALLOW TCP 203.0.113.55 -> 10.10.0.10:445",
+    "evidence_id": "fe266ee124d5",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.10"
+  },
+  {
+    "timestamp": "09:08:05",
+    "stage": "Malware Delivery",
+    "source": "ids",
+    "asset": "10.10.0.10",
+    "description": "ET MALWARE Possible Malicious Payload Upload via SMB (Malware)",
+    "evidence_id": "1aa4dc8cf4d4",
+    "src_ip": "203.0.113.55",
+    "dst_ip": "10.10.0.10"
+  },
+  {
+    "timestamp": "09:08:10",
+    "stage": "Malware Delivery",
+    "source": "device",
+    "asset": "SCADA-EWS-10.10.0.10",
+    "description": "[SCADA-EWS-10.10.0.10] FILE_WRITE by root: New executable written to /tmp/update_agent.bin",
+    "evidence_id": "c2aa4bf34efc",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:08:12",
+    "stage": "Execution",
+    "source": "device",
+    "asset": "SCADA-EWS-10.10.0.10",
+    "description": "[SCADA-EWS-10.10.0.10] PROCESS_START by root: Process update_agent.bin started",
+    "evidence_id": "fa1ffba78092",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:09:50",
+    "stage": "Discovery",
+    "source": "device",
+    "asset": "SCADA-EWS-10.10.0.10",
+    "description": "[SCADA-EWS-10.10.0.10] CONFIG_ACCESS by root: SCADA engineering software opened, substation project file loaded",
+    "evidence_id": "f2321d1561c5",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:10:00",
+    "stage": "Network Connection",
+    "source": "firewall",
+    "asset": "10.10.0.50",
+    "description": "ALLOW TCP 10.10.0.10 -> 10.10.0.50:502",
+    "evidence_id": "cdac0fea401a",
+    "src_ip": "10.10.0.10",
+    "dst_ip": "10.10.0.50"
+  },
+  {
+    "timestamp": "09:10:00",
+    "stage": "Impact",
+    "source": "device",
+    "asset": "Substation-Breaker-PLC-10.10.0.50",
+    "description": "[Substation-Breaker-PLC-10.10.0.50] LOGIC_CHANGE by SCADA-EWS-10.10.0.10: Breaker control logic modified via Modbus write, trip setpoint register altered",
+    "evidence_id": "32364c05790e",
+    "src_ip": null,
+    "dst_ip": null
+  },
+  {
+    "timestamp": "09:10:05",
+    "stage": "Impact",
+    "source": "ids",
+    "asset": "10.10.0.50",
+    "description": "ET SCADA Modbus Write Function Code Anomaly - Breaker Control Register (ICS-Attack)",
+    "evidence_id": "bb3b6d09105b",
+    "src_ip": "10.10.0.10",
+    "dst_ip": "10.10.0.50"
+  },
+  {
+    "timestamp": "09:10:05",
+    "stage": "Impact",
+    "source": "device",
+    "asset": "Substation-Breaker-PLC-10.10.0.50",
+    "description": "[Substation-Breaker-PLC-10.10.0.50] STATE_CHANGE by SCADA-EWS-10.10.0.10: Breaker entered unexpected operational state (output override) - risk of unplanned trip",
+    "evidence_id": "2c353e9850f5",
+    "src_ip": null,
+    "dst_ip": null
+  }
+]

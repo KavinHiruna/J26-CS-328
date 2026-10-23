@@ -1,0 +1,12 @@
+{
+  "initial_vector": "Initial Access",
+  "entry_ip": "198.51.100.23",
+  "origin_type": "external",
+  "compromised_ips": [
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.60",
+    "10.10.0.70"
+  ],
+  "description": "Stolen vendor VPN account, lateral movement to historian and EMS, protection setpoints altered on relay RTU."
+}

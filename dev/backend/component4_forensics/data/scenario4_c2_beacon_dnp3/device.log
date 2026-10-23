@@ -1,0 +1,17 @@
+timestamp,device,event_type,user,description,label,true_stage
+2026-09-12 10:00:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:05:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:10:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:12:30,SCADA-EWS-10.10.0.10,PROCESS_START,engineer_a,"Process officehelper.exe started, outbound connection to 198.51.100.77",ATTACK,Execution
+2026-09-12 10:15:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:15:00,SCADA-EWS-10.10.0.10,LOGIN,engineer_b,Local login from 10.10.0.31,BENIGN,
+2026-09-12 10:16:10,SCADA-EWS-10.10.0.10,AUTH_FAIL,engineer_b,Mistyped password (1 attempt),BENIGN,
+2026-09-12 10:18:00,HISTORIAN-10.10.0.30,BACKUP_JOB,svc_backup,Historian backup started,BENIGN,
+2026-09-12 10:19:00,SCADA-EWS-10.10.0.10,CRED_DUMP,engineer_a,Credential store accessed by officehelper.exe,ATTACK,Credential Access
+2026-09-12 10:19:45,HISTORIAN-10.10.0.30,FILE_WRITE,svc_remote,Remote service created via SMB from 10.10.0.10,ATTACK,Malware Delivery
+2026-09-12 10:20:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:24:10,Protection-Relay-RTU-10.10.0.70,SETPOINT_CHANGE,SCADA-EWS-10.10.0.10,Relay trip setpoint altered via DNP3 direct operate,ATTACK,Impact
+2026-09-12 10:24:15,Protection-Relay-RTU-10.10.0.70,STATE_CHANGE,SCADA-EWS-10.10.0.10,Protection relay output forced - risk of unplanned trip,ATTACK,Impact
+2026-09-12 10:25:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:30:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-12 10:35:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,

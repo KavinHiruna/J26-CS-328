@@ -1,0 +1,7 @@
+timestamp,signature,severity,src_ip,dst_ip,category,label,true_stage
+2026-09-11 14:20:10,ET POLICY VPN Login from Unusual Geolocation,Medium,198.51.100.23,10.10.0.2,Initial-Access,ATTACK,Initial Access
+2026-09-11 14:22:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-11 14:23:36,ET POLICY RDP Session Initiated from VPN Gateway,Medium,10.10.0.2,10.10.0.30,Lateral-Movement,ATTACK,Lateral Movement
+2026-09-11 14:28:15,ET POLICY SMB Administrative Share Access,Medium,10.10.0.30,10.10.0.60,Lateral-Movement,ATTACK,Lateral Movement
+2026-09-11 14:30:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-11 14:33:05,ET SCADA IEC-104 Setpoint Command Anomaly,Critical,10.10.0.60,10.10.0.70,ICS-Attack,ATTACK,Impact

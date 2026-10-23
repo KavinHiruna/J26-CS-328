@@ -1,0 +1,10 @@
+{
+  "initial_vector": "Initial Access",
+  "entry_ip": "203.0.113.55",
+  "origin_type": "external",
+  "compromised_ips": [
+    "10.10.0.10",
+    "10.10.0.50"
+  ],
+  "description": "External RDP login, SSH brute force, malware upload, unauthorized Modbus write to breaker PLC."
+}

@@ -1,0 +1,18 @@
+timestamp,device,event_type,user,description,label,true_stage
+2026-09-11 14:15:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-11 14:20:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-11 14:20:08,VPN-GW-10.10.0.2,VPN_LOGIN,svc_vendor,VPN login succeeded from 198.51.100.23 using valid vendor account,ATTACK,Initial Access
+2026-09-11 14:23:35,HISTORIAN-10.10.0.30,RDP_SESSION,svc_vendor,Remote desktop session opened from 10.10.0.2,ATTACK,Lateral Movement
+2026-09-11 14:24:00,HISTORIAN-10.10.0.30,AUTH_FAIL,engineer_c,Mistyped password (1 attempt),BENIGN,
+2026-09-11 14:25:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-11 14:25:00,HISTORIAN-10.10.0.30,BACKUP_JOB,svc_backup,Hourly historian backup started,BENIGN,
+2026-09-11 14:26:00,HISTORIAN-10.10.0.30,CRED_DUMP,svc_vendor,Credential dumping utility executed (lsass memory access),ATTACK,Credential Access
+2026-09-11 14:28:20,EMS-SERVER-10.10.0.60,REMOTE_LOGIN,svc_vendor,Administrator login from 10.10.0.30,ATTACK,Lateral Movement
+2026-09-11 14:30:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-11 14:31:00,EMS-SERVER-10.10.0.60,CONFIG_ACCESS,svc_vendor,EMS protection-setpoint configuration console opened,ATTACK,Discovery
+2026-09-11 14:32:00,EMS-SERVER-10.10.0.60,SCHEDULED_REPORT,svc_report,Hourly generation report exported,BENIGN,
+2026-09-11 14:32:30,EMS-SERVER-10.10.0.60,LOGIN,operator_b,Console login from 10.10.0.31,BENIGN,
+2026-09-11 14:33:00,EMS-SERVER-10.10.0.60,SETPOINT_CHANGE,svc_vendor,Under-frequency protection setpoint changed from 49.5 Hz to 47.0 Hz,ATTACK,Impact
+2026-09-11 14:33:12,Protection-Relay-RTU-10.10.0.70,SETPOINT_CHANGE,EMS-SERVER-10.10.0.60,Under-frequency trip threshold modified via IEC 60870-5-104 command,ATTACK,Impact
+2026-09-11 14:35:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,
+2026-09-11 14:40:00,Substation-Breaker-PLC-10.10.0.50,READ_REGISTER,HMI-01,Periodic poll of breaker status register,BENIGN,

@@ -1,0 +1,6 @@
+timestamp,signature,severity,src_ip,dst_ip,category,label,true_stage
+2026-09-12 10:12:08,ET MALWARE Known C2 Beacon Pattern,Critical,10.10.0.10,198.51.100.77,Command-And-Control,ATTACK,Command and Control
+2026-09-12 10:15:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-12 10:19:35,ET EXPLOIT SMB Remote Service Creation Attempt,High,10.10.0.10,10.10.0.30,Lateral-Movement,ATTACK,Lateral Movement
+2026-09-12 10:21:00,ET POLICY Modbus Read Burst (Periodic Polling),Low,10.10.0.20,10.10.0.50,Policy,BENIGN,
+2026-09-12 10:24:12,ET SCADA DNP3 Direct Operate Anomaly - Relay Control Point,Critical,10.10.0.10,10.10.0.70,ICS-Attack,ATTACK,Impact

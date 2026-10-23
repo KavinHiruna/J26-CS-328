@@ -1,0 +1,355 @@
+{
+  "scenario1_rdp_to_breaker": {
+    "records_in_scope": 49,
+    "attack_records": 21,
+    "baseline": {
+      "records_selected": 48,
+      "tp": 21,
+      "fp": 27,
+      "fn": 0,
+      "corr_precision": 0.4375,
+      "corr_recall": 1.0,
+      "corr_f1": 0.6086956521739131,
+      "stage_accuracy": 0.9230769230769231,
+      "sequence_similarity": 0.6363636363636364,
+      "pred_sequence": [
+        "Uncategorized",
+        "Initial Access",
+        "Uncategorized",
+        "Initial Access",
+        "Reconnaissance",
+        "Uncategorized",
+        "Initial Access",
+        "Credential Access",
+        "Uncategorized",
+        "Malware Delivery",
+        "Execution",
+        "Discovery",
+        "Uncategorized",
+        "Impact",
+        "Uncategorized"
+      ],
+      "true_sequence": [
+        "Initial Access",
+        "Reconnaissance",
+        "Credential Access",
+        "Malware Delivery",
+        "Execution",
+        "Discovery",
+        "Impact"
+      ],
+      "rca_vector_ok": false,
+      "rca_entry_ok": true,
+      "rca_origin_ok": false,
+      "rca_assets_f1": 1.0,
+      "rca_assets_pred": [
+        "10.10.0.10",
+        "10.10.0.50"
+      ]
+    },
+    "improved": {
+      "records_selected": 21,
+      "tp": 21,
+      "fp": 0,
+      "fn": 0,
+      "corr_precision": 1.0,
+      "corr_recall": 1.0,
+      "corr_f1": 1.0,
+      "stage_accuracy": 1.0,
+      "sequence_similarity": 1.0,
+      "pred_sequence": [
+        "Initial Access",
+        "Reconnaissance",
+        "Credential Access",
+        "Malware Delivery",
+        "Execution",
+        "Discovery",
+        "Impact"
+      ],
+      "true_sequence": [
+        "Initial Access",
+        "Reconnaissance",
+        "Credential Access",
+        "Malware Delivery",
+        "Execution",
+        "Discovery",
+        "Impact"
+      ],
+      "rca_vector_ok": true,
+      "rca_entry_ok": true,
+      "rca_origin_ok": true,
+      "rca_assets_f1": 1.0,
+      "rca_assets_pred": [
+        "10.10.0.10",
+        "10.10.0.50"
+      ]
+    }
+  },
+  "scenario2_vpn_lateral_ems": {
+    "records_in_scope": 44,
+    "attack_records": 15,
+    "baseline": {
+      "records_selected": 44,
+      "tp": 15,
+      "fp": 29,
+      "fn": 0,
+      "corr_precision": 0.3409090909090909,
+      "corr_recall": 1.0,
+      "corr_f1": 0.5084745762711864,
+      "stage_accuracy": 0.2727272727272727,
+      "sequence_similarity": 0.35294117647058826,
+      "pred_sequence": [
+        "Uncategorized",
+        "Initial Access",
+        "Uncategorized",
+        "Credential Access",
+        "Uncategorized",
+        "Initial Access",
+        "Uncategorized",
+        "Discovery",
+        "Uncategorized",
+        "Initial Access",
+        "Uncategorized"
+      ],
+      "true_sequence": [
+        "Initial Access",
+        "Lateral Movement",
+        "Credential Access",
+        "Lateral Movement",
+        "Discovery",
+        "Impact"
+      ],
+      "rca_vector_ok": false,
+      "rca_entry_ok": true,
+      "rca_origin_ok": false,
+      "rca_assets_f1": 0.0,
+      "rca_assets_pred": []
+    },
+    "improved": {
+      "records_selected": 15,
+      "tp": 15,
+      "fp": 0,
+      "fn": 0,
+      "corr_precision": 1.0,
+      "corr_recall": 1.0,
+      "corr_f1": 1.0,
+      "stage_accuracy": 1.0,
+      "sequence_similarity": 1.0,
+      "pred_sequence": [
+        "Initial Access",
+        "Lateral Movement",
+        "Credential Access",
+        "Lateral Movement",
+        "Discovery",
+        "Impact"
+      ],
+      "true_sequence": [
+        "Initial Access",
+        "Lateral Movement",
+        "Credential Access",
+        "Lateral Movement",
+        "Discovery",
+        "Impact"
+      ],
+      "rca_vector_ok": true,
+      "rca_entry_ok": true,
+      "rca_origin_ok": true,
+      "rca_assets_f1": 1.0,
+      "rca_assets_pred": [
+        "10.10.0.2",
+        "10.10.0.30",
+        "10.10.0.60",
+        "10.10.0.70"
+      ]
+    }
+  },
+  "scenario3_insider_modbus": {
+    "records_in_scope": 21,
+    "attack_records": 8,
+    "baseline": {
+      "records_selected": 20,
+      "tp": 8,
+      "fp": 12,
+      "fn": 0,
+      "corr_precision": 0.4,
+      "corr_recall": 1.0,
+      "corr_f1": 0.5714285714285715,
+      "stage_accuracy": 1.0,
+      "sequence_similarity": 0.6666666666666666,
+      "pred_sequence": [
+        "Uncategorized",
+        "Reconnaissance",
+        "Impact",
+        "Uncategorized"
+      ],
+      "true_sequence": [
+        "Reconnaissance",
+        "Impact"
+      ],
+      "rca_vector_ok": true,
+      "rca_entry_ok": false,
+      "rca_origin_ok": false,
+      "rca_assets_f1": 1.0,
+      "rca_assets_pred": [
+        "10.10.0.50"
+      ]
+    },
+    "improved": {
+      "records_selected": 8,
+      "tp": 8,
+      "fp": 0,
+      "fn": 0,
+      "corr_precision": 1.0,
+      "corr_recall": 1.0,
+      "corr_f1": 1.0,
+      "stage_accuracy": 1.0,
+      "sequence_similarity": 1.0,
+      "pred_sequence": [
+        "Reconnaissance",
+        "Impact"
+      ],
+      "true_sequence": [
+        "Reconnaissance",
+        "Impact"
+      ],
+      "rca_vector_ok": true,
+      "rca_entry_ok": true,
+      "rca_origin_ok": true,
+      "rca_assets_f1": 1.0,
+      "rca_assets_pred": [
+        "10.10.0.50"
+      ]
+    }
+  },
+  "scenario4_c2_beacon_dnp3": {
+    "records_in_scope": 47,
+    "attack_records": 13,
+    "baseline": {
+      "records_selected": 47,
+      "tp": 13,
+      "fp": 34,
+      "fn": 0,
+      "corr_precision": 0.2765957446808511,
+      "corr_recall": 1.0,
+      "corr_f1": 0.43333333333333335,
+      "stage_accuracy": 0.375,
+      "sequence_similarity": 0.23529411764705882,
+      "pred_sequence": [
+        "Uncategorized",
+        "Malware Delivery",
+        "Execution",
+        "Uncategorized",
+        "Initial Access",
+        "Credential Access",
+        "Uncategorized",
+        "Malware Delivery",
+        "Uncategorized",
+        "Impact",
+        "Uncategorized"
+      ],
+      "true_sequence": [
+        "Command and Control",
+        "Execution",
+        "Credential Access",
+        "Lateral Movement",
+        "Malware Delivery",
+        "Impact"
+      ],
+      "rca_vector_ok": false,
+      "rca_entry_ok": false,
+      "rca_origin_ok": false,
+      "rca_assets_f1": 0.8,
+      "rca_assets_pred": [
+        "10.10.0.10",
+        "10.10.0.70"
+      ]
+    },
+    "improved": {
+      "records_selected": 13,
+      "tp": 13,
+      "fp": 0,
+      "fn": 0,
+      "corr_precision": 1.0,
+      "corr_recall": 1.0,
+      "corr_f1": 1.0,
+      "stage_accuracy": 1.0,
+      "sequence_similarity": 1.0,
+      "pred_sequence": [
+        "Command and Control",
+        "Execution",
+        "Credential Access",
+        "Lateral Movement",
+        "Malware Delivery",
+        "Impact"
+      ],
+      "true_sequence": [
+        "Command and Control",
+        "Execution",
+        "Credential Access",
+        "Lateral Movement",
+        "Malware Delivery",
+        "Impact"
+      ],
+      "rca_vector_ok": true,
+      "rca_entry_ok": true,
+      "rca_origin_ok": true,
+      "rca_assets_f1": 1.0,
+      "rca_assets_pred": [
+        "10.10.0.10",
+        "10.10.0.30",
+        "10.10.0.70"
+      ]
+    }
+  },
+  "window_sweep": [
+    {
+      "window_minutes": 1,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    },
+    {
+      "window_minutes": 2,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    },
+    {
+      "window_minutes": 3,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    },
+    {
+      "window_minutes": 5,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    },
+    {
+      "window_minutes": 10,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    },
+    {
+      "window_minutes": 15,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    },
+    {
+      "window_minutes": 30,
+      "improved_precision": 1.0,
+      "improved_recall": 1.0,
+      "improved_f1": 1.0,
+      "baseline_f1": 0.5304830333017511
+    }
+  ]
+}

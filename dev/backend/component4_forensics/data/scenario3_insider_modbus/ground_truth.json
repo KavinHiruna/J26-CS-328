@@ -1,0 +1,9 @@
+{
+  "initial_vector": "Reconnaissance",
+  "entry_ip": "10.10.0.99",
+  "origin_type": "internal",
+  "compromised_ips": [
+    "10.10.0.50"
+  ],
+  "description": "Rogue internal laptop sweeps the OT network then writes directly to the breaker PLC (insider / unauthorized device)."
+}

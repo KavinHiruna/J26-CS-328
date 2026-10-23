@@ -1,0 +1,7252 @@
+[
+ {
+  "template": "remote_access",
+  "seed": 2027000,
+  "in_scope": 96,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 96,
+   "tp": 12,
+   "fp": 84,
+   "fn": 0,
+   "corr_precision": 0.125,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2222222222222222,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 12,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9230769230769231,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9600000000000001,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027001,
+  "in_scope": 90,
+  "attack": 6,
+  "baseline": {
+   "records_selected": 90,
+   "tp": 6,
+   "fp": 84,
+   "fn": 0,
+   "corr_precision": 0.06666666666666667,
+   "corr_recall": 1.0,
+   "corr_f1": 0.125,
+   "stage_accuracy": 0.5,
+   "sequence_similarity": 0.5,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 6,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.6,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7499999999999999,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027002,
+  "in_scope": 63,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 63,
+   "tp": 9,
+   "fp": 54,
+   "fn": 0,
+   "corr_precision": 0.14285714285714285,
+   "corr_recall": 1.0,
+   "corr_f1": 0.25,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027003,
+  "in_scope": 189,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 189,
+   "tp": 11,
+   "fp": 178,
+   "fn": 0,
+   "corr_precision": 0.0582010582010582,
+   "corr_recall": 1.0,
+   "corr_f1": 0.11,
+   "stage_accuracy": 0.625,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Credential Access",
+    "Initial Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 14,
+   "tp": 11,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.7857142857142857,
+   "corr_recall": 1.0,
+   "corr_f1": 0.88,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027004,
+  "in_scope": 108,
+  "attack": 16,
+  "baseline": {
+   "records_selected": 108,
+   "tp": 16,
+   "fp": 92,
+   "fn": 0,
+   "corr_precision": 0.14814814814814814,
+   "corr_recall": 1.0,
+   "corr_f1": 0.25806451612903225,
+   "stage_accuracy": 0.7272727272727273,
+   "sequence_similarity": 0.7058823529411765,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 15,
+   "tp": 15,
+   "fp": 0,
+   "fn": 1,
+   "corr_precision": 1.0,
+   "corr_recall": 0.9375,
+   "corr_f1": 0.967741935483871,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027005,
+  "in_scope": 94,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 94,
+   "tp": 12,
+   "fp": 82,
+   "fn": 0,
+   "corr_precision": 0.1276595744680851,
+   "corr_recall": 1.0,
+   "corr_f1": 0.22641509433962262,
+   "stage_accuracy": 0.7,
+   "sequence_similarity": 0.5882352941176471,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 18,
+   "tp": 12,
+   "fp": 6,
+   "fn": 0,
+   "corr_precision": 0.6666666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027006,
+  "in_scope": 105,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 95,
+   "tp": 12,
+   "fp": 83,
+   "fn": 0,
+   "corr_precision": 0.12631578947368421,
+   "corr_recall": 1.0,
+   "corr_f1": 0.22429906542056077,
+   "stage_accuracy": 0.8,
+   "sequence_similarity": 0.5263157894736842,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 16,
+   "tp": 12,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.75,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8571428571428571,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027007,
+  "in_scope": 101,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 101,
+   "tp": 12,
+   "fp": 89,
+   "fn": 0,
+   "corr_precision": 0.1188118811881188,
+   "corr_recall": 1.0,
+   "corr_f1": 0.21238938053097342,
+   "stage_accuracy": 0.875,
+   "sequence_similarity": 0.5882352941176471,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 12,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027008,
+  "in_scope": 70,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 70,
+   "tp": 8,
+   "fp": 62,
+   "fn": 0,
+   "corr_precision": 0.11428571428571428,
+   "corr_recall": 1.0,
+   "corr_f1": 0.20512820512820512,
+   "stage_accuracy": 0.6,
+   "sequence_similarity": 0.5454545454545454,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 8,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.7272727272727273,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8421052631578948,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027009,
+  "in_scope": 55,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 54,
+   "tp": 9,
+   "fp": 45,
+   "fn": 0,
+   "corr_precision": 0.16666666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2857142857142857,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Initial Access",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027010,
+  "in_scope": 55,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 54,
+   "tp": 9,
+   "fp": 45,
+   "fn": 0,
+   "corr_precision": 0.16666666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2857142857142857,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.46153846153846156,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Credential Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027011,
+  "in_scope": 69,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 69,
+   "tp": 9,
+   "fp": 60,
+   "fn": 0,
+   "corr_precision": 0.13043478260869565,
+   "corr_recall": 1.0,
+   "corr_f1": 0.23076923076923078,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.5333333333333333,
+   "pred_sequence": [
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 9,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027012,
+  "in_scope": 60,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 59,
+   "tp": 12,
+   "fp": 47,
+   "fn": 0,
+   "corr_precision": 0.2033898305084746,
+   "corr_recall": 1.0,
+   "corr_f1": 0.33802816901408456,
+   "stage_accuracy": 0.7,
+   "sequence_similarity": 0.5882352941176471,
+   "pred_sequence": [
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 12,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027013,
+  "in_scope": 86,
+  "attack": 6,
+  "baseline": {
+   "records_selected": 84,
+   "tp": 6,
+   "fp": 78,
+   "fn": 0,
+   "corr_precision": 0.07142857142857142,
+   "corr_recall": 1.0,
+   "corr_f1": 0.13333333333333333,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 6,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.6,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7499999999999999,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027014,
+  "in_scope": 62,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 62,
+   "tp": 9,
+   "fp": 53,
+   "fn": 0,
+   "corr_precision": 0.14516129032258066,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2535211267605634,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 9,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.75,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8571428571428571,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027015,
+  "in_scope": 67,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 66,
+   "tp": 12,
+   "fp": 54,
+   "fn": 0,
+   "corr_precision": 0.18181818181818182,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3076923076923077,
+   "stage_accuracy": 0.8,
+   "sequence_similarity": 0.5882352941176471,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 16,
+   "tp": 12,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.75,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8571428571428571,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027016,
+  "in_scope": 105,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 105,
+   "tp": 12,
+   "fp": 93,
+   "fn": 0,
+   "corr_precision": 0.11428571428571428,
+   "corr_recall": 1.0,
+   "corr_f1": 0.20512820512820512,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.5882352941176471,
+   "pred_sequence": [
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Reconnaissance",
+    "Initial Access",
+    "Reconnaissance",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 18,
+   "tp": 12,
+   "fp": 6,
+   "fn": 0,
+   "corr_precision": 0.6666666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027017,
+  "in_scope": 78,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 78,
+   "tp": 9,
+   "fp": 69,
+   "fn": 0,
+   "corr_precision": 0.11538461538461539,
+   "corr_recall": 1.0,
+   "corr_f1": 0.20689655172413793,
+   "stage_accuracy": 0.8571428571428571,
+   "sequence_similarity": 0.6153846153846154,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 9,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027018,
+  "in_scope": 76,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 76,
+   "tp": 12,
+   "fp": 64,
+   "fn": 0,
+   "corr_precision": 0.15789473684210525,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2727272727272727,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.8333333333333334,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 12,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9230769230769231,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9600000000000001,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027019,
+  "in_scope": 157,
+  "attack": 15,
+  "baseline": {
+   "records_selected": 157,
+   "tp": 15,
+   "fp": 142,
+   "fn": 0,
+   "corr_precision": 0.09554140127388536,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1744186046511628,
+   "stage_accuracy": 0.8181818181818182,
+   "sequence_similarity": 0.5454545454545454,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Credential Access",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 16,
+   "tp": 15,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9375,
+   "corr_recall": 1.0,
+   "corr_f1": 0.967741935483871,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027020,
+  "in_scope": 74,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 74,
+   "tp": 9,
+   "fp": 65,
+   "fn": 0,
+   "corr_precision": 0.12162162162162163,
+   "corr_recall": 1.0,
+   "corr_f1": 0.21686746987951808,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.47058823529411764,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027021,
+  "in_scope": 64,
+  "attack": 6,
+  "baseline": {
+   "records_selected": 63,
+   "tp": 6,
+   "fp": 57,
+   "fn": 0,
+   "corr_precision": 0.09523809523809523,
+   "corr_recall": 1.0,
+   "corr_f1": 0.17391304347826084,
+   "stage_accuracy": 0.5,
+   "sequence_similarity": 0.5714285714285714,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 7,
+   "tp": 6,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.8571428571428571,
+   "corr_recall": 1.0,
+   "corr_f1": 0.923076923076923,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027022,
+  "in_scope": 90,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 90,
+   "tp": 9,
+   "fp": 81,
+   "fn": 0,
+   "corr_precision": 0.1,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18181818181818182,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.5454545454545454,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.6666666666666666,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 15,
+   "tp": 9,
+   "fp": 6,
+   "fn": 0,
+   "corr_precision": 0.6,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7499999999999999,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027023,
+  "in_scope": 61,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 61,
+   "tp": 9,
+   "fp": 52,
+   "fn": 0,
+   "corr_precision": 0.14754098360655737,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2571428571428572,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.8,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Uncategorized",
+    "Execution",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 9,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.6923076923076923,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8181818181818181,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "remote_access",
+  "seed": 2027024,
+  "in_scope": 89,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 89,
+   "tp": 9,
+   "fp": 80,
+   "fn": 0,
+   "corr_precision": 0.10112359550561797,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18367346938775508,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.6153846153846154,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027100,
+  "in_scope": 162,
+  "attack": 13,
+  "baseline": {
+   "records_selected": 162,
+   "tp": 13,
+   "fp": 149,
+   "fn": 0,
+   "corr_precision": 0.08024691358024691,
+   "corr_recall": 1.0,
+   "corr_f1": 0.14857142857142858,
+   "stage_accuracy": 0.3333333333333333,
+   "sequence_similarity": 0.2222222222222222,
+   "pred_sequence": [
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.4,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 27,
+   "tp": 13,
+   "fp": 14,
+   "fn": 0,
+   "corr_precision": 0.48148148148148145,
+   "corr_recall": 1.0,
+   "corr_f1": 0.65,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027101,
+  "in_scope": 118,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 117,
+   "tp": 11,
+   "fp": 106,
+   "fn": 0,
+   "corr_precision": 0.09401709401709402,
+   "corr_recall": 1.0,
+   "corr_f1": 0.17187499999999997,
+   "stage_accuracy": 0.5,
+   "sequence_similarity": 0.3157894736842105,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 26,
+   "tp": 11,
+   "fp": 15,
+   "fn": 0,
+   "corr_precision": 0.4230769230769231,
+   "corr_recall": 1.0,
+   "corr_f1": 0.5945945945945945,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027102,
+  "in_scope": 77,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 77,
+   "tp": 10,
+   "fp": 67,
+   "fn": 0,
+   "corr_precision": 0.12987012987012986,
+   "corr_recall": 1.0,
+   "corr_f1": 0.22988505747126434,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 10,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.7692307692307693,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8695652173913044,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.60",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027103,
+  "in_scope": 107,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 107,
+   "tp": 10,
+   "fp": 97,
+   "fn": 0,
+   "corr_precision": 0.09345794392523364,
+   "corr_recall": 1.0,
+   "corr_f1": 0.17094017094017094,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 19,
+   "tp": 10,
+   "fp": 9,
+   "fn": 0,
+   "corr_precision": 0.5263157894736842,
+   "corr_recall": 1.0,
+   "corr_f1": 0.6896551724137931,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027104,
+  "in_scope": 140,
+  "attack": 13,
+  "baseline": {
+   "records_selected": 140,
+   "tp": 13,
+   "fp": 127,
+   "fn": 0,
+   "corr_precision": 0.09285714285714286,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1699346405228758,
+   "stage_accuracy": 0.3333333333333333,
+   "sequence_similarity": 0.26666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.4,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 22,
+   "tp": 13,
+   "fp": 9,
+   "fn": 0,
+   "corr_precision": 0.5909090909090909,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7428571428571429,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027105,
+  "in_scope": 81,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 81,
+   "tp": 10,
+   "fp": 71,
+   "fn": 0,
+   "corr_precision": 0.12345679012345678,
+   "corr_recall": 1.0,
+   "corr_f1": 0.21978021978021975,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 10,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.7692307692307693,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8695652173913044,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027106,
+  "in_scope": 57,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 57,
+   "tp": 11,
+   "fp": 46,
+   "fn": 0,
+   "corr_precision": 0.19298245614035087,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3235294117647059,
+   "stage_accuracy": 0.375,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 11,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9166666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9565217391304348,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027107,
+  "in_scope": 164,
+  "attack": 15,
+  "baseline": {
+   "records_selected": 164,
+   "tp": 15,
+   "fp": 149,
+   "fn": 0,
+   "corr_precision": 0.09146341463414634,
+   "corr_recall": 1.0,
+   "corr_f1": 0.16759776536312848,
+   "stage_accuracy": 0.45454545454545453,
+   "sequence_similarity": 0.5,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.4,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 36,
+   "tp": 15,
+   "fp": 21,
+   "fn": 0,
+   "corr_precision": 0.4166666666666667,
+   "corr_recall": 1.0,
+   "corr_f1": 0.5882352941176471,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027108,
+  "in_scope": 94,
+  "attack": 18,
+  "baseline": {
+   "records_selected": 93,
+   "tp": 18,
+   "fp": 75,
+   "fn": 0,
+   "corr_precision": 0.1935483870967742,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3243243243243243,
+   "stage_accuracy": 0.3076923076923077,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 18,
+   "tp": 18,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027109,
+  "in_scope": 91,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 91,
+   "tp": 10,
+   "fp": 81,
+   "fn": 0,
+   "corr_precision": 0.10989010989010989,
+   "corr_recall": 1.0,
+   "corr_f1": 0.198019801980198,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.3076923076923077,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 10,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.7692307692307693,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8695652173913044,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.60",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027110,
+  "in_scope": 37,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 37,
+   "tp": 11,
+   "fp": 26,
+   "fn": 0,
+   "corr_precision": 0.2972972972972973,
+   "corr_recall": 1.0,
+   "corr_f1": 0.4583333333333333,
+   "stage_accuracy": 0.375,
+   "sequence_similarity": 0.46153846153846156,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 11,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027111,
+  "in_scope": 80,
+  "attack": 14,
+  "baseline": {
+   "records_selected": 80,
+   "tp": 14,
+   "fp": 66,
+   "fn": 0,
+   "corr_precision": 0.175,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2978723404255319,
+   "stage_accuracy": 0.3,
+   "sequence_similarity": 0.42857142857142855,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.4,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 21,
+   "tp": 14,
+   "fp": 7,
+   "fn": 0,
+   "corr_precision": 0.6666666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027112,
+  "in_scope": 133,
+  "attack": 17,
+  "baseline": {
+   "records_selected": 132,
+   "tp": 17,
+   "fp": 115,
+   "fn": 0,
+   "corr_precision": 0.12878787878787878,
+   "corr_recall": 1.0,
+   "corr_f1": 0.22818791946308722,
+   "stage_accuracy": 0.25,
+   "sequence_similarity": 0.2222222222222222,
+   "pred_sequence": [
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Impact",
+    "Uncategorized",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 18,
+   "tp": 17,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9444444444444444,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9714285714285714,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027113,
+  "in_scope": 197,
+  "attack": 17,
+  "baseline": {
+   "records_selected": 197,
+   "tp": 17,
+   "fp": 180,
+   "fn": 0,
+   "corr_precision": 0.08629441624365482,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1588785046728972,
+   "stage_accuracy": 0.3333333333333333,
+   "sequence_similarity": 0.35294117647058826,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 32,
+   "tp": 17,
+   "fp": 15,
+   "fn": 0,
+   "corr_precision": 0.53125,
+   "corr_recall": 1.0,
+   "corr_f1": 0.6938775510204082,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027114,
+  "in_scope": 151,
+  "attack": 14,
+  "baseline": {
+   "records_selected": 151,
+   "tp": 14,
+   "fp": 137,
+   "fn": 0,
+   "corr_precision": 0.09271523178807947,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1696969696969697,
+   "stage_accuracy": 0.5,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.4,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 24,
+   "tp": 12,
+   "fp": 12,
+   "fn": 2,
+   "corr_precision": 0.5,
+   "corr_recall": 0.8571428571428571,
+   "corr_f1": 0.631578947368421,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027115,
+  "in_scope": 100,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 100,
+   "tp": 11,
+   "fp": 89,
+   "fn": 0,
+   "corr_precision": 0.11,
+   "corr_recall": 1.0,
+   "corr_f1": 0.19819819819819817,
+   "stage_accuracy": 0.5,
+   "sequence_similarity": 0.25,
+   "pred_sequence": [
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 16,
+   "tp": 11,
+   "fp": 5,
+   "fn": 0,
+   "corr_precision": 0.6875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8148148148148148,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027116,
+  "in_scope": 149,
+  "attack": 18,
+  "baseline": {
+   "records_selected": 148,
+   "tp": 18,
+   "fp": 130,
+   "fn": 0,
+   "corr_precision": 0.12162162162162163,
+   "corr_recall": 1.0,
+   "corr_f1": 0.21686746987951808,
+   "stage_accuracy": 0.3076923076923077,
+   "sequence_similarity": 0.34782608695652173,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 30,
+   "tp": 18,
+   "fp": 12,
+   "fn": 0,
+   "corr_precision": 0.6,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7499999999999999,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027117,
+  "in_scope": 86,
+  "attack": 18,
+  "baseline": {
+   "records_selected": 86,
+   "tp": 18,
+   "fp": 68,
+   "fn": 0,
+   "corr_precision": 0.20930232558139536,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3461538461538462,
+   "stage_accuracy": 0.23076923076923078,
+   "sequence_similarity": 0.26666666666666666,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 21,
+   "tp": 18,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.8571428571428571,
+   "corr_recall": 1.0,
+   "corr_f1": 0.923076923076923,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027118,
+  "in_scope": 70,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 70,
+   "tp": 10,
+   "fp": 60,
+   "fn": 0,
+   "corr_precision": 0.14285714285714285,
+   "corr_recall": 1.0,
+   "corr_f1": 0.25,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 10,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9090909090909091,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9523809523809523,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027119,
+  "in_scope": 80,
+  "attack": 17,
+  "baseline": {
+   "records_selected": 80,
+   "tp": 17,
+   "fp": 63,
+   "fn": 0,
+   "corr_precision": 0.2125,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3505154639175258,
+   "stage_accuracy": 0.3333333333333333,
+   "sequence_similarity": 0.3,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 18,
+   "tp": 17,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9444444444444444,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9714285714285714,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027120,
+  "in_scope": 52,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 52,
+   "tp": 10,
+   "fp": 42,
+   "fn": 0,
+   "corr_precision": 0.19230769230769232,
+   "corr_recall": 1.0,
+   "corr_f1": 0.32258064516129037,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.26666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Credential Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 10,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027121,
+  "in_scope": 117,
+  "attack": 17,
+  "baseline": {
+   "records_selected": 117,
+   "tp": 17,
+   "fp": 100,
+   "fn": 0,
+   "corr_precision": 0.1452991452991453,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2537313432835821,
+   "stage_accuracy": 0.3333333333333333,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 20,
+   "tp": 17,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.85,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9189189189189189,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50",
+    "10.10.0.60"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027122,
+  "in_scope": 119,
+  "attack": 17,
+  "baseline": {
+   "records_selected": 119,
+   "tp": 17,
+   "fp": 102,
+   "fn": 0,
+   "corr_precision": 0.14285714285714285,
+   "corr_recall": 1.0,
+   "corr_f1": 0.25,
+   "stage_accuracy": 0.25,
+   "sequence_similarity": 0.18181818181818182,
+   "pred_sequence": [
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.33333333333333337,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 27,
+   "tp": 17,
+   "fp": 10,
+   "fn": 0,
+   "corr_precision": 0.6296296296296297,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7727272727272727,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.60",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027123,
+  "in_scope": 56,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 55,
+   "tp": 11,
+   "fp": 44,
+   "fn": 0,
+   "corr_precision": 0.2,
+   "corr_recall": 1.0,
+   "corr_f1": 0.33333333333333337,
+   "stage_accuracy": 0.5,
+   "sequence_similarity": 0.5,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 11,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9166666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9565217391304348,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Credential Access",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "vpn_chain",
+  "seed": 2027124,
+  "in_scope": 54,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 47,
+   "tp": 10,
+   "fp": 37,
+   "fn": 0,
+   "corr_precision": 0.2127659574468085,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3508771929824561,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": true,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.5,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 10,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9090909090909091,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9523809523809523,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Initial Access",
+    "Lateral Movement",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.2",
+    "10.10.0.60",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027200,
+  "in_scope": 85,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 79,
+   "tp": 8,
+   "fp": 71,
+   "fn": 0,
+   "corr_precision": 0.10126582278481013,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18390804597701146,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Credential Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 8,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8,
+   "corr_recall": 1.0,
+   "corr_f1": 0.888888888888889,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027201,
+  "in_scope": 63,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 63,
+   "tp": 8,
+   "fp": 55,
+   "fn": 0,
+   "corr_precision": 0.12698412698412698,
+   "corr_recall": 1.0,
+   "corr_f1": 0.22535211267605632,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 8,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027202,
+  "in_scope": 50,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 50,
+   "tp": 9,
+   "fp": 41,
+   "fn": 0,
+   "corr_precision": 0.18,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3050847457627119,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 9,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8181818181818182,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027203,
+  "in_scope": 70,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 70,
+   "tp": 7,
+   "fp": 63,
+   "fn": 0,
+   "corr_precision": 0.1,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18181818181818182,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Initial Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 7,
+   "tp": 7,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027204,
+  "in_scope": 52,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 52,
+   "tp": 9,
+   "fp": 43,
+   "fn": 0,
+   "corr_precision": 0.17307692307692307,
+   "corr_recall": 1.0,
+   "corr_f1": 0.29508196721311475,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 9,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027205,
+  "in_scope": 50,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 50,
+   "tp": 8,
+   "fp": 42,
+   "fn": 0,
+   "corr_precision": 0.16,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2758620689655173,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 8,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8,
+   "corr_recall": 1.0,
+   "corr_f1": 0.888888888888889,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027206,
+  "in_scope": 136,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 136,
+   "tp": 7,
+   "fp": 129,
+   "fn": 0,
+   "corr_precision": 0.051470588235294115,
+   "corr_recall": 1.0,
+   "corr_f1": 0.09790209790209789,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 7,
+   "tp": 7,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027207,
+  "in_scope": 126,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 126,
+   "tp": 9,
+   "fp": 117,
+   "fn": 0,
+   "corr_precision": 0.07142857142857142,
+   "corr_recall": 1.0,
+   "corr_f1": 0.13333333333333333,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.3076923076923077,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Reconnaissance",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 9,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.75,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8571428571428571,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027208,
+  "in_scope": 30,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 30,
+   "tp": 8,
+   "fp": 22,
+   "fn": 0,
+   "corr_precision": 0.26666666666666666,
+   "corr_recall": 1.0,
+   "corr_f1": 0.4210526315789474,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.5,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 8,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8,
+   "corr_recall": 1.0,
+   "corr_f1": 0.888888888888889,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027209,
+  "in_scope": 113,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 113,
+   "tp": 9,
+   "fp": 104,
+   "fn": 0,
+   "corr_precision": 0.07964601769911504,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1475409836065574,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 9,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8181818181818182,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027210,
+  "in_scope": 151,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 151,
+   "tp": 9,
+   "fp": 142,
+   "fn": 0,
+   "corr_precision": 0.059602649006622516,
+   "corr_recall": 1.0,
+   "corr_f1": 0.11249999999999999,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027211,
+  "in_scope": 100,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 100,
+   "tp": 7,
+   "fp": 93,
+   "fn": 0,
+   "corr_precision": 0.07,
+   "corr_recall": 1.0,
+   "corr_f1": 0.13084112149532712,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Reconnaissance",
+    "Initial Access",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 7,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9333333333333333,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027212,
+  "in_scope": 50,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 50,
+   "tp": 7,
+   "fp": 43,
+   "fn": 0,
+   "corr_precision": 0.14,
+   "corr_recall": 1.0,
+   "corr_f1": 0.24561403508771928,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.5,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 7,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9333333333333333,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027213,
+  "in_scope": 106,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 106,
+   "tp": 8,
+   "fp": 98,
+   "fn": 0,
+   "corr_precision": 0.07547169811320754,
+   "corr_recall": 1.0,
+   "corr_f1": 0.14035087719298245,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.5714285714285714,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 8,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8,
+   "corr_recall": 1.0,
+   "corr_f1": 0.888888888888889,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027214,
+  "in_scope": 46,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 46,
+   "tp": 7,
+   "fp": 39,
+   "fn": 0,
+   "corr_precision": 0.15217391304347827,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2641509433962264,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 7,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9333333333333333,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027215,
+  "in_scope": 123,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 123,
+   "tp": 7,
+   "fp": 116,
+   "fn": 0,
+   "corr_precision": 0.056910569105691054,
+   "corr_recall": 1.0,
+   "corr_f1": 0.10769230769230768,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Credential Access",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 7,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.7777777777777778,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8750000000000001,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027216,
+  "in_scope": 75,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 75,
+   "tp": 7,
+   "fp": 68,
+   "fn": 0,
+   "corr_precision": 0.09333333333333334,
+   "corr_recall": 1.0,
+   "corr_f1": 0.17073170731707318,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 7,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9333333333333333,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027217,
+  "in_scope": 44,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 44,
+   "tp": 9,
+   "fp": 35,
+   "fn": 0,
+   "corr_precision": 0.20454545454545456,
+   "corr_recall": 1.0,
+   "corr_f1": 0.339622641509434,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 9,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8181818181818182,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027218,
+  "in_scope": 84,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 84,
+   "tp": 9,
+   "fp": 75,
+   "fn": 0,
+   "corr_precision": 0.10714285714285714,
+   "corr_recall": 1.0,
+   "corr_f1": 0.19354838709677416,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Initial Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 9,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027219,
+  "in_scope": 86,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 86,
+   "tp": 9,
+   "fp": 77,
+   "fn": 0,
+   "corr_precision": 0.10465116279069768,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18947368421052632,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.6666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 9,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027220,
+  "in_scope": 46,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 46,
+   "tp": 9,
+   "fp": 37,
+   "fn": 0,
+   "corr_precision": 0.1956521739130435,
+   "corr_recall": 1.0,
+   "corr_f1": 0.32727272727272727,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027221,
+  "in_scope": 67,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 67,
+   "tp": 7,
+   "fp": 60,
+   "fn": 0,
+   "corr_precision": 0.1044776119402985,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18918918918918917,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 0.5,
+   "pred_sequence": [
+    "Credential Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Impact",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 7,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9333333333333333,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027222,
+  "in_scope": 68,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 68,
+   "tp": 9,
+   "fp": 59,
+   "fn": 0,
+   "corr_precision": 0.1323529411764706,
+   "corr_recall": 1.0,
+   "corr_f1": 0.23376623376623376,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Credential Access",
+    "Initial Access",
+    "Reconnaissance",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 9,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9473684210526316,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027223,
+  "in_scope": 61,
+  "attack": 7,
+  "baseline": {
+   "records_selected": 61,
+   "tp": 7,
+   "fp": 54,
+   "fn": 0,
+   "corr_precision": 0.11475409836065574,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2058823529411765,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Reconnaissance",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 7,
+   "tp": 7,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "insider",
+  "seed": 2027224,
+  "in_scope": 82,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 82,
+   "tp": 9,
+   "fp": 73,
+   "fn": 0,
+   "corr_precision": 0.10975609756097561,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1978021978021978,
+   "stage_accuracy": 0.75,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Reconnaissance",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 9,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.6923076923076923,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8181818181818181,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Reconnaissance",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027300,
+  "in_scope": 59,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 59,
+   "tp": 12,
+   "fp": 47,
+   "fn": 0,
+   "corr_precision": 0.2033898305084746,
+   "corr_recall": 1.0,
+   "corr_f1": 0.33802816901408456,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.26666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Initial Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 12,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027301,
+  "in_scope": 96,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 96,
+   "tp": 10,
+   "fp": 86,
+   "fn": 0,
+   "corr_precision": 0.10416666666666667,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18867924528301885,
+   "stage_accuracy": 0.4,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 10,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8333333333333334,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9090909090909091,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027302,
+  "in_scope": 83,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 83,
+   "tp": 8,
+   "fp": 75,
+   "fn": 0,
+   "corr_precision": 0.0963855421686747,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1758241758241758,
+   "stage_accuracy": 0.4,
+   "sequence_similarity": 0.4444444444444444,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 8,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8,
+   "corr_recall": 1.0,
+   "corr_f1": 0.888888888888889,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027303,
+  "in_scope": 164,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 164,
+   "tp": 12,
+   "fp": 152,
+   "fn": 0,
+   "corr_precision": 0.07317073170731707,
+   "corr_recall": 1.0,
+   "corr_f1": 0.13636363636363635,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.2222222222222222,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 17,
+   "tp": 12,
+   "fp": 5,
+   "fn": 0,
+   "corr_precision": 0.7058823529411765,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8275862068965517,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027304,
+  "in_scope": 129,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 129,
+   "tp": 10,
+   "fp": 119,
+   "fn": 0,
+   "corr_precision": 0.07751937984496124,
+   "corr_recall": 1.0,
+   "corr_f1": 0.14388489208633096,
+   "stage_accuracy": 0.4,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 14,
+   "tp": 10,
+   "fp": 4,
+   "fn": 0,
+   "corr_precision": 0.7142857142857143,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8333333333333333,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027305,
+  "in_scope": 130,
+  "attack": 10,
+  "baseline": {
+   "records_selected": 130,
+   "tp": 10,
+   "fp": 120,
+   "fn": 0,
+   "corr_precision": 0.07692307692307693,
+   "corr_recall": 1.0,
+   "corr_f1": 0.14285714285714288,
+   "stage_accuracy": 0.8,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Initial Access",
+    "Malware Delivery",
+    "Uncategorized",
+    "Execution",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Credential Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 11,
+   "tp": 10,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9090909090909091,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9523809523809523,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027306,
+  "in_scope": 106,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 106,
+   "tp": 11,
+   "fp": 95,
+   "fn": 0,
+   "corr_precision": 0.10377358490566038,
+   "corr_recall": 1.0,
+   "corr_f1": 0.18803418803418803,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.25,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Execution",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 16,
+   "tp": 11,
+   "fp": 5,
+   "fn": 0,
+   "corr_precision": 0.6875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8148148148148148,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027307,
+  "in_scope": 127,
+  "attack": 13,
+  "baseline": {
+   "records_selected": 127,
+   "tp": 13,
+   "fp": 114,
+   "fn": 0,
+   "corr_precision": 0.10236220472440945,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1857142857142857,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 13,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027308,
+  "in_scope": 50,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 50,
+   "tp": 8,
+   "fp": 42,
+   "fn": 0,
+   "corr_precision": 0.16,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2758620689655173,
+   "stage_accuracy": 0.8,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 10,
+   "tp": 8,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8,
+   "corr_recall": 1.0,
+   "corr_f1": 0.888888888888889,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027309,
+  "in_scope": 74,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 73,
+   "tp": 12,
+   "fp": 61,
+   "fn": 0,
+   "corr_precision": 0.1643835616438356,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2823529411764706,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.25,
+   "pred_sequence": [
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Execution",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 12,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027310,
+  "in_scope": 92,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 92,
+   "tp": 12,
+   "fp": 80,
+   "fn": 0,
+   "corr_precision": 0.13043478260869565,
+   "corr_recall": 1.0,
+   "corr_f1": 0.23076923076923078,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.3076923076923077,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 17,
+   "tp": 12,
+   "fp": 5,
+   "fn": 0,
+   "corr_precision": 0.7058823529411765,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8275862068965517,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027311,
+  "in_scope": 106,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 105,
+   "tp": 11,
+   "fp": 94,
+   "fn": 0,
+   "corr_precision": 0.10476190476190476,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1896551724137931,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.21052631578947367,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 17,
+   "tp": 11,
+   "fp": 6,
+   "fn": 0,
+   "corr_precision": 0.6470588235294118,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7857142857142858,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027312,
+  "in_scope": 43,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 43,
+   "tp": 12,
+   "fp": 31,
+   "fn": 0,
+   "corr_precision": 0.27906976744186046,
+   "corr_recall": 1.0,
+   "corr_f1": 0.43636363636363634,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.25,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 12,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027313,
+  "in_scope": 98,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 98,
+   "tp": 9,
+   "fp": 89,
+   "fn": 0,
+   "corr_precision": 0.09183673469387756,
+   "corr_recall": 1.0,
+   "corr_f1": 0.16822429906542058,
+   "stage_accuracy": 0.4,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Uncategorized",
+    "Initial Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 12,
+   "tp": 9,
+   "fp": 3,
+   "fn": 0,
+   "corr_precision": 0.75,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8571428571428571,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027314,
+  "in_scope": 133,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 133,
+   "tp": 11,
+   "fp": 122,
+   "fn": 0,
+   "corr_precision": 0.08270676691729323,
+   "corr_recall": 1.0,
+   "corr_f1": 0.1527777777777778,
+   "stage_accuracy": 0.7142857142857143,
+   "sequence_similarity": 0.2857142857142857,
+   "pred_sequence": [
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 18,
+   "tp": 11,
+   "fp": 7,
+   "fn": 0,
+   "corr_precision": 0.6111111111111112,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7586206896551725,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027315,
+  "in_scope": 160,
+  "attack": 13,
+  "baseline": {
+   "records_selected": 160,
+   "tp": 13,
+   "fp": 147,
+   "fn": 0,
+   "corr_precision": 0.08125,
+   "corr_recall": 1.0,
+   "corr_f1": 0.15028901734104047,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.26666666666666666,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Credential Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 14,
+   "tp": 13,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9285714285714286,
+   "corr_recall": 1.0,
+   "corr_f1": 0.962962962962963,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027316,
+  "in_scope": 140,
+  "attack": 13,
+  "baseline": {
+   "records_selected": 139,
+   "tp": 13,
+   "fp": 126,
+   "fn": 0,
+   "corr_precision": 0.09352517985611511,
+   "corr_recall": 1.0,
+   "corr_f1": 0.17105263157894735,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.23529411764705882,
+   "pred_sequence": [
+    "Malware Delivery",
+    "Credential Access",
+    "Execution",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 21,
+   "tp": 13,
+   "fp": 8,
+   "fn": 0,
+   "corr_precision": 0.6190476190476191,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7647058823529412,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027317,
+  "in_scope": 80,
+  "attack": 11,
+  "baseline": {
+   "records_selected": 80,
+   "tp": 11,
+   "fp": 69,
+   "fn": 0,
+   "corr_precision": 0.1375,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2417582417582418,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Credential Access",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Impact",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 16,
+   "tp": 11,
+   "fp": 5,
+   "fn": 0,
+   "corr_precision": 0.6875,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8148148148148148,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027318,
+  "in_scope": 43,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 43,
+   "tp": 8,
+   "fp": 35,
+   "fn": 0,
+   "corr_precision": 0.18604651162790697,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3137254901960785,
+   "stage_accuracy": 0.6,
+   "sequence_similarity": 0.3333333333333333,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Initial Access",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Initial Access"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 8,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.8888888888888888,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9411764705882353,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027319,
+  "in_scope": 82,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 82,
+   "tp": 12,
+   "fp": 70,
+   "fn": 0,
+   "corr_precision": 0.14634146341463414,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2553191489361702,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.23529411764705882,
+   "pred_sequence": [
+    "Malware Delivery",
+    "Uncategorized",
+    "Execution",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 13,
+   "tp": 12,
+   "fp": 1,
+   "fn": 0,
+   "corr_precision": 0.9230769230769231,
+   "corr_recall": 1.0,
+   "corr_f1": 0.9600000000000001,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027320,
+  "in_scope": 78,
+  "attack": 9,
+  "baseline": {
+   "records_selected": 78,
+   "tp": 9,
+   "fp": 69,
+   "fn": 0,
+   "corr_precision": 0.11538461538461539,
+   "corr_recall": 1.0,
+   "corr_f1": 0.20689655172413793,
+   "stage_accuracy": 0.6,
+   "sequence_similarity": 0.36363636363636365,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 9,
+   "tp": 9,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027321,
+  "in_scope": 108,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 107,
+   "tp": 12,
+   "fp": 95,
+   "fn": 0,
+   "corr_precision": 0.11214953271028037,
+   "corr_recall": 1.0,
+   "corr_f1": 0.20168067226890757,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.25,
+   "pred_sequence": [
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.50"
+   ]
+  },
+  "improved": {
+   "records_selected": 14,
+   "tp": 12,
+   "fp": 2,
+   "fn": 0,
+   "corr_precision": 0.8571428571428571,
+   "corr_recall": 1.0,
+   "corr_f1": 0.923076923076923,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.50"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027322,
+  "in_scope": 106,
+  "attack": 12,
+  "baseline": {
+   "records_selected": 106,
+   "tp": 12,
+   "fp": 94,
+   "fn": 0,
+   "corr_precision": 0.11320754716981132,
+   "corr_recall": 1.0,
+   "corr_f1": 0.2033898305084746,
+   "stage_accuracy": 0.42857142857142855,
+   "sequence_similarity": 0.23529411764705882,
+   "pred_sequence": [
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Malware Delivery",
+    "Uncategorized",
+    "Credential Access",
+    "Uncategorized",
+    "Credential Access",
+    "Initial Access",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 17,
+   "tp": 12,
+   "fp": 5,
+   "fn": 0,
+   "corr_precision": 0.7058823529411765,
+   "corr_recall": 1.0,
+   "corr_f1": 0.8275862068965517,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027323,
+  "in_scope": 143,
+  "attack": 13,
+  "baseline": {
+   "records_selected": 143,
+   "tp": 13,
+   "fp": 130,
+   "fn": 0,
+   "corr_precision": 0.09090909090909091,
+   "corr_recall": 1.0,
+   "corr_f1": 0.16666666666666669,
+   "stage_accuracy": 0.5714285714285714,
+   "sequence_similarity": 0.35294117647058826,
+   "pred_sequence": [
+    "Initial Access",
+    "Credential Access",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Malware Delivery",
+    "Impact",
+    "Uncategorized",
+    "Impact",
+    "Uncategorized"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 0.8,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 23,
+   "tp": 13,
+   "fp": 10,
+   "fn": 0,
+   "corr_precision": 0.5652173913043478,
+   "corr_recall": 1.0,
+   "corr_f1": 0.7222222222222222,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Lateral Movement",
+    "Malware Delivery",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+   ]
+  }
+ },
+ {
+  "template": "c2_beacon",
+  "seed": 2027324,
+  "in_scope": 36,
+  "attack": 8,
+  "baseline": {
+   "records_selected": 36,
+   "tp": 8,
+   "fp": 28,
+   "fn": 0,
+   "corr_precision": 0.2222222222222222,
+   "corr_recall": 1.0,
+   "corr_f1": 0.3636363636363636,
+   "stage_accuracy": 0.4,
+   "sequence_similarity": 0.4,
+   "pred_sequence": [
+    "Uncategorized",
+    "Malware Delivery",
+    "Execution",
+    "Uncategorized",
+    "Initial Access",
+    "Uncategorized",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": false,
+   "rca_entry_ok": false,
+   "rca_origin_ok": false,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  },
+  "improved": {
+   "records_selected": 8,
+   "tp": 8,
+   "fp": 0,
+   "fn": 0,
+   "corr_precision": 1.0,
+   "corr_recall": 1.0,
+   "corr_f1": 1.0,
+   "stage_accuracy": 1.0,
+   "sequence_similarity": 1.0,
+   "pred_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "true_sequence": [
+    "Command and Control",
+    "Execution",
+    "Impact"
+   ],
+   "rca_vector_ok": true,
+   "rca_entry_ok": true,
+   "rca_origin_ok": true,
+   "rca_assets_f1": 1.0,
+   "rca_assets_pred": [
+    "10.10.0.10",
+    "10.10.0.70"
+   ]
+  }
+ }
+]

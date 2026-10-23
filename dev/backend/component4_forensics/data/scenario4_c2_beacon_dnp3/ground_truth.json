@@ -1,0 +1,11 @@
+{
+  "initial_vector": "Command and Control",
+  "entry_ip": "198.51.100.77",
+  "origin_type": "external",
+  "compromised_ips": [
+    "10.10.0.10",
+    "10.10.0.30",
+    "10.10.0.70"
+  ],
+  "description": "Malware on the EWS beacons to an external C2 server, spreads to the historian over SMB and sends a DNP3 write to the protection relay RTU."
+}

@@ -1,0 +1,38 @@
+[
+  {
+    "records": 500,
+    "in_scope": 484,
+    "kept": 49,
+    "load_s": 0.007,
+    "analyse_s": 0.001,
+    "total_s": 0.008,
+    "precision": 0.429,
+    "recall": 1.0,
+    "origin": "external",
+    "entry_ip": "203.0.113.55"
+  },
+  {
+    "records": 5000,
+    "in_scope": 4984,
+    "kept": 20,
+    "load_s": 0.06,
+    "analyse_s": 0.007,
+    "total_s": 0.066,
+    "precision": 1.0,
+    "recall": 0.952,
+    "origin": "external",
+    "entry_ip": "203.0.113.55"
+  },
+  {
+    "records": 50000,
+    "in_scope": 49984,
+    "kept": 20,
+    "load_s": 0.788,
+    "analyse_s": 0.091,
+    "total_s": 0.873,
+    "precision": 1.0,
+    "recall": 0.952,
+    "origin": "external",
+    "entry_ip": "203.0.113.55"
+  }
+]

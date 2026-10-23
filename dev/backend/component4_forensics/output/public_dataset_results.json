@@ -1,0 +1,89 @@
+{
+ "file": "EdgeIIoT_train_80_with_incident_id.csv",
+ "records_total": 126240,
+ "skipped_no_time": 12512,
+ "records_used": 113728,
+ "attack_records": 94287,
+ "seed_ip": "192.168.0.170",
+ "seed_candidates": [
+  [
+   "192.168.0.128",
+   7614
+  ],
+  [
+   "192.168.0.170",
+   4320
+  ],
+  [
+   "0.0.0.0",
+   3
+  ]
+ ],
+ "improved": {
+  "tp": 77552,
+  "fp": 8061,
+  "fn": 16735,
+  "precision": 0.9058437386845456,
+  "recall": 0.8225099960758111,
+  "benign_excluded": 0.585360835347976,
+  "f1": 0.8621678710394662
+ },
+ "baseline_seed_ip_only": {
+  "tp": 71869,
+  "fp": 0,
+  "fn": 22418,
+  "precision": 1.0,
+  "recall": 0.7622365755618484,
+  "benign_excluded": 1.0,
+  "f1": 0.8650786008329522
+ },
+ "baseline_everything": {
+  "tp": 94287,
+  "fp": 19441,
+  "fn": 0,
+  "precision": 0.8290570483961733,
+  "recall": 1.0,
+  "benign_excluded": 0.0,
+  "f1": 0.9065403937216066
+ },
+ "missed_reasons": [
+  [
+   "inbound to the victim from many other source addresses (distributed or spoofed)",
+   14254
+  ],
+  [
+   "no IP address in the record (ARP, ICMP or malformed)",
+   2357
+  ],
+  [
+   "other",
+   124
+  ]
+ ],
+ "missed_distinct_other_sources": 14228,
+ "false_positive_pairs": [
+  [
+   "192.168.0.128 -> 192.168.0.101",
+   8032
+  ],
+  [
+   "192.168.0.128 -> 192.168.0.1",
+   17
+  ],
+  [
+   "192.168.0.128 -> 224.0.0.251",
+   10
+  ],
+  [
+   "192.168.0.128 -> 94.228.220.14",
+   1
+  ],
+  [
+   "192.168.0.128 -> 196.200.160.123",
+   1
+  ]
+ ],
+ "load_s": 2.11,
+ "correlate_s": 0.23,
+ "clusters": 4
+}

@@ -1,0 +1,48 @@
+{
+  "incident_id": "INC-2026-0910-01",
+  "source_component": "SOC Alert Prioritization (Component 3)",
+  "priority": "Critical",
+  "seed_ips": [
+    "203.0.113.55"
+  ],
+  "window_start": "2026-09-10 08:58:00",
+  "window_end": "2026-09-10 09:15:00",
+  "flagged_assets": [
+    "10.10.0.50"
+  ],
+  "upstream": {
+    "illustrative_sample": true,
+    "detection": {
+      "model": "Random Forest (sample)",
+      "predicted_class": "Modbus write anomaly",
+      "confidence": 0.94,
+      "detected_at": "2026-09-10 09:10:06",
+      "alert_count": 5
+    },
+    "explanation": {
+      "method": "SHAP (sample)",
+      "top_features": [
+        {
+          "feature": "modbus_write_rate",
+          "contribution": 0.41,
+          "direction": "raises risk"
+        },
+        {
+          "feature": "src_ip_is_new",
+          "contribution": 0.27,
+          "direction": "raises risk"
+        },
+        {
+          "feature": "packets_per_second",
+          "contribution": 0.09,
+          "direction": "raises risk"
+        }
+      ],
+      "summary": "A burst of Modbus writes from a host that had not written to this PLC before."
+    },
+    "prioritization": {
+      "priority_score": 0.97,
+      "reason": "Critical asset (breaker PLC) with a control write"
+    }
+  }
+}

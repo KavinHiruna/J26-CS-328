@@ -37,6 +37,14 @@ DATASET_PATHS = [
 MODEL_PATHS = [MODEL_DIR / MODEL_FILE]
 FEATURE_PATHS = [MODEL_DIR / FEATURES_FILE]
 
+# Web Injection dashboard (SQLi · XSS · Uploading) - multi-class model built by
+# model/train_web_injection_rf.py; the dashboard uses it instead of the SQLi-only model.
+WEB_MODEL_FILE = "web_injection_rf.pkl"
+WEB_FEATURES_FILE = "web_feature_columns.pkl"
+WEB_MODEL_CARD = MODEL_DIR / "web_injection_model_card.json"
+WEB_MODEL_PATHS = [MODEL_DIR / WEB_MODEL_FILE]
+WEB_FEATURE_PATHS = [MODEL_DIR / WEB_FEATURES_FILE]
+
 
 def first_existing(paths):
     """Return the first path in the list that exists on disk, else None."""

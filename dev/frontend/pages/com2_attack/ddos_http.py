@@ -179,16 +179,99 @@ def score(_xai: DDoSHttpXAI, _raw: pd.DataFrame, key: tuple) -> pd.DataFrame:
 # --------------------------------------------------------------------------- #
 # Tabs
 # --------------------------------------------------------------------------- #
-def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> None:
+def http_requests(raw: pd.DataFrame, scored: pd.DataFrame, secs: pd.Series) -> pd.DataFrame:
+    """One row per HTTP request packet with the HTTP-flood key columns (method, URI, version, referer, port)."""
+    def col(name):
+        return raw[name].astype(str).str.strip() if name in raw.columns else pd.Series("", index=raw.index)
+
+    empty = ["", "0", "0.0", "nan"]
+    method = col("http.request.method")
+    is_req = ~method.isin(empty)
+    req = pd.DataFrame({
+        "t": secs, "src": col("ip.src_host"), "method": method.str.upper(),
+        "version": col("http.request.version").str.extract(r"(HTTP/\d\.\d)")[0].fillna("other"),
+        "path": col("http.request.full_uri").str.extract(r"^(?:https?://[^/]+)?(/[^?#]*)")[0].fillna("(no URI)"),
+        "referer": ~col("http.referer").isin(empty),
+        "dstport": col("tcp.dstport").str.replace(r"\.0$", "", regex=True),
+        "flagged": scored["is_attack"],
+    })[is_req]
+    req["status"] = np.where(req["flagged"], "flagged as HTTP flood", "not flagged")
+    return req
+
+
+def http_flood_view(req: pd.DataFrame) -> None:
+    """Spec 'HTTP Flood UI': requests per second per URI, top requesting IPs, GET/POST mix, key columns."""
+    section("HTTP flood view — requests per URI, requesting IPs and method mix")
+    if req.empty:
+        st.info("No HTTP request packets in this traffic.")
+        return
+    status_colors = {"flagged as HTTP flood": THEME["attack"], "not flagged": THEME["normal"]}
+    timed = req.dropna(subset=["t"])
+    left, right = st.columns([2, 1])
+    with left:
+        if not timed.empty:
+            top_paths = timed["path"].value_counts().head(5).index
+            t = timed.assign(minute=(timed["t"] // 60) * 60,
+                             uri=np.where(timed["path"].isin(top_paths), timed["path"], "other URIs"))
+            rate = t.groupby(["minute", "uri"]).size().div(60).rename("req_per_s").reset_index()
+            rate["clock"] = rate["minute"].map(lambda m: _hhmmss(m)[:5])
+            fig = px.line(rate.sort_values("minute"), x="clock", y="req_per_s", color="uri", markers=True,
+                          title="Requests per second per URI (per-minute average, top 5 URIs)")
+            fig.update_layout(xaxis_title="time of day (dataset is a sample, rates are approximate)",
+                              yaxis_title="requests / s")
+            st.plotly_chart(style_fig(fig, 340), width="stretch")
+        else:
+            st.info("frame.time is not usable here, so request rates cannot be drawn.")
+    with right:
+        mix = req.groupby(["method", "status"]).size().rename("requests").reset_index()
+        order = req["method"].value_counts().index.tolist()
+        fig = px.bar(mix, x="requests", y="method", color="status", orientation="h", text="requests",
+                     color_discrete_map=status_colors, category_orders={"method": order},
+                     title="GET / POST mix (HTTP methods)")
+        fig.update_traces(textposition="outside", cliponaxis=False)
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
+
+    left, right = st.columns([1, 1.6])
+    with left:
+        top_src = req["src"].value_counts().head(8).index
+        srcs = req[req["src"].isin(top_src)].groupby(["src", "status"]).size().rename("requests").reset_index()
+        fig = px.bar(srcs, x="requests", y="src", color="status", orientation="h",
+                     color_discrete_map=status_colors, category_orders={"src": list(top_src)},
+                     title="Top requesting IPs (HTTP requests)")
+        st.plotly_chart(style_fig(fig, 340), width="stretch")
+    with right:
+        per_min = timed.assign(minute=timed["t"] // 60).groupby(["path", "minute"]).size()
+        peak = per_min.groupby(level=0).max().div(60)
+        tbl = req.groupby("path").agg(
+            requests=("path", "size"), sources=("src", "nunique"), flagged=("flagged", "mean"),
+            methods=("method", lambda s: ", ".join(f"{k} {v}" for k, v in s.value_counts().head(3).items())),
+            version=("version", lambda s: s.value_counts().index[0]),
+            referer=("referer", "mean"),
+            dst_ports=("dstport", lambda s: ", ".join(s.value_counts().index[:3])),
+        )
+        tbl["peak_req_per_s"] = peak.reindex(tbl.index)
+        tbl = tbl.sort_values("requests", ascending=False).head(15).reset_index()
+        st.caption("Per-URI request profile (key columns: method · URI · version · referer · tcp.dstport)")
+        st.dataframe(tbl[["path", "requests", "peak_req_per_s", "sources", "flagged", "methods", "version",
+                          "referer", "dst_ports"]], width="stretch", hide_index=True, height=300,
+                     column_config={
+                         "path": "URI path", "peak_req_per_s": st.column_config.NumberColumn("peak req/s", format="%.2f"),
+                         "flagged": st.column_config.ProgressColumn("flagged share", min_value=0.0, max_value=1.0, format="percent"),
+                         "referer": st.column_config.ProgressColumn("with Referer", min_value=0.0, max_value=1.0, format="percent"),
+                         "dst_ports": "tcp.dstport"})
+
+
+def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame, data_key: tuple) -> None:
     ind = xai.flood_indicators(raw, scored)
+    req = http_requests(raw, scored, seconds_of_day(raw, data_key))
     c1, c2, c3, c4, c5 = st.columns(5)
     with c1:
         card("Packets analysed", f"{ind['packets']:,}")
     with c2:
         card("Flagged as HTTP flood", f"{ind['flagged']:,}", f"{ind['flagged_ratio']:.1%} of traffic", THEME["attack"])
     with c3:
-        card("HTTP request packets", f"{ind['http_request_ratio']:.1%}",
-             ", ".join(f"{k}: {v:,}" for k, v in ind["http_methods"].items()) or "none")
+        card("HTTP requests", f"{len(req):,}",
+             " · ".join(f"{k} {v:,}" for k, v in req["method"].value_counts().head(3).items()) or "none")
     with c4:
         card("Flagged sources", f"{ind['distinct_sources_flagged']:,}", "distinct source IPs")
     with c5:
@@ -198,6 +281,9 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
         card("Agreement with labels", f"{acc:.1%}" if acc is not None else "—",
              "dataset labels present" if acc is not None else "no labels in file", THEME["normal"])
 
+    http_flood_view(req)
+
+    section("Model verdicts")
     left, right = st.columns([1, 2])
     with left:
         level = ind["flagged_ratio"] * 100
@@ -226,21 +312,11 @@ def tab_detection(xai: DDoSHttpXAI, raw: pd.DataFrame, scored: pd.DataFrame) -> 
                           yaxis_title="P(HTTP flood)", yaxis_range=[0, 1.02])
         st.plotly_chart(style_fig(fig, 300), use_container_width=True)
 
-    c1, c2, c3 = st.columns(3)
+    c1, c3 = st.columns(2)
     with c1:
         fig = px.histogram(scored, x="attack_probability", color="prediction", nbins=40,
                            color_discrete_map=CLASS_COLORS, title="Probability distribution")
         st.plotly_chart(style_fig(fig, 320), use_container_width=True)
-    with c2:
-        if ind["top_flagged_sources"]:
-            src = pd.DataFrame({"source": list(ind["top_flagged_sources"].keys()),
-                                "packets": list(ind["top_flagged_sources"].values())})
-            fig = px.bar(src, x="packets", y="source", orientation="h", title="Top flagged source IPs",
-                         color_discrete_sequence=[THEME["attack"]])
-            fig.update_yaxes(categoryorder="total ascending")
-            st.plotly_chart(style_fig(fig, 320, legend=False), use_container_width=True)
-        else:
-            st.info("No packets flagged — no source IPs to rank.")
     with c3:
         # Bars, not a donut: one level usually dominates and tiny slices' labels collide.
         levels = ["Low", "Elevated", "High", "Critical"]
@@ -1017,7 +1093,7 @@ def main() -> None:
     with t0:
         tab_incident(xai, raw, scored, top_k, use_lime, signature)
     with t1:
-        tab_detection(xai, raw, scored)
+        tab_detection(xai, raw, scored, signature)
     with t2:
         tab_local(xai, raw, scored, top_k, use_lime)
     with t3:

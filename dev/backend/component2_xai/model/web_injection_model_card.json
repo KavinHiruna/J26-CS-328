@@ -1,0 +1,100 @@
+{
+  "model": "RandomForestClassifier (multi-class stand-in baseline, web injection)",
+  "classes": {
+    "Other": "Not web injection",
+    "SQL_injection": "SQL injection",
+    "Uploading": "Malicious upload",
+    "XSS": "XSS"
+  },
+  "label_rules": {
+    "SQL_injection": "Attack_label == 1 AND full_uri matches /vulnerabilities/sqli",
+    "XSS": "Attack_label == 1 AND request text matches <\\s*/?\\s*script|%3c\\s*script|javascript\\s*:|\\bon(?:error|load|mouseover)\\s*=|/vulnerabilities/xss",
+    "Uploading": "Attack_label == 1 AND full_uri matches /hackable/uploads/|/vulnerabilities/upload"
+  },
+  "n_rows": 126240,
+  "class_counts": {
+    "Other": 124923,
+    "SQL_injection": 678,
+    "Uploading": 420,
+    "XSS": 219
+  },
+  "n_features": 65,
+  "holdout_20pct": {
+    "Other": {
+      "precision": 1.0,
+      "recall": 0.9999,
+      "f1": 1.0,
+      "support": 24984
+    },
+    "SQL_injection": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 136
+    },
+    "Uploading": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "support": 84
+    },
+    "XSS": {
+      "precision": 0.9565,
+      "recall": 1.0,
+      "f1": 0.9778,
+      "support": 44
+    }
+  },
+  "holdout_confusion_matrix": {
+    "labels": [
+      "Other",
+      "SQL_injection",
+      "Uploading",
+      "XSS"
+    ],
+    "matrix": [
+      [
+        24982,
+        0,
+        0,
+        2
+      ],
+      [
+        0,
+        136,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        84,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        44
+      ]
+    ]
+  },
+  "top_feature_importances": {
+    "upload_dir": 0.1094,
+    "uri_length": 0.1001,
+    "xss_dom_sink": 0.0917,
+    "equals_count": 0.0776,
+    "http_get": 0.0594,
+    "tcp_payload_length": 0.0559,
+    "http.content_length": 0.052,
+    "xss_script_tag": 0.0462,
+    "query_parameter_count": 0.0456,
+    "tcp.len": 0.0442,
+    "exec_extension": 0.0418,
+    "tcp.srcport": 0.0406
+  },
+  "trained_with": {
+    "scikit-learn": "1.9.1",
+    "pickle_protocol": 4
+  }
+}

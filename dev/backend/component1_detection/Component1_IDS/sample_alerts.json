@@ -1,0 +1,42 @@
+[
+  {
+    "flow_id":6,
+    "src_ip":"192.168.0.170",
+    "dst_ip":"192.168.0.128",
+    "predicted_type":"Ransomware",
+    "confidence":0.9650390148,
+    "event_time":" 2021 22:49:49.709983000 "
+  },
+  {
+    "flow_id":7,
+    "src_ip":"192.168.0.128",
+    "dst_ip":"192.168.0.170",
+    "predicted_type":"DDoS_HTTP",
+    "confidence":0.9940400124,
+    "event_time":" 2021 11:36:50.031957000 "
+  },
+  {
+    "flow_id":8,
+    "src_ip":"192.168.0.170",
+    "dst_ip":"192.168.0.128",
+    "predicted_type":"Backdoor",
+    "confidence":0.9987519979,
+    "event_time":" 2021 20:59:13.616844000 "
+  },
+  {
+    "flow_id":8509,
+    "src_ip":"192.168.0.101",
+    "dst_ip":"192.168.0.128",
+    "predicted_type":"Normal",
+    "confidence":0.9999619722,
+    "event_time":" 2021 18:20:11.441842000 "
+  },
+  {
+    "flow_id":28500,
+    "src_ip":"192.168.0.101",
+    "dst_ip":"192.168.0.128",
+    "predicted_type":"Normal",
+    "confidence":0.9999899864,
+    "event_time":" 2021 21:55:30.312224000 "
+  }
+]

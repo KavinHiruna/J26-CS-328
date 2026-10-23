@@ -1,0 +1,4 @@
+"""DDoS HTTP Flood detection with explainable AI (Edge-IIoTset) — Component 2."""
+from .service import DDoSHttpXAI, ModelNotTrainedError  # noqa: F401
+
+__all__ = ["DDoSHttpXAI", "ModelNotTrainedError"]

@@ -1,0 +1,16 @@
+respondent,background,experience,w_severity,w_confidence,w_asset,w_frequency,CR
+1,SOC / security analyst,1 to 3 years,0.3899,0.1524,0.3899,0.0679,0.016
+2,Student,Under 1 year,0.125,0.375,0.375,0.125,0.0
+3,Student,1 to 3 years,0.172,0.172,0.5995,0.0565,0.126
+4,SOC / security analyst,Under 1 year,0.4369,0.1164,0.2166,0.2301,0.128
+5,SOC / security analyst,1 to 3 years,0.2526,0.1376,0.5331,0.0767,0.213
+6,SOC / security analyst,1 to 3 years,0.2876,0.1431,0.5048,0.0645,0.073
+7,Academic / lecturer,Under 1 year,0.3889,0.1783,0.3031,0.1296,0.057
+8,IT / network engineer,Under 1 year,0.2345,0.1231,0.2923,0.35,0.098
+9,Academic / lecturer,Over 3 years,0.3899,0.1524,0.3899,0.0679,0.016
+10,SOC / security analyst,1 to 3 years,0.2876,0.1431,0.5048,0.0645,0.073
+11,Student,Under 1 year,0.4874,0.2762,0.1182,0.1182,0.057
+12,Academic / lecturer,Over 3 years,0.2706,0.1219,0.5439,0.0636,0.073
+13,Student,Under 1 year,0.2992,0.1484,0.4727,0.0797,0.128
+14,Academic / lecturer,1 to 3 years,0.324,0.1231,0.4919,0.061,0.128
+15,Student,Under 1 year,0.2849,0.1645,0.4935,0.057,0.115

@@ -1,0 +1,101 @@
+{
+  "dataset": "data\\raw\\EdgeIIoT_train_80_with_incident_id.csv",
+  "model": "backend\\component2_xai\\model\\sql_injection_rf.pkl",
+  "attack_class": "1",
+  "incidents_explained": 300,
+  "predicted_attacks": 205,
+  "shapley_efficiency_max_error": 6.938893903907228e-17,
+  "trust_score": {
+    "n": 300,
+    "mean": 0.537,
+    "median": 0.5017,
+    "std": 0.3537,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "trust_levels": {
+    "Medium": 123,
+    "High": 90,
+    "Low": 87
+  },
+  "rule_pss_agreement": {
+    "n": 300,
+    "mean": 0.7667,
+    "median": 1.0,
+    "std": 0.3972,
+    "min": 0.0,
+    "max": 1.0
+  },
+  "pss_shap_agreement": {
+    "n": 0
+  },
+  "pss_lime_agreement": {
+    "n": 0
+  },
+  "deletion_drop_top": {
+    "n": 205,
+    "mean": 0.0072,
+    "median": 0.0033,
+    "std": 0.0089,
+    "min": 0.0,
+    "max": 0.0467
+  },
+  "deletion_drop_random": {
+    "n": 205,
+    "mean": 0.0019,
+    "median": 0.0,
+    "std": 0.0057,
+    "min": -0.0023,
+    "max": 0.0413
+  },
+  "fidelity_gain": {
+    "n": 205,
+    "mean": 0.0093,
+    "median": 0.0035,
+    "std": 0.0192,
+    "min": -0.0495,
+    "max": 0.0795
+  },
+  "fidelity_gain_positive_rate": 0.7268,
+  "counterfactual_found_rate": 0.1805,
+  "counterfactual_size": {
+    "n": 37,
+    "mean": 1.1081,
+    "median": 1.0,
+    "std": 0.3105,
+    "min": 1.0,
+    "max": 2.0
+  },
+  "payload_share_attacks": {
+    "n": 205,
+    "mean": 0.1233,
+    "median": 0.11,
+    "std": 0.0428,
+    "min": 0.0211,
+    "max": 0.2459
+  },
+  "technique_frequency": {
+    "Comment truncation": 159,
+    "Quote break-out": 81,
+    "Boolean-based blind / tautology": 43,
+    "Nested sub-query": 42,
+    "Obfuscation / encoding": 38,
+    "Time-based blind injection": 26,
+    "Error-based injection": 10,
+    "Stacked queries": 8,
+    "Obfuscation / encoding (double URL-encoding)": 5,
+    "UNION-based injection": 3
+  },
+  "explain_seconds": {
+    "n": 300,
+    "mean": 0.2503,
+    "median": 0.2757,
+    "std": 0.0784,
+    "min": 0.0819,
+    "max": 0.4221
+  },
+  "notes": [
+    "deletion_drop_top uses the same removal operator as PSS, so compare it with deletion_drop_random (same character budget) rather than reading it alone.",
+    "payload_share near 0 for many attacks means the model relies on network/size features, not on the SQL payload - report this as a model-behaviour finding."
+  ]
+}

@@ -1,0 +1,105 @@
+{
+  "incident_id": "ALR-000004",
+  "prediction": "DDoS Network Flood",
+  "attack_probability": 0.9973051170552547,
+  "dataset_label": "DDoS Network Flood",
+  "analyst_priority": "High",
+  "explanation_trust": "Medium",
+  "xai_consensus_score": 0.6622936413275539,
+  "consensus_components": {
+    "rank": 0.21584123197688218,
+    "topk": 0.43333333333333335,
+    "direction": 1.0,
+    "verdict": 1.0
+  },
+  "method_verdicts": {
+    "Random Forest": 1,
+    "Surrogate tree": 1,
+    "LIME local model": 1
+  },
+  "recommendation": "Explanations partly agree \u2014 corroborate with traffic context (packet rate, distinct spoofed sources) before acting.",
+  "attribution_method": "SHAP (TreeExplainer)",
+  "base_value": 0.5000471565315315,
+  "top_contributions": [
+    {
+      "feature": "tcp.seq",
+      "value": "0",
+      "contribution": 0.10402893179034983
+    },
+    {
+      "feature": "icmp.seq_le",
+      "value": "42174",
+      "contribution": 0.0857785213247268
+    },
+    {
+      "feature": "tcp.flags",
+      "value": "0",
+      "contribution": 0.07651215449333237
+    },
+    {
+      "feature": "http.tls_port",
+      "value": "0",
+      "contribution": 0.056920526552655594
+    },
+    {
+      "feature": "tcp.connection.synack",
+      "value": "0",
+      "contribution": 0.055694162349512626
+    },
+    {
+      "feature": "tcp.ack",
+      "value": "0",
+      "contribution": 0.04781620739011939
+    },
+    {
+      "feature": "udp.stream",
+      "value": "0",
+      "contribution": -0.04119208719024602
+    },
+    {
+      "feature": "tcp.flags.ack",
+      "value": "0",
+      "contribution": 0.03922580087680147
+    },
+    {
+      "feature": "mbtcp.trans_id",
+      "value": "0",
+      "contribution": 0.01887987142586372
+    },
+    {
+      "feature": "mqtt.ver",
+      "value": "0",
+      "contribution": 0.018367118004004823
+    }
+  ],
+  "flood_context": {
+    "src": "192.168.0.128",
+    "dst": "27.174.192.124",
+    "protocol": "ICMP",
+    "time": 83921.023041,
+    "src_flagged": 0.1034872026436239,
+    "flood": true,
+    "timed": true,
+    "target": "192.168.0.128",
+    "direction": "reply from target",
+    "peer": "27.174.192.124",
+    "to_target": 9671,
+    "from_target": 3256,
+    "sources_to_target": 9408,
+    "peer_packets": 0,
+    "window_to_target": 2743,
+    "window_rate_s": 22.858333333333334,
+    "window_sources": 2743,
+    "window_concentration": 0.0003645643456069996,
+    "window_flagged": 1.0,
+    "window_synack": null,
+    "window_seconds": 60
+  },
+  "surrogate_path": [
+    "tcp.seq <= 4.55   (this packet: 0)",
+    "dns.qry.type <= 0.50   (this packet: 0)",
+    "tcp.flags <= 3.00   (this packet: 0)",
+    "udp.time_delta <= 261.00   (this packet: 0)",
+    "\u2192 DDoS Network Flood"
+  ]
+}

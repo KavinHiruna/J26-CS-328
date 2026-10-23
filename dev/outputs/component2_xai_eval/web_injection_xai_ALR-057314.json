@@ -1,0 +1,45 @@
+{
+  "incident_id": "ALR-057314",
+  "prediction": "Malicious upload",
+  "attack_type": "Malicious upload",
+  "attack_probability": 0.9936011263206184,
+  "class_probabilities": {
+    "SQL injection": 0.0,
+    "XSS": 0.00016811503911215103,
+    "Malicious upload": 0.9936011263206184
+  },
+  "priority": {
+    "score": 0.9439210700045874,
+    "level": "Critical",
+    "max_technique_severity": 0.95,
+    "note": ""
+  },
+  "techniques": [
+    {
+      "key": "webshell_exec",
+      "technique": "Web shell execution from upload directory",
+      "family": "upload",
+      "severity": 0.95,
+      "cwe": "CWE-434",
+      "capec": "CAPEC-650",
+      "attack": "T1505.003",
+      "evidence": "/hackable/uploads/hack.php",
+      "matches": 1,
+      "recommendation": "Remove the file, block script execution in the upload directory and look for earlier upload POSTs."
+    }
+  ],
+  "shap_top": {
+    "upload_dir": 0.1839171192365739,
+    "uri_length": 0.06636563915367635,
+    "equals_count": 0.06092711618976282,
+    "exec_extension": 0.0570518463703193,
+    "tcp_payload_length": 0.05375198750767399,
+    "tcp.len": 0.049491480191411676,
+    "http_get": 0.043965531626617774,
+    "xss_dom_sink": 0.0363720922397078,
+    "query_length": 0.024501458428892498,
+    "query_parameter_count": 0.02224235081707874,
+    "parenthesis_count": 0.02062572717582353,
+    "percent_encoded_count": 0.01834702650727822
+  }
+}

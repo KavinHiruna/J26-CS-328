@@ -1,0 +1,16 @@
+change,spearman_with_chosen,top1000_kept_%,levels_changed_%
+weight of severity x0.8,0.983,100.0,5.6
+weight of severity x1.2,0.991,100.0,4.9
+weight of confidence x0.8,0.994,100.0,2.5
+weight of confidence x1.2,0.994,100.0,3.7
+weight of asset x0.8,0.992,100.0,5.1
+weight of asset x1.2,0.989,100.0,5.4
+weight of frequency x0.8,0.993,100.0,3.5
+weight of frequency x1.2,0.996,100.0,1.9
+equal weights (25% each),0.846,0.0,21.7
+frequency factor removed,0.953,99.9,15.3
+asset values 5/3/3 (earlier assumption) instead of survey 5/4/4,0.937,100.0,22.2
+percentile-rank scaling instead of (x-1)/4,0.947,100.0,87.7
+level cut-offs 80/60/40 (no source),1.0,100.0,48.3
+level cut-offs 85/65/40,1.0,100.0,9.8
+level cut-offs 95/75/45,1.0,100.0,34.4

@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SQL Injection XAI</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { font-family: Inter, sans-serif; background:#f8fafc; color:#0f172a; margin:0; padding:24px; }
+  a.back { color:#2563eb; text-decoration:none; font-weight:500; }
+  h1 { font-size:22px; margin:12px 0 4px; }
+  .card { background:#fff; border:1px solid #e2e8f0; border-radius:12px; padding:16px; margin-top:16px; }
+  .meta { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px; }
+  .meta div span { display:block; color:#64748b; font-size:12px; }
+  textarea { width:100%; box-sizing:border-box; min-height:70px; font-family:monospace; font-size:14px;
+             border:1px solid #cbd5e1; border-radius:8px; padding:10px; }
+  button { margin-top:8px; background:#2563eb; color:#fff; border:0; border-radius:8px; padding:8px 16px;
+           cursor:pointer; font-family:inherit; }
+  .verdict { font-size:18px; font-weight:600; }
+  .verdict.bad { color:#b91c1c; } .verdict.good { color:#15803d; }
+  .tokens { font-family:monospace; font-size:15px; line-height:2.2; word-break:break-word; }
+  .tok { padding:2px 4px; border-radius:4px; margin:0 1px; }
+  .bar-row { display:flex; align-items:center; gap:8px; margin:6px 0; }
+  .bar-row code { width:150px; text-align:right; }
+  .bar { height:14px; background:#ef4444; border-radius:4px; }
+  .err { color:#b91c1c; }
+</style>
+</head>
+<body>
+  <a class="back" href="{{ url_for('ids_dashboard') }}">← Back to XAI IDS Dashboard</a>
+  <h1>SQL Injection XAI</h1>
+  <div id="incidentTitle" style="color:#64748b">Analyze a query manually, or open an incident from the IDS dashboard.</div>
+
+  <div class="card" id="incidentCard" style="display:none">
+    <div class="meta">
+      <div><span>Incident ID</span><b id="mId"></b></div>
+      <div><span>IDS Label</span><b id="mLabel"></b></div>
+      <div><span>Attack Type</span><b id="mType"></b></div>
+      <div><span>Source IP</span><b id="mIp"></b></div>
+      <div><span>Time</span><b id="mTime"></b></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <b>Query / payload</b>
+    <textarea id="queryInput" placeholder="e.g. id=1' OR '1'='1' --"></textarea>
+    <button id="explainBtn">Explain</button>
+    <div id="error" class="err"></div>
+  </div>
+
+  <div class="card" id="resultCard" style="display:none">
+    <div id="verdict" class="verdict"></div>
+    <p style="color:#64748b;margin:6px 0 12px">Red = pushes toward SQL injection. Darker = stronger influence.</p>
+    <div id="tokens" class="tokens"></div>
+    <h3 style="margin-top:20px">Top contributing tokens</h3>
+    <div id="bars"></div>
+  </div>
+
+<script>
+  // incident id passed from the IDS dashboard (Flask puts it here from ?incident=...)
+  const incidentId = {{ incident_id | tojson }};
+
+  const $ = id => document.getElementById(id);
+  const esc = s => s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  async function explain(query) {
+    $("error").textContent = "";
+    const res = await fetch("/api/sqli/explain", {
+      method: "POST", headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ query })
+    });
+    if (!res.ok) { $("error").textContent = "Could not explain this query."; return; }
+    show(await res.json());
+  }
+
+  function show(r) {
+    $("resultCard").style.display = "";
+    const bad = r.prediction === "SQL Injection";
+    $("verdict").className = "verdict " + (bad ? "bad" : "good");
+    $("verdict").textContent = `${r.prediction} — ${(r.probability * 100).toFixed(1)}% confidence`;
+
+    $("tokens").innerHTML = r.tokens.map(t => {
+      const a = Math.max(0, Math.min(1, t.weight / 0.6));
+      const bg = t.weight > 0 ? `rgba(239,68,68,${a})` : "transparent";
+      return `<span class="tok" style="background:${bg}" title="weight ${t.weight}">${esc(t.token)}</span>`;
+    }).join("");
+
+    const max = Math.max(...r.top_features.map(f => f.weight), 0.01);
+    $("bars").innerHTML = r.top_features.map(f =>
+      `<div class="bar-row"><code>${esc(f.token)}</code>
+         <div class="bar" style="width:${(f.weight / max) * 300}px"></div><span>${f.weight}</span></div>`
+    ).join("") || "<i>No suspicious tokens.</i>";
+  }
+
+  // ---- THE CONNECTION: load incident sent from IDS dashboard ----
+  async function loadIncident(id) {
+    const res = await fetch(`/api/incidents/${encodeURIComponent(id)}`);
+    if (!res.ok) { $("error").textContent = `Incident ${id} not found.`; return; }
+    const inc = await res.json();
+
+    $("incidentTitle").textContent = `Explaining incident ${inc.incident_id} from XAI IDS`;
+    $("incidentCard").style.display = "";
+    $("mId").textContent = inc.incident_id;
+    $("mLabel").textContent = inc.label;
+    $("mType").textContent = inc.attack_type;
+    $("mIp").textContent = inc.src_ip;
+    $("mTime").textContent = inc.timestamp;
+    $("queryInput").value = inc.payload;
+
+    if (!inc.payload) { $("error").textContent = "This incident has no payload to explain."; return; }
+    explain(inc.payload);   // auto-run the explanation
+  }
+
+  $("explainBtn").onclick = () => {
+    const q = $("queryInput").value.trim();
+    if (q) explain(q);
+  };
+
+  if (incidentId) loadIncident(incidentId);
+</script>
+</body>
+</html>

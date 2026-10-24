@@ -50,3 +50,18 @@ Results are saved to `dev\outputs\component2_xai_eval\` (`summary.json`, `per_in
 5. **SQLi technique profiling** – CWE-89 / CAPEC / ATT&CK T1190 mapping, narrative and priority.
 
 **Important:** the feature builder must match how the model was trained. If it doesn't, pass your own `feature_builder=` to `SQLiXAIEngine`.
+
+## Fixes for the known PSS problems (v2)
+Search `FIX P<n>` in `sqli_xai_engine.py`.
+
+| Problem | Fix |
+|---|---|
+| P1 parameter `=` counted as evidence | `name=` signs go to a fixed "structure" group, never a player; only comparison `=` (1=1) is evidence |
+| P2 removal creates unusual requests | PSS re-run with a second removal method (delete vs blank) + out-of-range check; both shown in the trust table |
+| P3 results depend on grouping | Groups fixed to `TAXONOMY` (OWASP/CAPEC); evaluation compares with a coarse grouping |
+| P4 overlapping groups | Each character belongs to one group (`FAMILY_PRIORITY`) |
+| P5 only the payload part explained | Two-player Shapley split: baseline + SQL payload + network/size |
+| P6 cost | At most 11 groups (2,048 model calls); `n_players` reported |
+| P7 novelty claim | Same deletion test for the groups PSS, SHAP and LIME pick, so they can be compared |
+
+Feature definitions are unchanged, so the model still receives inputs built like its training data.

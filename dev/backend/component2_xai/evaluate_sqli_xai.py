@@ -1,4 +1,4 @@
-"""
+r"""
 Batch evaluation of the Component 2 SQLi XAI engine (results for the thesis/report).
 
 For a sample of incidents it measures:
@@ -9,6 +9,13 @@ For a sample of incidents it measures:
   * how often a minimal sanitisation counterfactual exists, and its size
   * payload share (how much of the decision comes from payload text vs network/size features)
   * technique frequency and explanation time
+Mitigation metrics (see "FIX P<n>" in sqli_xai_engine.py):
+  * P1 how many parameter "=" signs were excluded from the evidence
+  * P2 agreement between the two removal methods + out-of-range fraction
+  * P3 grouping sensitivity: does the default top group fall inside the top group of a coarser grouping?
+  * P5 payload vs network/size split of P(attack)
+  * P6 number of evidence groups per incident (2^n model calls)
+  * P7 deletion drop when removing the top groups chosen by PSS vs SHAP vs LIME
 
 FILE LOCATION : dev/backend/component2_xai/evaluate_sqli_xai.py
 Default paths come from sqli_xai_config.py:
@@ -52,6 +59,12 @@ def describe(series: pd.Series) -> dict:
             "std": round(float(s.std(ddof=0)), 4), "min": round(float(s.min()), 4), "max": round(float(s.max()), 4)}
 
 
+def rate(mask) -> float | None:
+    """Share of True values, ignoring missing ones."""
+    s = pd.Series(mask).dropna()
+    return round(float(s.astype(bool).mean()), 4) if len(s) else None
+
+
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--data", default=_default(C.DATASET_PATHS), help="CSV with Incident_ID and HTTP/TCP columns")
@@ -64,6 +77,7 @@ def main(argv=None):
     ap.add_argument("--candidates", action="store_true", help="sample only rows containing SQL-like text")
     ap.add_argument("--no-shap", action="store_true")
     ap.add_argument("--no-lime", action="store_true")
+    ap.add_argument("--no-grouping-check", action="store_true", help="skip the coarse-grouping sensitivity test (P3)")
     ap.add_argument("--seed", type=int, default=42)
     ap.add_argument("--out", default=str(C.OUTPUT_DIR), help="output folder")
     args = ap.parse_args(argv)
@@ -81,6 +95,11 @@ def main(argv=None):
     background = probe.build_feature_matrix(df.sample(min(args.background, len(df)), random_state=args.seed))
     engine = X.SQLiXAIEngine(model, feature_names=feats, background=background,
                              attack_class=args.attack_class, random_state=args.seed)
+    coarse = None
+    if not args.no_grouping_check:   # FIX P3: same model, coarser groups, no SHAP/LIME/robustness needed
+        coarse = X.SQLiXAIEngine(model, feature_names=feats, background=background, attack_class=args.attack_class,
+                                 random_state=args.seed, grouping="coarse", check_robustness=False)
+    coarse_map = X.GROUPINGS["coarse"]
     res = engine.resolver(df.columns)
     if not res.id_col:
         sys.exit("No Incident ID column found.")
@@ -103,6 +122,12 @@ def main(argv=None):
         row["explain_seconds"] = round(time.perf_counter() - t0, 4)
         row["shapley_efficiency_error"] = abs(sum(e.pss.values()) - (e.attack_probability - e.pss_base))
         eff_errors.append(row["shapley_efficiency_error"])
+        if coarse is not None and e.pss:
+            ec = coarse.explain(record, use_shap=False, use_lime=False)
+            top_default = max(e.pss, key=e.pss.get)
+            top_coarse = max(ec.pss, key=ec.pss.get) if ec.pss else None
+            row["grouping_top_consistent"] = coarse_map.get(top_default, top_default) == top_coarse
+            row["coarse_top_group"] = top_coarse
         techniques.update(t["technique"] for t in e.techniques)
         rows.append(row)
         if i % 25 == 0:
@@ -130,6 +155,22 @@ def main(argv=None):
         "counterfactual_size": describe(attacks.loc[attacks["counterfactual_found"].astype(bool), "counterfactual_size"]),
         "payload_share_attacks": describe(attacks["pss_payload_share"]),
         "technique_frequency": dict(techniques.most_common()),
+        # ---- mitigation metrics -------------------------------------------------------------
+        "P1_param_equals_excluded_per_incident": describe(per["n_param_equals_excluded"]),
+        "P1_incidents_with_param_equals": rate(per["n_param_equals_excluded"] > 0),
+        "P2_removal_top_agreement_rate": rate(per["removal_top_agree"]),
+        "P2_removal_rank_corr": describe(per["removal_rank_corr"]),
+        "P2_ood_fraction": describe(per["ood_fraction"]),
+        "P3_grouping_top_consistency_rate": rate(per["grouping_top_consistent"]) if "grouping_top_consistent" in per else None,
+        "P5_split_attacks": {"base": describe(attacks["split_base"]),
+                             "payload": describe(attacks["split_payload"]),
+                             "network": describe(attacks["split_network"])},
+        "P6_n_players": describe(per["n_players"]),
+        "P6_n_players_counts": {int(k): int(v) for k, v in per["n_players"].value_counts().sort_index().items()},
+        "P7_deletion_drop_by_method": {"PSS": describe(attacks["deletion_drop_top"]),
+                                       "SHAP": describe(attacks["deletion_drop_shap_top"]),
+                                       "LIME": describe(attacks["deletion_drop_lime_top"]),
+                                       "random": describe(attacks["deletion_drop_random"])},
         "explain_seconds": describe(per["explain_seconds"]),
         "notes": [
             "deletion_drop_top uses the same removal operator as PSS, so compare it with "

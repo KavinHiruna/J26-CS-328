@@ -39,7 +39,7 @@ Each page opens with `?incident=<ID>` selected and has a "← Back to XAI IDS" b
 
 | Page | Default URL | Override (`settings.py` or env var) | Start it (from `dev/`) |
 |---|---|---|---|
-| SQL Injection XAI | http://localhost:8501 | `SQLI_XAI_URL` | `python -m streamlit run frontend/pages/com2_attack/sqli_xai_novelty_page.py --server.port 8501` |
+| Web Injection XAI | http://localhost:8501 | `SQLI_XAI_URL` | `python -m streamlit run frontend/pages/com2_attack/web_injection.py --server.port 8501` |
 | DDoS HTTP Flood XAI | http://localhost:8510 | `DDOS_XAI_URL` | `python -m streamlit run frontend/pages/com2_attack/ddos_http.py --server.port 8510` |
 
 The XAI pages link back to `XAI_IDS_URL` (default http://127.0.0.1:5000).

@@ -2,7 +2,7 @@
 Component 2 - Web Injection XAI (SQL injection · XSS · Uploading)  (BACKEND, UI-independent)
 
 FILE LOCATION : dev/backend/component2_xai/web_injection_xai.py
-USED BY       : frontend/pages/com2_attack/sqli_xai_novelty_page.py (Web Injection dashboard)
+USED BY       : frontend/pages/com2_attack/web_injection.py (Web Injection dashboard)
                 backend/component2_xai/model/train_web_injection_rf.py (training)
 
 Extends the SQLi engine (sqli_xai_engine.py) to the three web-injection attacks:

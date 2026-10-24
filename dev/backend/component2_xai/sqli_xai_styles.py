@@ -2,7 +2,7 @@
 Component 2 - SQLi XAI dashboard styles (colours, fonts, CSS and small HTML blocks).
 
 Location : dev/backend/component2_xai/sqli_xai_styles.py
-Used by  : dev/frontend/pages/com2_attack/sqli_xai_novelty_page.py
+Used by  : dev/frontend/pages/com2_attack/web_injection.py
 
 Change colours or fonts here only - the page itself contains no styling.
 Palette follows the XAI-IDS design (navy sidebar, light background, white cards, blue actions).

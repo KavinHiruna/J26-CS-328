@@ -17,7 +17,7 @@ dev\
 │       ├── sql_injection_rf.pkl        ← MODEL
 │       └── sql_feature_columns.pkl     ← FEATURE LIST
 ├── frontend\pages\com2_attack\         ← FRONTEND
-│   └── sqli_xai_novelty_page.py        ← Streamlit page (layout only)
+│   └── web_injection.py                ← Streamlit page (layout only)
 └── outputs\component2_xai_eval\        ← created by the evaluation script
 ```
 
@@ -32,7 +32,7 @@ python -m pip install pandas numpy scikit-learn joblib streamlit shap lime
 ## Run the dashboard
 ```powershell
 cd D:\4Y1S\research\J26-CS-328\dev
-python -m streamlit run frontend\pages\com2_attack\sqli_xai_novelty_page.py
+python -m streamlit run frontend\pages\com2_attack\web_injection.py
 ```
 
 ## Run the evaluation

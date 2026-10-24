@@ -4,7 +4,7 @@
 | File | Purpose |
 |---|---|
 | `sqli_xai_engine.py` | Core engine (no UI). Feature builder, Payload-Span Shapley, trust score, counterfactual, technique profile, narrative. |
-| `sqli_xai_novelty_page.py` | Streamlit dashboard page that uses the engine. |
+| `web_injection.py` | Streamlit dashboard page (Web Injection: SQLi + XSS + Upload). |
 | `evaluate_sqli_xai.py` | Batch evaluation → `per_incident_metrics.csv` + `summary.json` for the report. |
 
 Put all three in `dev/frontend/pages/com2_attack/`.
@@ -18,7 +18,7 @@ The model and feature-column artifacts are loaded with `joblib`; only use truste
 
 ## Run the dashboard (from the `dev` folder)
 ```powershell
-python -m streamlit run frontend\pages\com2_attack\sqli_xai_novelty_page.py
+python -m streamlit run frontend\pages\com2_attack\web_injection.py
 ```
 It looks for:
 - `data/raw/EdgeIIoT_train_80_with_incident_id.csv`

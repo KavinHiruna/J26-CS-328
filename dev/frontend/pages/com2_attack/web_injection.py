@@ -1,16 +1,17 @@
 """
-Component 2 - Evidence-Grounded Hybrid XAI for SQL Injection (Streamlit page - FRONTEND)
+Component 2 - Web Injection XAI (SQL injection · XSS · Uploading) (Streamlit page - FRONTEND)
 
-FILE LOCATION : dev/frontend/pages/com2_attack/sqli_xai_novelty_page.py
+FILE LOCATION : dev/frontend/pages/com2_attack/web_injection.py
 BACKEND FILES : dev/backend/component2_xai/
                 sqli_xai_config.py  (file paths: dataset, model, outputs)
                 sqli_xai_engine.py  (XAI logic)
                 sqli_xai_styles.py  (colours, fonts, CSS)
+                web_injection_xai.py (multi-class: SQLi + XSS + Upload)
 DATASET       : dev/data/EdgeIIoT_train_80_with_incident_id.csv
 MODEL         : dev/backend/component2_xai/model/sql_injection_rf.pkl (+ sql_feature_columns.pkl)
 
 Run from the repo's dev folder:
-  python -m streamlit run frontend\\pages\\com2_attack\\sqli_xai_novelty_page.py
+  python -m streamlit run frontend\\pages\\com2_attack\\web_injection.py
 
 ==============================================================================
 SCREEN MAP - where each part of the page is in this code
@@ -64,7 +65,7 @@ import sqli_xai_styles as S  # noqa: E402   -> colours, fonts, CSS
 # [SCREEN: BROWSER TAB + WHOLE PAGE] page title in browser tab, wide layout, theme
 # Colours/fonts come from S.apply_theme() -> edit sqli_xai_styles.py to change them
 # =============================================================================
-st.set_page_config(page_title="SQLi Evidence-Grounded XAI", page_icon="🛡️",
+st.set_page_config(page_title="Web Injection XAI", page_icon="🛡️",
                    layout="wide", initial_sidebar_state="expanded")
 S.apply_theme(st)
 
@@ -156,7 +157,7 @@ engine: X.SQLiXAIEngine = st.session_state["engine"]
 # [SCREEN-2] TOP OF MAIN AREA - page title + dataset info line
 # =============================================================================
 st.markdown(S.page_header(
-    "SQL Injection - Evidence-Grounded Hybrid XAI",
+    "Web Injection - Evidence-Grounded Hybrid XAI",
     f"Dataset {data_name} · {len(df):,} rows · model classes: {', '.join(classes)} · "
     f"explaining class {engine.attack_class}"), unsafe_allow_html=True)
 

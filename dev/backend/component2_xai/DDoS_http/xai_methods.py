@@ -1,11 +1,16 @@
 """
 Explanation methods shared by training (global) and the runtime service (local).
 
-* SHAP TreeExplainer          – exact Shapley values for the Random Forest
-* Tree-path contributions     – Saabas decomposition; dependency-free fallback
-                                used automatically when `shap` is not installed
-* LIME                        – local surrogate around a single packet
-* Surrogate decision tree     – global, human-readable rules that mimic the RF
+FIX M3: three fixed attribution methods for all packets:
+  A. SHAP TreeExplainer   — model-internal (exact Shapley values)
+  B. LIME                 — local surrogate (different explanation family)
+  C. Occlusion            — perturbation-based (in consensus.py)
+The surrogate decision tree is a separate global rule check, not an
+attribution method counted toward XCS.
+
+Tree-path (Saabas) contributions are kept as a private utility for the
+surrogate's path decomposition but are NOT used as a patient-facing
+explanation method.
 """
 from __future__ import annotations
 
@@ -100,12 +105,18 @@ def tree_contributions(model, X: pd.DataFrame):
 
 
 def local_attributions(model, X: pd.DataFrame, shap_explainer=None, use_shap: bool = True):
-    """Best available additive attribution. Returns (values, base, method_name)."""
-    if HAS_SHAP and use_shap:
-        vals, base = shap_values(model, X, shap_explainer)
-        return vals, base, "SHAP (TreeExplainer)"
-    vals, base = tree_contributions(model, X)
-    return vals, base, "Tree-path contributions"
+    """Additive attribution for the attack class.
+
+    FIX M3: SHAP is the only attribution method used for consensus so that
+    every packet is scored the same way.  If ``shap`` is not installed the
+    function raises immediately — install it with ``pip install shap``.
+    """
+    if not HAS_SHAP:
+        raise ImportError(
+            "SHAP is required for the XAI consensus pipeline (FIX M3). "
+            "Install it with: pip install shap")
+    vals, base = shap_values(model, X, shap_explainer)
+    return vals, base, "SHAP (TreeExplainer)"
 
 
 # --------------------------------------------------------------------------- #
@@ -114,6 +125,7 @@ def local_attributions(model, X: pd.DataFrame, shap_explainer=None, use_shap: bo
 def lime_explain(model, background: pd.DataFrame, row: pd.Series,
                  categorical_mask: list[bool], class_names: list[str],
                  num_features: int = 10, seed: int = 42):
+    """Single LIME run with a fixed random seed (FIX M3)."""
     if not HAS_LIME:
         raise ImportError("lime is not installed")
     feature_names = list(background.columns)
@@ -135,6 +147,36 @@ def lime_explain(model, background: pd.DataFrame, row: pd.Series,
     local_pred = float(np.ravel(exp.local_pred)[0]) if getattr(exp, "local_pred", None) is not None else None
     return ([{"rule": rule, "weight": float(w)} for rule, w in exp.as_list(label=1)],
             float(exp.intercept[1]), local_pred)
+
+
+def lime_stability(model, background: pd.DataFrame, row: pd.Series,
+                   categorical_mask: list[bool], class_names: list[str],
+                   num_features: int = 10, repeats: int = 3,
+                   base_seed: int = 42) -> dict:
+    """Run LIME *repeats* times with different seeds; return mean weights and std.
+
+    FIX M3: exposes LIME instability so the analyst can see it.
+    """
+    all_weights: dict[str, list[float]] = {}
+    all_preds: list[float] = []
+    for i in range(repeats):
+        weights, _intercept, local_pred = lime_explain(
+            model, background, row, categorical_mask, class_names,
+            num_features=num_features, seed=base_seed + i)
+        for w in weights:
+            all_weights.setdefault(w["rule"], []).append(w["weight"])
+        if local_pred is not None:
+            all_preds.append(local_pred)
+    summary = []
+    for rule, vals in all_weights.items():
+        summary.append({"rule": rule,
+                        "weight_mean": float(np.mean(vals)),
+                        "weight_std": float(np.std(vals)),
+                        "runs": len(vals)})
+    return {"weights": summary,
+            "local_pred_mean": float(np.mean(all_preds)) if all_preds else None,
+            "local_pred_std": float(np.std(all_preds)) if all_preds else None,
+            "repeats": repeats}
 
 
 # --------------------------------------------------------------------------- #

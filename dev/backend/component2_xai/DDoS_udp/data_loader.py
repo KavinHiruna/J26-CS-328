@@ -16,6 +16,7 @@ from typing import Iterable
 import pandas as pd
 
 from . import config
+from .rate_features import add_rate_features
 
 
 def _is_attack(label: pd.Series) -> pd.Series:
@@ -168,6 +169,8 @@ def build_dataset(paths: Iterable[str | Path],
         data = data[~dup].reset_index(drop=True)
     if verbose:
         print(f"  removed {before - len(data):,} duplicate rows")
+
+    data = add_rate_features(data)
 
     y = _is_attack(data[config.LABEL_COL]).astype(int)
     return data, y

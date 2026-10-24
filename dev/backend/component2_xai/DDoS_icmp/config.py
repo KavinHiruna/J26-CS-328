@@ -73,7 +73,10 @@ PAPER_DROP_COLUMNS = [
 
 # Extra near-identifier columns dropped here: raw sequence numbers and
 # checksums are effectively random per packet and leak capture artefacts.
-EXTRA_DROP_COLUMNS = ["tcp.ack_raw", "tcp.checksum", "icmp.checksum"]
+EXTRA_DROP_COLUMNS = [
+    "tcp.ack_raw", "tcp.checksum", "icmp.checksum",
+    "tcp.seq", "tcp.ack",
+]
 # Row identifiers added by the project's EdgeIIoT_train_80 export.
 EXTRA_DROP_COLUMNS += ["Incident ID", "Incident_ID"]
 
@@ -93,8 +96,7 @@ FEATURE_DESCRIPTIONS = {
     "tcp.len": "TCP payload length (bytes)",
     "tcp.flags": "TCP flag bits (SYN/ACK/PSH/FIN…)",
     "tcp.flags.ack": "TCP ACK flag set",
-    "tcp.ack": "Relative TCP acknowledgement number",
-    "tcp.seq": "Relative TCP sequence number",
+    # tcp.ack and tcp.seq dropped (leakage columns)
     "tcp.connection.syn": "Connection-opening SYN packet",
     "tcp.connection.synack": "SYN-ACK handshake reply",
     "tcp.connection.fin": "Connection-closing FIN packet",
@@ -134,7 +136,7 @@ MAX_ATTACK_ROWS = 120_000
 DROP_DUPLICATES = True
 # Flood packets are near-identical by design; keep their repetition (normal rows are
 # still de-duplicated), as in the HTTP-flood component.
-DROP_DUPLICATE_ATTACK_ROWS = False
+DROP_DUPLICATE_ATTACK_ROWS = True
 
 RF_PARAMS = dict(
     n_estimators=200,
@@ -154,8 +156,18 @@ PERMUTATION_REPEATS = 5
 # NOVELTY: Multi-method XAI consensus
 # --------------------------------------------------------------------------- #
 CONSENSUS_TOP_K = 5
-CONSENSUS_WEIGHTS = {"rank": 0.25, "topk": 0.25, "direction": 0.25, "verdict": 0.25}
+CONSENSUS_TOP_K_VALUES = [3, 5, 10]
+CONSENSUS_WEIGHTS = {"rank": 1 / 3, "topk": 1 / 3, "direction": 1 / 3}
 CONSENSUS_HIGH = 0.75
 CONSENSUS_MEDIUM = 0.50
-CONSENSUS_TRIAGE_MAX = 300        # packets scored in the batch consensus triage
-CONSENSUS_GLOBAL_SAMPLE = 300     # held-out packets for the global consensus study
+DIRECTION_EPSILON = 0.01
+CONSENSUS_TRIAGE_MAX = 300
+CONSENSUS_GLOBAL_SAMPLE = 300
+
+FAITHFULNESS_TOP_K = 5
+FAITHFULNESS_RANDOM_REPEATS = 10
+
+LIME_SEED = 42
+LIME_REPEATS = 3
+
+RATE_WINDOW_S = 1.0

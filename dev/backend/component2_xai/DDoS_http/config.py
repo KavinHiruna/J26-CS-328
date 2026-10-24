@@ -60,7 +60,13 @@ PAPER_DROP_COLUMNS = [
 
 # Extra near-identifier columns dropped here: raw sequence numbers and
 # checksums are effectively random per packet and leak capture artefacts.
-EXTRA_DROP_COLUMNS = ["tcp.ack_raw", "tcp.checksum", "icmp.checksum"]
+# FIX M1: tcp.seq and tcp.ack are relative sequence/acknowledgement numbers
+# that encode session order, not attack behaviour — keeping them lets the
+# model memorise capture position instead of learning flood patterns.
+EXTRA_DROP_COLUMNS = [
+    "tcp.ack_raw", "tcp.checksum", "icmp.checksum",
+    "tcp.seq", "tcp.ack",
+]
 # Row identifiers added by the project's EdgeIIoT_train_80 export.
 EXTRA_DROP_COLUMNS += ["Incident ID", "Incident_ID"]
 
@@ -77,8 +83,7 @@ FEATURE_DESCRIPTIONS = {
     "tcp.len": "TCP payload length (bytes)",
     "tcp.flags": "TCP flag bits (SYN/ACK/PSH/FIN…)",
     "tcp.flags.ack": "TCP ACK flag set",
-    "tcp.ack": "Relative TCP acknowledgement number",
-    "tcp.seq": "Relative TCP sequence number",
+    # tcp.ack and tcp.seq dropped (FIX M1 — capture-order leakage)
     "tcp.connection.syn": "Connection-opening SYN packet",
     "tcp.connection.synack": "SYN-ACK handshake reply",
     "tcp.connection.fin": "Connection-closing FIN packet",
@@ -101,6 +106,15 @@ FEATURE_DESCRIPTIONS = {
     "mbtcp.len": "Modbus/TCP length",
     "mbtcp.trans_id": "Modbus/TCP transaction id",
     "mbtcp.unit_id": "Modbus/TCP unit id",
+    # FIX M5: rate-based features
+    "_rate_src_pkt_count": "Total packets from this source IP",
+    "_rate_src_req_count": "HTTP requests from this source IP",
+    "_rate_src_req_per_s": "Requests per second from this source IP",
+    "_rate_src_interval_mean": "Mean inter-packet time from this source (s)",
+    "_rate_src_interval_std": "Std of inter-packet time from this source (s)",
+    "_rate_win_pkt_count": "Packets in this 1-second window",
+    "_rate_win_src_count": "Distinct source IPs in this 1-second window",
+    "_rate_win_http_frac": "Fraction of HTTP requests in this 1-second window",
 }
 
 # --------------------------------------------------------------------------- #
@@ -116,10 +130,10 @@ MAX_ATTACK_ROWS = 120_000
 # dropped many packets become identical, so this also prevents train/test
 # leakage of identical feature vectors.
 DROP_DUPLICATES = True
-# A flood *is* the same request repeated: EdgeIIoT_train_80 has 691 flood
-# requests but only 17 distinct feature vectors, so de-duplicating them leaves
-# too few attack rows to split/evaluate. Normal rows are still de-duplicated.
-DROP_DUPLICATE_ATTACK_ROWS = False
+# FIX M1: de-duplicate ALL rows (including attack) before splitting so the
+# same feature vector cannot appear in both train and test.  The original
+# 17 unique attack vectors remain — they are just not repeated.
+DROP_DUPLICATE_ATTACK_ROWS = True
 
 RF_PARAMS = dict(
     n_estimators=200,
@@ -138,9 +152,27 @@ PERMUTATION_REPEATS = 5
 # --------------------------------------------------------------------------- #
 # NOVELTY: Multi-method XAI consensus
 # --------------------------------------------------------------------------- #
+# FIX M3: three fixed attribution methods (SHAP, LIME, Occlusion).
+# Surrogate is a global rule check reported separately, not part of XCS.
+# FIX M4: verdict is reported as pass/fail and excluded from the XCS average.
 CONSENSUS_TOP_K = 5
-CONSENSUS_WEIGHTS = {"rank": 0.25, "topk": 0.25, "direction": 0.25, "verdict": 0.25}
+CONSENSUS_TOP_K_VALUES = [3, 5, 10]   # M4: test overlap at several k
+CONSENSUS_WEIGHTS = {"rank": 1 / 3, "topk": 1 / 3, "direction": 1 / 3}
 CONSENSUS_HIGH = 0.75
 CONSENSUS_MEDIUM = 0.50
-CONSENSUS_TRIAGE_MAX = 300        # packets scored in the batch consensus triage
-CONSENSUS_GLOBAL_SAMPLE = 300     # held-out packets for the global consensus study
+DIRECTION_EPSILON = 0.01              # M4: ignore features below this magnitude
+CONSENSUS_TRIAGE_MAX = 300
+CONSENSUS_GLOBAL_SAMPLE = 300
+
+# FIX M2: faithfulness deletion test
+FAITHFULNESS_TOP_K = 5
+FAITHFULNESS_RANDOM_REPEATS = 10
+
+# FIX M3: LIME stability
+LIME_SEED = 42
+LIME_REPEATS = 3                      # run LIME this many times; report std
+
+# --------------------------------------------------------------------------- #
+# FIX M5: rate-based features (computed before identifier columns are dropped)
+# --------------------------------------------------------------------------- #
+RATE_WINDOW_S = 1.0                   # time window for per-window features

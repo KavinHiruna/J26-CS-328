@@ -52,11 +52,11 @@ const XAI_PAGES = [
     label: "🛡 Web Injection XAI", name: "Web Injection XAI", top: "sqliTopBtn", dash: "sqliDashBtn" },
   { key: "ddos", flag: "is_ddos_http", url: (window.DDOS_XAI_URL || "").replace(/\/$/, ""),
     label: "🌊 HTTP Flood XAI", name: "DDoS HTTP Flood XAI", top: "ddosTopBtn", dash: "ddosDashBtn" },
-  { key: "tcp", flag: "is_ddos_tcp", url: (window.TCP_XAI_URL || "").replace(/\/$/, ""),
-    label: "⚡ SYN Flood XAI", name: "DDoS TCP SYN Flood XAI", top: "tcpTopBtn", dash: "tcpDashBtn" },
-  { key: "udp", flag: "is_ddos_udp", url: (window.UDP_XAI_URL || "").replace(/\/$/, ""),
-    label: "📨 UDP Flood XAI", name: "DDoS UDP Flood XAI", top: "udpTopBtn", dash: "udpDashBtn" },
-  { key: "icmp", flag: "is_ddos_icmp", url: (window.ICMP_XAI_URL || "").replace(/\/$/, ""),
+  { key: "icmp", flag: "is_ddos_tcp", url: (window.ICMP_XAI_URL || "").replace(/\/$/, ""),
+    label: "📡 Network Flood XAI", name: "DDoS Network Flood XAI", top: "icmpTopBtn", dash: "icmpDashBtn" },
+  { key: "icmp_udp", flag: "is_ddos_udp", url: (window.ICMP_XAI_URL || "").replace(/\/$/, ""),
+    label: "📡 Network Flood XAI", name: "DDoS Network Flood XAI", top: "icmpTopBtn", dash: "icmpDashBtn" },
+  { key: "icmp_icmp", flag: "is_ddos_icmp", url: (window.ICMP_XAI_URL || "").replace(/\/$/, ""),
     label: "📡 Network Flood XAI", name: "DDoS Network Flood XAI", top: "icmpTopBtn", dash: "icmpDashBtn" },
 ];
 const pageFor = (inc) => XAI_PAGES.find((p) => p.url && inc[p.flag]);

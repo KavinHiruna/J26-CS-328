@@ -32,6 +32,7 @@ TAB LAYOUT (matches the DDoS page structure)
 """
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -55,6 +56,7 @@ import sqli_xai_styles as S  # noqa: E402
 st.set_page_config(page_title="Web Injection XAI", page_icon="\U0001f6e1️",
                    layout="wide", initial_sidebar_state="expanded")
 S.apply_theme(st)
+IDS_URL = os.environ.get("XAI_IDS_URL", "http://192.168.1.119:5000").rstrip("/")
 
 
 @st.cache_data(show_spinner="Loading dataset...")
@@ -169,7 +171,12 @@ if not options:
     st.warning("No Incident ID matches the search.")
     st.stop()
 
-selected = st.selectbox(f"Incident ({len(options):,} shown)", options)
+c1, c2 = st.columns([4, 1])
+with c1:
+    selected = st.selectbox(f"Incident ({len(options):,} shown)", options)
+with c2:
+    st.write("")
+    st.link_button("← Back to XAI IDS", f"{IDS_URL}/?incident={selected}", width="stretch")
 record = view_df[view_df[res.id_col].astype(str) == selected].iloc[0]
 
 with st.spinner("Explaining incident (PSS, SHAP, LIME, trust, counterfactual)..."):

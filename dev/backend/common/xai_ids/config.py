@@ -19,7 +19,7 @@ DATA_DIR = DEV_ROOT / "data" / "raw"
 # ---------------------------------------------------------------------------
 # API server
 # ---------------------------------------------------------------------------
-HOST = os.environ.get("XAI_IDS_BACKEND_HOST", "127.0.0.1")
+HOST = os.environ.get("XAI_IDS_BACKEND_HOST", "0.0.0.0")
 PORT = int(os.environ.get("XAI_IDS_BACKEND_PORT", 5001))
 # Origins allowed to call the API from a browser (the frontend). "*" = any.
 CORS_ORIGINS = os.environ.get("XAI_IDS_CORS_ORIGINS", "*")

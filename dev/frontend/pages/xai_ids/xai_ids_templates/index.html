@@ -27,8 +27,6 @@
   <div class="topbar-right">
     <a class="top-link" id="sqliTopBtn" href="#" target="_blank" rel="noopener" title="Open the Web Injection XAI page">🛡 Web Injection XAI</a>
     <a class="top-link" id="ddosTopBtn" href="#" target="_blank" rel="noopener" title="Open the DDoS HTTP Flood XAI page">🌊 HTTP Flood XAI</a>
-    <a class="top-link" id="tcpTopBtn" href="#" target="_blank" rel="noopener" title="Open the DDoS TCP SYN Flood XAI page">⚡ SYN Flood XAI</a>
-    <a class="top-link" id="udpTopBtn" href="#" target="_blank" rel="noopener" title="Open the DDoS UDP Flood XAI page">📨 UDP Flood XAI</a>
     <a class="top-link" id="icmpTopBtn" href="#" target="_blank" rel="noopener" title="Open the DDoS Network Flood XAI page (TCP SYN · UDP · ICMP)">📡 Network Flood XAI</a>
     <div class="divider-v"></div>
     <button class="bell" id="bellBtn" title="Open incidents">
@@ -91,14 +89,6 @@
         <a class="xai-dash d-http" id="ddosDashBtn" href="#" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24"><path d="M2 12c2.5-3 5-3 7.5 0s5 3 7.5 0 3.5-2 5-1M2 17c2.5-3 5-3 7.5 0s5 3 7.5 0 3.5-2 5-1M2 7c2.5-3 5-3 7.5 0s5 3 7.5 0 3.5-2 5-1"/></svg>
           <span><b>DDoS HTTP Flood</b><small>Application-layer request flood</small></span>
-        </a>
-        <a class="xai-dash d-tcp" id="tcpDashBtn" href="#" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>
-          <span><b>DDoS TCP SYN Flood</b><small>Network-layer half-open flood</small></span>
-        </a>
-        <a class="xai-dash d-udp" id="udpDashBtn" href="#" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24"><path d="M21 3 3 10.5l7 2.5 2.5 7z"/><path d="m10 13.5 11-10.5"/></svg>
-          <span><b>DDoS UDP Flood</b><small>Network-layer volumetric flood</small></span>
         </a>
         <a class="xai-dash d-icmp" id="icmpDashBtn" href="#" target="_blank" rel="noopener">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2"/></svg>
@@ -218,7 +208,7 @@
 </div>
 
 <div class="toast" id="toast" hidden></div>
-<script>window.XAI_IDS_API = {{ api_base|tojson }}; window.SQLI_XAI_URL = {{ sqli_xai_url|tojson }}; window.DDOS_XAI_URL = {{ ddos_xai_url|tojson }}; window.ICMP_XAI_URL = {{ icmp_xai_url|tojson }}; window.TCP_XAI_URL = {{ tcp_xai_url|tojson }}; window.UDP_XAI_URL = {{ udp_xai_url|tojson }};</script>
+<script>window.XAI_IDS_API = {{ api_base|tojson }}; window.SQLI_XAI_URL = {{ sqli_xai_url|tojson }}; window.DDOS_XAI_URL = {{ ddos_xai_url|tojson }}; window.ICMP_XAI_URL = {{ icmp_xai_url|tojson }};</script>
 <script src="{{ url_for('static', filename='app.js') }}"></script>
 </body>
 </html>

@@ -170,10 +170,14 @@ class Detector:
             base, contrib = self._perturb_contrib(x, k, proba[k])
             method = "Perturbation (feature set to dataset median)"
         raw = self.ds.df.iloc[pos]
+        if isinstance(x, pd.DataFrame):
+            xrow = x.iloc[0]
+        else:
+            xrow = pd.Series(np.asarray(x, dtype=np.float64).ravel(), index=self.features)
         order = np.argsort(np.abs(contrib))[::-1][:top_n]
         items = [{
             "feature": self.features[i],
-            "value": _fmt(raw[self.features[i]]),
+            "value": _fmt(raw.get(self.features[i], xrow.iloc[i])),
             "contribution": float(contrib[i]),
         } for i in order if abs(contrib[i]) > 1e-6]
         label = self.classes[k]

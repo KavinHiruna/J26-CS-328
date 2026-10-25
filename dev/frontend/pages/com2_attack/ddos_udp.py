@@ -659,8 +659,9 @@ def tab_performance(xai: DDoSUdpXAI) -> None:
 # NOVELTY — Multi-method XAI Consensus
 # --------------------------------------------------------------------------- #
 TRUST_COLORS = {"High": THEME["normal"], "Medium": THEME["warn"], "Low": THEME["attack"]}
-COMPONENT_LABELS = {"rank": "Rank agreement", "topk": "Top-k feature overlap",
-                    "direction": "Direction agreement", "verdict": "Verdict agreement"}
+COMPONENT_LABELS = {"rank": "Rank agreement (ρ→[0,1])",
+                    "topk": "Top-k feature overlap",
+                    "direction": "Direction agreement"}
 
 
 def novelty_banner(xai: DDoSUdpXAI) -> None:

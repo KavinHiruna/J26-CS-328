@@ -675,15 +675,21 @@ def novelty_banner(xai: DDoSIcmpXAI) -> None:
       <h3>Multi-method XAI Consensus</h3>
       <p>Different XAI methods often disagree about <i>why</i> a packet was flagged, and a single
       explanation gives the analyst no way to know whether it can be trusted. This component explains
-      every packet with <b>four independent methods</b> and measures how much they agree, producing an
-      <b>XAI Consensus Score (XCS)</b> and a trust level for each verdict. Low-consensus verdicts are
-      routed to analyst review instead of automated mitigation.</p>
+      every packet with <b>three attribution methods</b> — each from a different explanation family —
+      and measures how much they agree, producing an <b>XAI Consensus Score (XCS)</b> and a trust level
+      for each verdict. A <b>faithfulness deletion test</b> verifies that removing the top-ranked
+      features actually changes the prediction. The global surrogate tree is reported as a separate
+      rule check. Low-consensus or unfaithful verdicts are routed to analyst review.</p>
       <div class="chips">
-        <span>A · {labels['rf_attribution']}</span><span>B · LIME{lime_state}</span>
-        <span>C · Occlusion (normal-baseline substitution)</span><span>D · Global surrogate tree</span>
+        <span>A · SHAP TreeExplainer (model-internal)</span>
+        <span>B · LIME (local surrogate){lime_state}</span>
+        <span>C · Occlusion (perturbation-based)</span>
+        <span>Rule check · Global surrogate tree (reported separately)</span>
       </div>
-      <div class="formula">XCS = {w['rank']:.2f}·Rank + {w['topk']:.2f}·Top-k overlap + {w['direction']:.2f}·Direction
-        + {w['verdict']:.2f}·Verdict &nbsp;→&nbsp; High ≥ {ddos_cfg.CONSENSUS_HIGH:.2f} · Medium ≥ {ddos_cfg.CONSENSUS_MEDIUM:.2f} · Low</div>
+      <div class="formula">XCS = {w['rank']:.2f}·Rank + {w['topk']:.2f}·Top-k + {w['direction']:.2f}·Direction
+        &nbsp; | &nbsp; Verdict = pass / fail (separate) &nbsp; | &nbsp;
+        Faithfulness = P(x) − P(x without top-k)
+        &nbsp;→&nbsp; High ≥ {ddos_cfg.CONSENSUS_HIGH:.2f} AND faithful · Medium ≥ {ddos_cfg.CONSENSUS_MEDIUM:.2f} · Low</div>
     </div>""", unsafe_allow_html=True)
 
 
@@ -727,9 +733,28 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
         fig.update_layout(title="Agreement components", xaxis_range=[0, 1.15])
         fig.update_yaxes(autorange="reversed")
         st.plotly_chart(style_fig(fig, 250, legend=False), use_container_width=True)
-        st.caption(f"Methods compared: {', '.join(labels[m] for m in cons['methods'])}")
+        st.caption(f"Methods compared: {', '.join(labels.get(m, m) for m in cons['methods'])}")
     with c3:
-        section("Verdict per method")
+        faith = cons.get("faithfulness", {})
+        if faith:
+            f_drop = faith.get("drop", 0)
+            f_rand = faith.get("random_drop", 0)
+            f_ratio = faith.get("ratio", 0)
+            f_pass = faith.get("faithful", False)
+            f_col = THEME["normal"] if f_pass else THEME["attack"]
+            st.markdown(f"""<div class="xai-card" style="margin-bottom:10px">
+                <div class="label">FAITHFULNESS TEST</div>
+                <div class="value" style="color:{f_col}">{"PASS" if f_pass else "FAIL"}</div>
+                <div class="sub">Top-k drop: {f_drop:.3f} · Random drop: {f_rand:.3f} · Ratio: {f_ratio:.1f}×</div>
+                </div>""", unsafe_allow_html=True)
+
+        section("Verdict check (pass / fail)")
+        vp = cons.get("verdict_pass", True)
+        vp_col = THEME["normal"] if vp else THEME["attack"]
+        st.markdown(f"""<div class="xai-card" style="padding:10px 14px;margin-bottom:8px;border-color:{vp_col}">
+            <span class="label">Verdict agreement</span>
+            <span style="float:right;color:{vp_col};font-weight:700">{"PASS ✔" if vp else "FAIL ✘"}</span>
+            </div>""", unsafe_allow_html=True)
         for name, v in cons["verdicts"].items():
             col = THEME["attack"] if v else THEME["normal"]
             agree = "✔" if v == cons["verdicts"]["Random Forest"] else "✘"
@@ -746,7 +771,7 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
             feats = rank["feature"].tolist()
             z = np.array([[rank.loc[rank["feature"] == f, m].iloc[0] for f in feats] for m in cons["methods"]])
             fig = go.Figure(go.Heatmap(
-                z=z, x=feats, y=[labels[m] for m in cons["methods"]], zmid=0, zmin=-1, zmax=1,
+                z=z, x=feats, y=[labels.get(m, m) for m in cons["methods"]], zmid=0, zmin=-1, zmax=1,
                 colorscale=[[0, THEME["normal"]], [0.5, THEME["panel"]], [1, THEME["attack"]]],
                 text=np.round(z, 2), texttemplate="%{text}", colorbar=dict(title="→ flood", thickness=10)))
             fig.update_layout(title=f"Normalised attribution per method (red → {FLOOD_SHORT}, teal → Normal)")
@@ -760,7 +785,7 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
                              "importance", min_value=0.0, max_value=1.0, format="%.2f")})
         if cons["pairs"]:
             with st.expander("Pairwise method agreement for this packet"):
-                st.dataframe(pd.DataFrame([{"method pair": " vs ".join(labels[m] for m in k.split("|")),
+                st.dataframe(pd.DataFrame([{"method pair": " vs ".join(labels.get(m, m) for m in k.split("|")),
                                             "Spearman ρ": v["spearman"], "top-k overlap": v["overlap"]}
                                            for k, v in cons["pairs"].items()]),
                              use_container_width=True, hide_index=True)
@@ -774,7 +799,7 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
         sel = flagged.index[: ddos_cfg.CONSENSUS_TRIAGE_MAX]
         with st.spinner(f"Scoring consensus for {len(sel):,} flagged packets…"):
             tri = xai.batch_consensus(raw.loc[sel])
-        st.caption(f"Fast consensus (methods A, C, D) on the {len(sel):,} most suspicious flagged packets.")
+        st.caption(f"Fast consensus (SHAP + Occlusion) on the {len(sel):,} most suspicious flagged packets.")
         counts = tri["trust"].value_counts()
         k1, k2, k3, k4 = st.columns(4)
         with k1:
@@ -833,7 +858,7 @@ def tab_consensus(xai: DDoSIcmpXAI, raw: pd.DataFrame, scored: pd.DataFrame, use
         for c in pair_cols:
             a, b = c[5:].split("|")
             mat.loc[a, b] = mat.loc[b, a] = gc[c].mean()
-        names = [labels[m] for m in methods]
+        names = [labels.get(m, m) for m in methods]
         fig = go.Figure(go.Heatmap(z=mat.values, x=names, y=names, zmin=-1, zmax=1,
                                    colorscale=[[0, THEME["attack"]], [0.5, THEME["panel"]], [1, THEME["normal"]]],
                                    text=np.round(mat.values, 2), texttemplate="%{text}", showscale=False))

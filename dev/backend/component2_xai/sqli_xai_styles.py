@@ -5,44 +5,50 @@ Location : dev/backend/component2_xai/sqli_xai_styles.py
 Used by  : dev/frontend/pages/com2_attack/web_injection.py
 
 Change colours or fonts here only - the page itself contains no styling.
-Palette follows the XAI-IDS design (navy sidebar, light background, white cards, blue actions).
+Dark theme matching the DDoS XAI dashboard design.
 """
 from __future__ import annotations
 
 import html
 
 # ---------------------------------------------------------------- colours
-# Blue & white theme
+# Dark theme (matches DDoS pages)
 COLORS = {
-    "navy": "#0d47a1",          # headings, main text (dark blue)
+    "navy": "#e6ecff",          # headings, main text (light on dark)
     "navy_light": "#1e6fe8",    # sidebar top (bright blue)
     "navy_dark": "#0d47a1",     # sidebar bottom (deep blue)
-    "blue": "#1a73e8",          # buttons, charts, accents
-    "blue_hover": "#1557b0",
-    "page_bg": "#ffffff",       # page background (white)
-    "card_bg": "#ffffff",       # cards (white)
-    "card_border": "#cfe0fb",   # light blue borders
-    "soft_bg": "#f4f8ff",       # very light blue (heat-map box)
-    "muted": "#4f6b95",         # captions, secondary text
-    "text": "#163a6b",          # body text in cards
-    "code_bg": "#eef5ff",
+    "blue": "#4cc9f0",          # buttons, charts, accents
+    "blue_hover": "#3ab8df",
+    "page_bg": "#0b1020",       # page background (dark navy)
+    "panel": "#121a2f",         # cards, panels
+    "card_bg": "#121a2f",       # cards (dark panel)
+    "card_border": "#1f2b4a",   # dark borders
+    "panel_border": "#1f2b4a",
+    "soft_bg": "#121a2f",       # heat-map box (same as panel)
+    "muted": "#8a96b8",         # captions, secondary text
+    "text": "#e6ecff",          # body text in cards
+    "code_bg": "#1a2340",
     "sidebar_text": "#ffffff",
+    "attack": "#ff4d6d",
+    "normal": "#2ec4b6",
+    "warn": "#ffb703",
+    "accent": "#4cc9f0",
 }
 
 # status pills: kind -> (background, text)
 PILLS = {
-    "red": ("#fde2e4", "#c8233c"),
-    "amber": ("#fff1c2", "#8a5a00"),
-    "green": ("#d8f3e0", "#1b7a3a"),
-    "blue": ("#dce8ff", "#1f5fd1"),
-    "grey": ("#e8f0fe", "#3b5a8a"),
+    "red": ("rgba(255,77,109,.18)", "#ff4d6d"),
+    "amber": ("rgba(255,183,3,.18)", "#ffb703"),
+    "green": ("rgba(46,196,182,.18)", "#2ec4b6"),
+    "blue": ("rgba(76,201,240,.18)", "#4cc9f0"),
+    "grey": ("rgba(138,150,184,.18)", "#8a96b8"),
 }
 
 # chart colours (used with st.bar_chart(color=...))
-CHART = {"primary": COLORS["blue"], "secondary": "#64a3f5"}
+CHART = {"primary": COLORS["accent"], "secondary": "#64a3f5"}
 
 # heat-map legend (must match render_attribution_html in sqli_xai_engine.py)
-HEAT = {"towards_attack": "#e04848", "away_from_attack": "#3b82f6"}
+HEAT = {"towards_attack": "#ff4d6d", "away_from_attack": "#4cc9f0"}
 
 # ---------------------------------------------------------------- fonts
 FONTS = {
@@ -62,47 +68,55 @@ def page_css() -> str:
 <style>
 @import url('{f["google_import"]}');
 html, body, .stApp, [class*="css"] {{font-family:{f["body"]}}}
-.stApp {{background:{c["page_bg"]};color:{c["navy"]}}}
+.stApp {{background:radial-gradient(1200px 600px at 10% -10%, #16224a 0%, {c["page_bg"]} 55%);color:{c["text"]}}}
 [data-testid="stHeader"] {{background:transparent}}
 .block-container {{max-width:1450px;padding-top:1.2rem}}
-h1, h2, h3, h4 {{color:{c["navy"]};font-weight:800}}
+h1, h2, h3, h4 {{color:{c["text"]};font-weight:800}}
 
 /* sidebar */
 [data-testid="stSidebar"] {{background:linear-gradient(180deg,{c["navy_light"]} 0%,{c["navy_dark"]} 100%)}}
 [data-testid="stSidebar"] h1, [data-testid="stSidebar"] h2, [data-testid="stSidebar"] h3,
 [data-testid="stSidebar"] label, [data-testid="stSidebar"] p, [data-testid="stSidebar"] span,
 [data-testid="stSidebar"] small {{color:{c["sidebar_text"]} !important}}
-[data-testid="stSidebar"] [data-baseweb="select"] *, [data-testid="stSidebar"] input {{color:{c["navy"]} !important}}
+[data-testid="stSidebar"] [data-baseweb="select"] *, [data-testid="stSidebar"] input {{color:{c["navy_dark"]} !important}}
 [data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] {{background:rgba(255,255,255,.08);
   border:1px dashed rgba(255,255,255,.35)}}
-[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button span {{color:{c["navy"]} !important}}
+[data-testid="stSidebar"] [data-testid="stFileUploaderDropzone"] button span {{color:{c["navy_dark"]} !important}}
 
 /* buttons */
-.stButton>button, .stDownloadButton>button {{background:{c["blue"]};color:#fff;border:0;border-radius:8px;font-weight:600}}
-.stButton>button:hover, .stDownloadButton>button:hover {{background:{c["blue_hover"]};color:#fff}}
+.stButton>button, .stDownloadButton>button {{background:{c["blue"]};color:{c["page_bg"]};border:0;border-radius:8px;font-weight:600}}
+.stButton>button:hover, .stDownloadButton>button:hover {{background:{c["blue_hover"]};color:{c["page_bg"]}}}
 
 /* metric cards */
-[data-testid="stMetric"] {{background:{c["card_bg"]};border:1px solid {c["card_border"]};border-radius:12px;
-  padding:12px 16px;box-shadow:0 2px 10px rgba(15,43,82,.05)}}
-[data-testid="stMetricLabel"] p {{color:{c["muted"]};font-weight:600}}
-[data-testid="stMetricValue"] {{color:{c["navy"]}}}
+[data-testid="stMetric"] {{background:{c["panel"]};border:1px solid {c["panel_border"]};border-radius:12px;
+  padding:12px 16px}}
+[data-testid="stMetricLabel"] p {{color:{c["muted"]};font-weight:600;text-transform:uppercase;letter-spacing:.06em;font-size:.78rem}}
+[data-testid="stMetricValue"] {{color:{c["text"]};font-weight:800;font-family:{f["mono"]}}}
+
+/* tabs */
+.stTabs [data-baseweb="tab-list"] {{gap:6px}}
+.stTabs [data-baseweb="tab"] {{background:{c["panel"]};border-radius:10px 10px 0 0;padding:8px 16px}}
+.stTabs [aria-selected="true"] {{border-bottom:2px solid {c["accent"]} !important}}
+
+/* dataframes */
+div[data-testid="stDataFrame"] {{border:1px solid {c["panel_border"]};border-radius:10px}}
 
 /* page parts */
-.page-title {{font-size:{f["size_heading"]};font-weight:800;color:{c["navy"]};margin:0 0 2px}}
+.page-title {{font-size:{f["size_heading"]};font-weight:800;color:{c["text"]};margin:0 0 2px}}
 .page-sub {{color:{c["muted"]};font-size:{f["size_small"]};margin-bottom:12px}}
 .section-title {{font-size:1rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;
-  color:{c["navy"]};margin:18px 0 8px;padding-left:10px;border-left:4px solid {c["blue"]}}}
-.heat {{background:{c["soft_bg"]};border:1px solid {c["card_border"]};border-radius:10px;padding:14px;color:{c["text"]};
+  color:{c["text"]};margin:18px 0 8px;padding-left:10px;border-left:4px solid {c["accent"]}}}
+.heat {{background:{c["panel"]};border:1px solid {c["panel_border"]};border-radius:10px;padding:14px;color:{c["text"]};
   font-family:{f["mono"]};font-size:.92rem;line-height:1.95;overflow-wrap:anywhere}}
-.narrative {{background:{c["card_bg"]};border:1px solid {c["card_border"]};border-left:5px solid {c["blue"]};
+.narrative {{background:{c["panel"]};border:1px solid {c["panel_border"]};border-left:5px solid {c["accent"]};
   border-radius:10px;padding:14px 16px;line-height:1.65;color:{c["text"]}}}
-.tech {{background:{c["card_bg"]};border:1px solid {c["card_border"]};border-radius:10px;padding:10px 12px;
+.tech {{background:{c["panel"]};border:1px solid {c["panel_border"]};border-radius:10px;padding:10px 12px;
   margin-bottom:8px;color:{c["text"]}}}
 .tech .meta {{color:{c["muted"]};font-size:{f["size_small"]}}}
 .legend span {{display:inline-block;padding:2px 10px;border-radius:6px;margin:0 8px 8px 0;
   font-size:{f["size_small"]};color:#fff;font-weight:600}}
 .pill {{display:inline-block;padding:2px 10px;border-radius:6px;font-size:.78rem;font-weight:700;margin:1px 3px 1px 0}}
-code {{color:#c8233c;background:{c["code_bg"]}}}
+code {{color:{c["attack"]};background:{c["code_bg"]}}}
 </style>
 """
 

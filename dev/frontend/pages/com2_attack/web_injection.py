@@ -57,7 +57,7 @@ import web_injection_xai as W  # noqa: E402
 st.set_page_config(page_title="Web Injection XAI", page_icon="\U0001f6e1️",
                    layout="wide", initial_sidebar_state="expanded")
 S.apply_theme(st)
-IDS_URL = os.environ.get("XAI_IDS_URL", "http://192.168.1.119:5000").rstrip("/")
+IDS_URL = os.environ.get("XAI_IDS_URL", "http://localhost:5000").rstrip("/")
 
 
 @st.cache_data(show_spinner="Loading dataset...")

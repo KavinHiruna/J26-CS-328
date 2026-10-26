@@ -49,6 +49,7 @@ if str(BACKEND_DIR) not in sys.path:
 import sqli_xai_config as C  # noqa: E402
 import sqli_xai_engine as X  # noqa: E402
 import sqli_xai_styles as S  # noqa: E402
+import web_injection_xai as W  # noqa: E402
 
 # =============================================================================
 # PAGE CONFIG + THEME
@@ -70,7 +71,7 @@ def load_csv(source) -> pd.DataFrame:
 with st.sidebar:
     st.header("Inputs")
     data_up = st.file_uploader("Dataset CSV (optional)", type=["csv"], key="d")
-    model_up = st.file_uploader("Trained SQLi model (.pkl)", type=["pkl", "pickle"], key="m")
+    model_up = st.file_uploader("Trained web injection model (.pkl)", type=["pkl", "pickle"], key="m")
     feat_up = st.file_uploader("Feature columns (.pkl, optional)", type=["pkl", "pickle"], key="f")
     st.caption("Only load pickle files you trust - loading a pickle can run code.")
     st.header("Explanation settings")
@@ -96,14 +97,16 @@ else:
 # =============================================================================
 # LOAD MODEL + FEATURE LIST
 # =============================================================================
+WEB_MODEL_PATHS = [C.MODEL_DIR / "web_injection_rf.pkl"]
+WEB_FEATURE_PATHS = [C.MODEL_DIR / "web_feature_columns.pkl"]
 try:
-    model = C.load_artifact(model_up or C.first_existing(C.MODEL_PATHS))
-    feature_names = C.load_artifact(feat_up or C.first_existing(C.FEATURE_PATHS))
+    model = C.load_artifact(model_up or C.first_existing(WEB_MODEL_PATHS))
+    feature_names = C.load_artifact(feat_up or C.first_existing(WEB_FEATURE_PATHS))
 except Exception as exc:
     st.error(f"Could not load model/feature file: {type(exc).__name__}: {exc}")
     st.stop()
 if model is None:
-    st.warning(f"No trained model found in {C.MODEL_DIR}. Upload `sql_injection_rf.pkl` (and its feature column list) in the sidebar. "
+    st.warning(f"No trained model found in {C.MODEL_DIR}. Upload `web_injection_rf.pkl` (and its feature column list) in the sidebar. "
                "This page never shows explanations without a real model.")
     st.stop()
 
@@ -111,24 +114,24 @@ if model is None:
 # SIDEBAR (bottom) - attack class
 # =============================================================================
 classes = [str(c) for c in getattr(model, "classes_", [])]
+attack_classes = [c for c in classes if c != W.OTHER]
 with st.sidebar:
-    default_attack = X.infer_attack_index(classes) if classes else 0
-    attack_class = st.selectbox("Class that means 'SQL injection / attack'", classes or ["1"],
-                                index=min(default_attack, max(len(classes) - 1, 0)))
+    attack_class = st.selectbox("Attack class to explain", [W.DISPLAY.get(c, c) for c in attack_classes] or ["SQL injection"],
+                                index=0)
+    attack_cls_key = next((c for c in attack_classes if W.DISPLAY.get(c, c) == attack_class), attack_classes[0] if attack_classes else W.SQLI)
 
 # =============================================================================
 # BUILD THE XAI ENGINE
 # =============================================================================
 signature = (data_name, len(df), getattr(model_up, "name", "default-model"), str(feature_names)[:200],
-             bg_size, attack_class, threshold)
+             bg_size, attack_cls_key, threshold)
 if st.session_state.get("engine_sig") != signature:
     try:
         with st.spinner("Building explanation engine and background sample..."):
-            tmp = X.SQLiXAIEngine(model, feature_names=feature_names, attack_class=attack_class, threshold=threshold)
             sample = df.sample(min(bg_size, len(df)), random_state=42)
-            background = tmp.build_feature_matrix(sample)
-            engine = X.SQLiXAIEngine(model, feature_names=feature_names, background=background,
-                                     attack_class=attack_class, threshold=threshold)
+            background = W.build_matrix(sample, feature_names)
+            engine = W.make_sqli_engine(model, feature_names=feature_names, background=background,
+                                        threshold=threshold)
     except Exception as exc:
         st.error(f"Could not build the explanation engine: {type(exc).__name__}: {exc}")
         st.stop()
@@ -140,7 +143,8 @@ engine: X.SQLiXAIEngine = st.session_state["engine"]
 # =============================================================================
 st.markdown(S.page_header(
     "Web Injection — Evidence-Grounded Hybrid XAI",
-    f"Dataset {data_name} \xb7 {len(df):,} rows \xb7 model classes: {', '.join(classes)} \xb7 "
+    f"Dataset {data_name} \xb7 {len(df):,} rows \xb7 "
+    f"attack classes: {', '.join(W.DISPLAY[c] for c in attack_classes)} \xb7 "
     f"explaining class {engine.attack_class}"), unsafe_allow_html=True)
 
 res = engine.resolver(df.columns)
@@ -148,16 +152,17 @@ if not res.id_col:
     st.error("No Incident ID column found (expected 'Incident_ID').")
     st.stop()
 
-st.caption(f"Dataset **{data_name}** \xb7 {len(df):,} rows \xb7 model classes: "
-           f"{', '.join(classes)} \xb7 attack class: {attack_class} \xb7 "
+st.caption(f"Dataset **{data_name}** \xb7 {len(df):,} rows \xb7 "
+           f"attack classes: {', '.join(W.DISPLAY[c] for c in attack_classes)} \xb7 "
+           f"explaining: {engine.attack_class} \xb7 "
            f"SHAP {'on' if use_shap else 'off'} \xb7 LIME {'on' if use_lime else 'off'}")
 
 # =============================================================================
 # INCIDENT SELECTION (above tabs, shared by all)
 # =============================================================================
-only_candidates = st.toggle("Show only requests containing SQL-like text", True,
-                            help="Fast text pre-filter to find interesting incidents. It is not a classifier.")
-view_df = df[X.candidate_mask(df)] if only_candidates else df
+only_candidates = st.toggle("Show only requests containing injection / upload text", True,
+                            help="Fast text pre-filter (SQL, XSS, upload keywords) to find interesting incidents. It is not a classifier.")
+view_df = df[W.candidate_mask(df)] if only_candidates else df
 if view_df.empty:
     st.warning("No incidents match the filter.")
     st.stop()
@@ -182,6 +187,12 @@ record = view_df[view_df[res.id_col].astype(str) == selected].iloc[0]
 with st.spinner("Explaining incident (PSS, SHAP, LIME, trust, counterfactual)..."):
     e = engine.explain(record, incident_id=selected, use_shap=use_shap, use_lime=use_lime)
 
+# Multi-class prediction (all attack classes)
+_mc_proba = model.predict_proba(W.build_matrix(pd.DataFrame([record]), feature_names).values)
+_mc_pred_idx = _mc_proba[0].argmax()
+_mc_pred_class = model.classes_[_mc_pred_idx]
+_mc_class_probs = {W.DISPLAY.get(c, c): float(p) for c, p in zip(model.classes_, _mc_proba[0]) if c != W.OTHER}
+
 # =============================================================================
 # TABS
 # =============================================================================
@@ -198,7 +209,7 @@ t0, t1, t2, t3 = st.tabs([
 with t0:
     # --- KPI cards
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Model prediction", e.predicted_label)
+    c1.metric("Model prediction", W.DISPLAY.get(_mc_pred_class, _mc_pred_class))
     c2.metric(f"P({e.attack_class})", f"{e.attack_probability:.1%}")
     c3.metric("Analyst priority", e.priority["level"], f"score {e.priority['score']:.2f}", delta_color="off")
     trust_val = "-" if e.trust["score"] is None else f"{e.trust['score']:.2f}"
@@ -206,11 +217,27 @@ with t0:
     if e.priority.get("note"):
         st.warning(e.priority["note"])
 
+    # --- Multi-class probabilities
+    prob_cols = st.columns(len(_mc_class_probs))
+    for col, (cls_name, prob) in zip(prob_cols, _mc_class_probs.items()):
+        col.metric(cls_name, f"{prob:.1%}")
+
+    view = engine.resolver(df.columns).view(record)
+
     # --- Analyst summary
     st.markdown(S.narrative_box(e.narrative), unsafe_allow_html=True)
     st.write("")
 
-    # --- Payload heat-map
+    # --- Payload inspector (SQL red, XSS amber, upload purple)
+    st.markdown(S.section_title("Payload inspector"), unsafe_allow_html=True)
+    inspector_html = W.render_inspector_html(view)
+    _legend = " · ".join(f'<span style="color:{c}">&#9632; {k.upper()}</span>' for k, c in W.INSPECT_COLORS.items())
+    st.markdown(f"<div style='font-size:0.85em;margin-bottom:4px'>{_legend}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-family:monospace;font-size:0.82em;white-space:pre-wrap;background:#111;padding:12px;"
+                f"border-radius:8px;line-height:1.5;overflow-x:auto'>{inspector_html}</div>", unsafe_allow_html=True)
+    st.caption("SQL evidence (red), XSS evidence (amber), upload evidence (purple).")
+
+    # --- Payload heat-map (PSS attribution)
     st.markdown(S.section_title("Where in the request the decision comes from"), unsafe_allow_html=True)
     st.markdown(S.heat_legend(), unsafe_allow_html=True)
     st.markdown(S.heat_box(X.render_attribution_html(e)), unsafe_allow_html=True)
@@ -220,13 +247,14 @@ with t0:
         st.caption(f"{len(e.structure_spans)} normal parameter '=' sign(s) (name=) are request structure, "
                    "not SQL evidence: they are kept in every combination and get no colour.")
 
-    # --- Technique profile
-    st.markdown(S.section_title("SQLi technique profile"), unsafe_allow_html=True)
-    if e.techniques:
-        for t in e.techniques:
+    # --- Technique profile (SQL + XSS + upload)
+    st.markdown(S.section_title("Attack technique profile"), unsafe_allow_html=True)
+    web_techs = W.all_techniques(view)
+    if web_techs:
+        for t in web_techs:
             st.markdown(S.technique_card(t), unsafe_allow_html=True)
     else:
-        st.info("No known SQLi technique pattern in this request.")
+        st.info("No known attack technique pattern in this request.")
 
     # --- Minimal sanitisation counterfactual
     st.markdown(S.section_title("Minimal sanitisation counterfactual"), unsafe_allow_html=True)
@@ -344,6 +372,6 @@ with t3:
     st.caption("Parameter '=' signs (name=), request size and TCP fields are never evidence groups.")
 
     st.download_button("Download incident explanation (JSON)", e.to_json(),
-                       file_name=f"sqli_xai_{selected}.json", mime="application/json")
+                       file_name=f"web_injection_xai_{selected}.json", mime="application/json")
     st.caption("All probabilities and attributions come from the loaded model. Explanations describe model behaviour; "
                "they do not prove that an attack succeeded.")
